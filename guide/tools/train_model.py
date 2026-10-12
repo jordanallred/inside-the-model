@@ -149,7 +149,7 @@ for p in PROMPTS: print(' ', greedy(P, p))
 R = lambda a: np.round(a, 8)
 W = {'E': R(P['E']).tolist(), 'layers': [{k: R(P[f'{k}{l}']).tolist() for k in ('Wq', 'Wk', 'Wv', 'Wo', 'W1', 'W2')} for l in range(NL)]}
 meta = {'trained': True, 'steps': STEPS, 'batch': BATCH, 'optimizer': 'Adam, cosine learning-rate decay', 'initSeed': SEED, 'heldOutLoss': round(float(hl), 4), 'uniformLoss': round(math.log(V), 4),
-        'corpus': 'synthetic grammar over the 25-word vocabulary (subject, verb, object, place, and "then it ..." follow-ups)'}
+        'corpus': 'synthetic grammar over the 25-entry vocabulary (subject, verb, object, place, and "then it ..." follow-ups)'}
 out = {'meta': meta, 'weights': W}
 import os; os.makedirs('public/trace', exist_ok=True)
 json.dump(out, open('public/trace/weights.json', 'w'), separators=(',', ':'))

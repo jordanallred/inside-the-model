@@ -22,9 +22,9 @@ hero:
 ---
 
 <div class="home-stats">
-<div><b>21</b><span>chapters, about 14 hours</span></div>
+<div><b>21</b><span>chapters, about 13.5 hours</span></div>
 <div><b>10</b><span>hands-on labs</span></div>
-<div><b>3</b><span>real-model teardowns</span></div>
+<div><b>2</b><span>layer-by-layer teardowns</span></div>
 <div><b>118</b><span>papers, each linked</span></div>
 </div>
 
@@ -44,7 +44,7 @@ The browser engine is checked against an independent NumPy implementation to wit
 ## Start where you are
 
 <div class="home-paths">
-<a href="/guide/gradient-descent/"><b>Curious beginner</b><span>Start with functions and gradients. No machine-learning background assumed.</span></a>
+<a href="/guide/gradient-descent/"><b>Curious beginner</b><span>Start with functions and gradients. Needs calculus and linear algebra, but no machine-learning background.</span></a>
 <a href="/explorer/"><b>Software engineer</b><span>Connect tensor shapes and operations to code in the Explorer and the labs.</span></a>
 <a href="/teardown/"><b>ML practitioner</b><span>Verify the mathematics, then compare against real open-weight models.</span></a>
 <a href="/labs/"><b>Instructor or student</b><span>Share reproducible examples by link, then check understanding with the challenges and labs.</span></a>
@@ -71,4 +71,4 @@ Each chapter opens with a box saying who can skip it, works through numbers befo
 - [Public security guidance for AI systems](/reference/security-guidance/): what NSA, CISA and allied agencies have published.
 - [All papers](/reference/papers/): every reference, with the chapters that cite it.
 
-Every paper links to arXiv, and every id and title was checked against the arXiv API. Statements about specific models come from their technical reports or model cards, and anything that could not be confirmed is marked. Reading progress stays private to this browser.
+Every paper is linked (all but three textbooks to arXiv), and every arXiv id and title was checked against the arXiv API. Statements about specific models come from their technical reports or model cards, and anything that could not be confirmed is marked. Reading progress stays private to this browser.

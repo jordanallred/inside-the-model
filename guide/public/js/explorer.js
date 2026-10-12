@@ -17,7 +17,7 @@
     mlp: 'MLP with GELU', resid2: 'Second residual', lnf: 'Final RMSNorm', logits: 'Logits (tied unembedding)', probs: 'Next-token probabilities',
   };
   const PURPOSE = {
-    tokens: 'Words become integer IDs through a fixed 25-word vocabulary. &lt;bos&gt; is always prepended. Real models use subword tokenizers (BPE) with vocabularies of 30k to 200k entries.',
+    tokens: 'Words become integer IDs through a fixed 25-entry vocabulary (23 words, a period and &lt;bos&gt;). &lt;bos&gt; is always prepended. Real models use subword tokenizers (BPE) with vocabularies of 30k to 200k entries.',
     embed: 'Each ID selects one row of the embedding matrix E. This is a table lookup, not a calculation.',
     pos: 'Attention has no built-in sense of order, so a sinusoidal position pattern (scaled by 0.5) is added to each embedding. The sum is the residual stream x⁰.',
     ln1: 'Pre-norm: each token vector is rescaled to unit root-mean-square before attention reads it. The residual stream itself is left untouched.',
@@ -31,8 +31,8 @@
     mlp: 'A per-token two-layer network: expand 16 to 32 dimensions, apply GELU, project back to 16. No information moves between tokens here.',
     resid2: 'The MLP output is added to the residual stream. This vector is the layer’s output.',
     lnf: 'One last RMSNorm before reading out the vocabulary.',
-    logits: 'Each normalized vector is dotted with every embedding row (weights are tied), giving one score per vocabulary word.',
-    probs: 'Softmax over the logits gives the next-token distribution. With the trained weights the top candidates are grammatical words. Switch Weights to Random to run the identical computation with nothing learned.',
+    logits: 'Each normalized vector is dotted with every embedding row (weights are tied), giving one score per vocabulary entry.',
+    probs: 'Softmax over the logits gives the next-token distribution. With the trained weights the top candidates tend to fit the toy grammar. Switch Weights to Random to run the identical computation with nothing learned.',
   };
 
   /* ---- pipeline diagram: which block each step belongs to ---- */
@@ -55,7 +55,7 @@
     { s: 7, t: 3, v: 'visual', x: 'Softmax turns each row of scores into weights that sum to 1. Read the highlighted row: it says how much “sat” draws from each earlier token. Switch to Math to see the exact sums, or Code to see the line that does it.' },
     { s: 8, t: 3, v: 'math', x: 'The head output is a weighted average of the value vectors. This is the whole point of attention: information from other tokens flows into this token’s vector. You can recompute it by hand from the table.' },
     { s: 11, t: 3, v: 'visual', x: 'After attention comes the MLP, which works on each token separately. Together, attention (move information between tokens) and MLP (process it) make one layer. This model stacks two.' },
-    { s: 25, t: 8, v: 'visual', x: 'Finally the last token’s vector is compared with every word in the vocabulary, giving next-token probabilities. The trained weights favor words that fit the toy grammar. Use the Weights switch to run the same steps with random weights and see that the arithmetic is identical but the prediction is not. That is the whole forward pass.' },
+    { s: 25, t: 99, v: 'visual', x: 'Finally the last token’s vector is compared with every word in the vocabulary, giving next-token probabilities. The trained weights favor words that fit the toy grammar. Use the Weights switch to run the same steps with random weights and see that the arithmetic is identical but the prediction is not. That is the whole forward pass.' },
   ];
 
   /* ---- reference source shown in the Code view; the active operation is highlighted ---- */
@@ -101,8 +101,8 @@
   window.W = window.W || {};
   window.W.explorer = el => {
     const { ITM } = window; if (!ITM) { el.insertAdjacentHTML('beforeend', '<p class="src">The model engine failed to load.</p>'); return; }
-    const { CFG } = ITM, { W: WT, sum } = ITM.weights(), V = CFG.vocab;
-    const st = { prompt: CFG.prompts[0], step: 0, t: 8, l: 0, h: 0, view: 'visual', p: 3, w: 'trained' };
+    const { CFG } = ITM, V = CFG.vocab;
+    const st = { prompt: CFG.prompts[0], step: 0, t: 99, l: 0, h: 0, view: 'visual', p: 3, w: 'trained' };
     try {
       const q = new URLSearchParams(location.hash.slice(1));
       if (q.get('p')) st.prompt = q.get('p');
@@ -208,7 +208,7 @@
       if (k === 'tokens') return h + '<pre class="xp-pre">' + wd.map((w, i) => i + ': ' + w + ' → id ' + tk.ids[i]).join('\n') + '</pre>';
       if (k === 'logits') {
         const lg = tr.logits[t];
-        return h + '<p>Token ' + t + ': logit for each word = y_' + t + ' · E[word].</p>' + vecTable([{ l: 'logit', v: lg }, { l: 'softmax', v: tr.probs[t] }], p, V);
+        return h + '<p>Token ' + t + ': logit for each vocabulary entry = y_' + t + ' · E[entry].</p>' + vecTable([{ l: 'logit', v: lg }, { l: 'softmax', v: tr.probs[t] }], p, V);
       }
       if (k === 'probs') { const pr = tr.probs[t]; return h + vecTable([{ l: 'p', v: pr }], p, V) + '<p>Σ p = ' + pr.reduce((a, b) => a + b, 0).toFixed(12) + '</p>'; }
       h += '<p>Token ' + t + ' (“' + esc(wd[t]) + '”):</p>' + vecTable(D.vec, p);
@@ -243,9 +243,9 @@
       $('view').innerHTML = '<h2 class="xp-h">' + (S.l === undefined ? '' : 'Layer ' + S.l + ' · ') + LABEL[S.k] + '</h2><p class="xp-why">' + PURPOSE[S.k] + '</p>' + (st.view === 'visual' ? viewVisual(D, st.p) : st.view === 'math' ? viewMath(D, st.p) : viewCode());
       $('prov').innerHTML = '<h3>Operation</h3><dl><dt>ID</dt><dd><code>' + opId(st.step) + '</code></dd><dt>Selected</dt><dd>token ' + st.t + ' “' + esc(words()[st.t]) + '”' + (S.l === undefined ? '' : ', layer ' + S.l) + (HEADD[S.k] ? ', head ' + st.h : '') + '</dd>' +
         '<dt>Inputs</dt><dd>' + esc(D.inputs) + '</dd><dt>Output shape</dt><dd><code>' + esc(D.shape) + '</code> float64</dd><dt>Equation</dt><dd><code>' + esc(D.eq) + '</code></dd></dl>' +
-        '<h3>Reference model</h3><dl><dt>Version</dt><dd><code>' + CFG.version + '</code></dd><dt>Weights</dt><dd>' + (ws().meta.trained ? 'trained: ' + ws().meta.steps + ' Adam steps on a toy grammar; held-out loss ' + ws().meta.heldOutLoss + ' (uniform guessing ' + ws().meta.uniformLoss + ')' : 'random initialization, never trained') + '; checksum <code>' + ws().sum + '</code></dd><dt>Precision</dt><dd>values shown to ' + st.p + ' decimals; computed in float64, checked against NumPy to 1e-9</dd></dl>' +
+        '<h3>Reference model</h3><dl><dt>Version</dt><dd><code>' + CFG.version + '</code></dd><dt>Weights</dt><dd>' + (ws().meta.trained ? 'trained: ' + ws().meta.steps + ' Adam steps on a toy grammar; held-out loss ' + ws().meta.heldOutLoss + ' (uniform guessing ' + ws().meta.uniformLoss + ')' : 'random initialization, never trained') + '; checksum <code>' + ws().sum + '</code></dd><dt>Precision</dt><dd>values shown to ' + st.p + ' decimals; computed in float64' + (ws().meta.trained ? '; attention weights and logits checked against NumPy to 1e-9' : '; these random weights are not part of the NumPy check') + '</dd></dl>' +
         '<button class="btn" data-a="copylink">Copy link to this state</button>';
-      $('foot').innerHTML = 'The model has 2 layers, 2 heads, d<sub>model</sub> = 16 and a 25-word vocabulary. It is a teaching model: real LLMs are far larger, use subword tokenizers, and train on vastly more data. Differences from production models are noted in the <a href="/guide/transformer-block/">transformer chapter</a>.';
+      $('foot').innerHTML = 'The model has 2 layers, 2 heads, d<sub>model</sub> = 16 and a 25-entry vocabulary. It is a teaching model: real LLMs are far larger, use subword tokenizers, and train on vastly more data. See <a href="/teardown/compare/">how it compares with real models</a> and the <a href="/guide/transformer-block/">transformer chapter</a>.';
       const box = BLOCKS.findIndex(B => B.has(S));
       $('pipe').innerHTML = BLOCKS.map((B, i) => '<button class="blk' + (i === box ? ' on' : '') + '" data-blk="' + i + '" style="--bc:' + B.c + '"' + (i === box ? ' aria-current="step"' : '') + '><b>' + B.n + '</b><small>' + B.sub + '</small></button>' + (i < BLOCKS.length - 1 ? '<span class="arr" aria-hidden="true">→</span>' : '')).join('');
       const tb = $('tour');

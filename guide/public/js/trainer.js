@@ -10,7 +10,7 @@
       '<div class="ctl"><label>learning rate</label><input type="range" data-k="lr" min="-2" max="0.2" step="0.05" value="-1" aria-label="Learning rate (log scale)"><output data-k="lrout"></output></div>' +
       '<div class="row"><button class="btn primary" data-a="1">Take 1 step</button><button class="btn" data-a="10">Take 10 steps</button><button class="btn" data-a="reset">Reset</button></div>' +
       '<div data-out aria-live="polite"></div>' +
-      '<p class="src">Each step runs a forward pass, measures the loss (mean negative log-probability of the true next word), backpropagates to get a gradient for every weight, then moves each weight a small step against its gradient: w → w − lr · gradient. This is plain gradient descent on a <b>copy</b> of the weights, using the same engine as the Explorer. It trains on one sentence, so it memorizes it. Real pretraining averages over billions of tokens per step and uses the Adam optimizer. Try a learning rate near the top of the slider to see a step overshoot.</p>';
+      '<p class="src">Each step runs a forward pass, measures the loss (mean negative log-probability of the true next word), backpropagates to get a gradient for every weight, then moves each weight a small step against its gradient: w → w − lr · gradient. This is plain gradient descent on a <b>copy</b> of the weights, using the same engine as the Explorer. It trains on one sentence, so it memorizes it. Real pretraining averages over millions of tokens per step and uses an Adam-style optimizer (usually AdamW). Try a learning rate near the top of the slider to see a step overshoot.</p>';
     let W, hist, last, p0;
     const get = k => el.querySelector('[data-k="' + k + '"]');
     const ids = () => ITM.tokenize(P[+get('p').value]).ids;

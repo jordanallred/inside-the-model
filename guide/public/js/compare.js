@@ -10,19 +10,19 @@
     const M = [
       { id: 'toy', n: 'Toy model (Explorer)', c: 'var(--c3)', layers: C.nLayers, d: C.dModel, params: toyParams, active: toyParams, vocab: V, link: '/explorer/',
         rows: {
-          tokens: V + ' whole words plus <bos>', pos: 'Fixed sinusoidal pattern added once to the embeddings', norm: 'RMSNorm before attention and MLP, no learned scale',
+          tokens: V + ' entries: ' + (V - 2) + ' whole words, a period and <bos>', pos: 'Fixed sinusoidal pattern added once to the embeddings', norm: 'RMSNorm before attention and MLP, no learned scale',
           attn: C.nHeads + ' heads of size ' + C.dHead + ', full multi-head, causal mask', mlp: 'Dense GELU MLP, ' + C.dModel + ' → ' + C.dMlp + ' → ' + C.dModel, out: 'Tied with the embedding', size: fmt(toyParams) + ' parameters, all used for every token' } },
       { id: 'llama', n: 'Llama 3 8B', c: 'var(--c1)', layers: 32, d: 4096, params: 8e9, active: 8e9, vocab: 128256, link: '/guide/transformer-block/',
         rows: {
-          tokens: '128,256-token vocabulary', pos: 'Rotary position embeddings (RoPE), applied to queries and keys inside attention', norm: 'RMSNorm before attention and MLP, with learned scales',
+          tokens: '128K-token vocabulary (128,256 entries in the released model)', pos: 'Rotary position embeddings (RoPE), base 500,000, applied to queries and keys inside attention', norm: 'RMSNorm before attention and MLP',
           attn: '32 query heads of size 128, 8 key/value heads (grouped-query)', mlp: 'Gated MLP (SwiGLU), hidden width 14,336', out: 'Untied output matrix', size: '8B parameters, all used for every token' } },
       { id: 'oss', n: 'gpt-oss-120b', c: 'var(--c4)', layers: 36, d: 2880, params: 116.8e9, active: 5.1e9, vocab: 201088, link: '/teardown/gpt-oss-120b/',
         rows: {
           tokens: '201,088 tokens (o200k_harmony)', pos: 'RoPE, base 150,000, YaRN factor 32 (4,096 to 131,072 tokens)', norm: 'RMSNorm before each attention and expert block',
-          attn: '64 query heads of size 64, 8 key/value heads, alternating 128-token sliding window and full attention', mlp: '128 experts per layer, top-4 routing, expert width 2,880', out: 'Untied output matrix', size: '116.8B total, 5.1B active per token' } },
+          attn: '64 query heads of size 64, 8 key/value heads, alternating 128-token sliding window and full attention, plus a learned per-head bias in the softmax denominator (an attention sink)', mlp: '128 experts per layer, top-4 routing, expert width 2,880, gated SwiGLU experts', out: 'Untied output matrix', size: '116.8B total, 5.1B active per token' } },
       { id: 'dsv3', n: 'DeepSeek-V3', c: 'var(--c2)', layers: 61, d: 7168, params: 671e9, active: 37e9, vocab: 129280, link: '/teardown/deepseek-v3/',
         rows: {
-          tokens: '129,280 tokens (byte-level BPE)', pos: 'RoPE with YaRN factor 40, on a separate 64-wide rotary part of each key', norm: 'RMSNorm',
+          tokens: '129,280 tokens (byte-level BPE)', pos: 'RoPE on a separate 64-wide part of the queries and key; YaRN factor 40 for long context', norm: 'RMSNorm, plus extra RMSNorm layers on the compressed latents',
           attn: 'Multi-head latent attention: 128 heads, keys and values compressed to a 512-wide latent', mlp: '1 shared plus 256 routed experts, 8 routed per token, expert width 2,048 (first 3 layers dense)', out: 'Untied output matrix, plus a multi-token prediction objective', size: '671B total, 37B active per token' } },
     ];
     const OPS = [
@@ -32,7 +32,7 @@
     const METRICS = [['layers', 'Layers'], ['d', 'Model width'], ['vocab', 'Vocabulary size'], ['params', 'Total parameters'], ['active', 'Parameters used per token']];
     const st = { on: { toy: true, llama: true, oss: true, dsv3: true }, m: 'params' };
     el.innerHTML = '<div class="cmp-pick" role="group" aria-label="Models to compare">' + M.map(m => '<button class="chipbtn" data-id="' + m.id + '" aria-pressed="true" style="--bc:' + m.c + '">' + esc(m.n) + '</button>').join('') + '</div>' +
-      '<div class="cmp-scale"><label>Scale <select data-k="m" aria-label="Metric for the bars">' + METRICS.map(x => '<option value="' + x[0] + '">' + x[1] + '</option>').join('') + '</select></label><span class="src">Bars use a logarithmic scale: each step to the right is 10× larger.</span></div>' +
+      '<div class="cmp-scale"><label>Scale <select data-k="m" aria-label="Metric for the bars">' + METRICS.map(x => '<option value="' + x[0] + '">' + x[1] + '</option>').join('') + '</select></label><span class="src">Bars use a logarithmic scale, which compresses huge differences, so read the numbers on the right for the actual values.</span></div>' +
       '<div class="cmp-bars" data-x="bars"></div><div class="gscroll"><table class="cmp-t" data-x="tbl"></table></div>' +
       '<p class="src">The toy model’s numbers come directly from the Explorer’s engine. The other models’ figures come from this site’s teardown pages and the dense-model presets of the parameter-count widget, which cite the technical reports and model cards. Open any row in the Explorer to see the toy model’s version of that operation.</p>';
     function draw() {
