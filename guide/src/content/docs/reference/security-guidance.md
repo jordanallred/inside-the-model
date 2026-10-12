@@ -6,7 +6,7 @@ description: What NSA, CISA and allied cyber agencies have published about secur
 Government cyber agencies now publish practical guidance on deploying and securing AI systems. These documents are short, unclassified, and written for practitioners, which makes them a useful bridge from the research in the guide to what organizations are actually told to do.
 
 :::caution[How reliable is this page?]
-The nsa.gov site blocked direct fetching while this page was researched, so most items below come from news and law-firm summaries of the documents, listed at the bottom. Items marked **confirmed** appeared in at least one such summary. Items marked **unconfirmed** come from background knowledge and were not verified in this session. Read the primary documents before quoting anything.
+nsa.gov rejects scripted requests, so most of this page was first assembled from news and law-firm summaries. Two documents, the MCP guidance and the distillation advisory, were later read in full from the NSA's own PDFs and are marked **confirmed (primary)**. Items marked **confirmed** appeared in at least one secondary summary. Items marked **unconfirmed** come from background knowledge and were not verified. Read the primary documents before quoting anything.
 :::
 
 ## Who publishes it
@@ -23,8 +23,9 @@ The NSA's **Artificial Intelligence Security Center (AISC)** was announced in Se
 | May 22, 2025 | AI Data Security: Best Practices for Securing Data Used to Train and Operate AI Systems | Three risks (data supply chain, maliciously modified data, data drift) and lifecycle controls; see below | confirmed |
 | Dec 2025 | Principles for the Secure Integration of AI in Operational Technology | Guidance on AI in industrial control settings | unconfirmed |
 | May 1, 2026 | Careful Adoption of Agentic AI Services | First Five Eyes guidance on agentic AI; see below | confirmed |
-| May 20, 2026 | Model Context Protocol (MCP): Security Design Considerations for AI-Driven Automation | Risks and controls for tool-connected agents; see below | confirmed (secondary summary) |
+| May 20, 2026 | Model Context Protocol (MCP): Security Design Considerations for AI-Driven Automation (NSA Cybersecurity Information sheet) | Risks and controls for tool-connected agents; see below | confirmed (primary) |
 | Aug–Sep 2026 | Joint advisory on AI-generated exploit scripts against industrial controllers; Best Practices for Cyber Hygiene | Adversaries use AI to speed up intrusions that exploit weak basics; recommends inventory, MFA, patching, segmentation, monitoring | confirmed |
+| Sep 8, 2026 | China-Based AI Companies Conducting Industrial-Scale Distillation Campaigns Against U.S. AI Companies (joint advisory by NSA, CISA and FBI) | Attributes large-scale model distillation to named companies; lists tactics and defenses; see below | confirmed (primary) |
 
 ## What the key documents say
 
@@ -52,7 +53,39 @@ It points to the OWASP Top 10 for Agentic Applications and MITRE ATLAS for threa
 
 ### MCP security design considerations (May 2026)
 
-As summarized by a secondary source: MCP does not require authentication, does not define identity binding or role-based access control, and lets agents discover tools dynamically without signed manifests. The listed threats are optional authentication, unsigned tool manifests, **tool poisoning** (through a compromised registry, a man-in-the-middle on unencrypted connections, or an impersonating server), broad or session-wide credentials, and lateral movement from a compromised agent runtime. Recommendations: per-action least-privilege tokens, signed provenance for discovered tools (pinning approved sources as a minimum), hardening MCP infrastructure like an API gateway (rate limits, anomaly detection, schema validation, audit logs for every tool call), and segmenting agent networks so sensitive stores are reachable only through mediating tools.
+An NSA Cybersecurity Information sheet, written with the Carnegie Mellon Software Engineering Institute. Its thesis is that MCP's adoption has outpaced its security model: the protocol is flexible and underspecified, and security depends on implementation discipline rather than protocol guarantees. It also notes that MCP inverts the usual pattern, because servers often query and sometimes act on behalf of connected clients. It names eight concerns:
+
+- **Access control.** Tying a session to an identity is optional. Many implementations skip authentication, and those that include it often lack role-based permissions (for example, separate create, read, update and delete rights).
+- **Insecure serialization.** Structured context and payloads are often not validated against a schema, so comments or prompts can carry injected instructions.
+- **Poor approval workflows.** Protocol-level enforcement of user consent is absent, and a server that is already trusted can change its capabilities without a new approval.
+- **Token and session security.** Authorization is optional, bearer tokens have no mandated lifecycle (refresh, revocation, rotation), and replay and session hijacking are possible.
+- **Misconfiguration.** A trivial server, such as one for weather, can later be repurposed for sensitive data, and servers often lack task or data isolation.
+- **Inconsistent behavior.** Different agents interpret the same context differently, which an attacker can exploit by preconditioning an agent.
+- **Missing audit logs.** Many implementations log nothing, or very little.
+- **Denial of service.** Prompt storms, recursive task requests and "lethargy" attacks that exhaust resources with legitimate but expensive tasks.
+
+Its real-world examples are tool-parameter injection in open-source agents, tool-name collisions that load attacker-controlled code, over-broad GitHub MCP access (private repositories read and published to public ones), a malicious server that coerced a WhatsApp MCP client into exposing message history, outputs from one agent injected into the next, and CVE-2025-49596, a remote code execution flaw in the MCP Inspector tool (fixed in 0.14.1).
+
+Its recommendations are to prefer supported, audited MCP projects and run them locally for private data; draw trust boundaries and align tools with data-classification zones; use a filtering outbound proxy or data loss prevention; validate every tool parameter against a schema and its context; sandbox tool execution with OS controls such as seccomp, AppArmor, SELinux or AppContainers and least privilege; sign MCP messages with expiry timestamps and replay protection; treat every tool output as untrusted input to the next stage; log every invocation with parameters, identities and hashes of results, feeding a SIEM; track MCP vulnerabilities and keep an inventory of deployed servers; and scan the network for unauthenticated or unauthorized MCP servers.
+
+An earlier version of this page, written from a secondary summary, listed "signed tool manifests", per-action tokens and agent network segmentation as the document's themes. Those do not appear in the NSA text, which is why the section was rewritten from the PDF.
+
+### Distillation campaigns against US AI companies (September 2026)
+
+A joint advisory from the NSA, CISA and the FBI (marked TLP:CLEAR). It is a government attribution, so the claims below are the agencies' and are reported as such. It says that DeepSeek, Moonshot AI, Alibaba, MiniMax, StepFun and Z.AI extracted billions of tokens across millions of requests from US frontier models since at least late 2024, and that this was probably known to the Chinese government. It treats distillation as a legitimate technique that these campaigns use maliciously, and says it is central to those companies' development rather than a supplement. It also argues that DeepSeek's publicly quoted $5.6M training cost omits the cost of the data acquired this way.
+
+How it is done, by the advisory's account:
+
+- **Access.** Fraudulent accounts with similar registration and payment details, bulk-purchased premium subscriptions shared across developers, and a gray market of API proxies called "transfer stations" that bypass regional restrictions and erase traceability.
+- **Routing.** Central tooling spreads requests across native APIs, cloud providers, aggregators and account pools, with automated failover when blocked and automated removal of organizational metadata. One example is a company retargeting a new model within 24 hours of release.
+- **Extraction.** Prompts crafted to make models write out their hidden chain-of-thought reasoning, millions of exchanges aimed at agentic tool use, coding and computer-use skills, and rubric-grading queries that reveal how a model judges response quality.
+- **Verification.** Automated quality checks that tell a service fault from a deliberately degraded answer.
+
+It maps these to MITRE ATLAS techniques (for example AML.T0040 inference API access, AML.T0051 prompt injection, AML.T0024.002 extraction via inference API) and describes four techniques that ATLAS does not cover: regional-restriction and subscription evasion, centralized request routing, automated metadata sanitization, and quota and cost optimization. Detection indicators include shared accounts across many IPs, round-the-clock usage with no human idle periods, new subscriptions that start at maximum usage, and correlated timing across pathways.
+
+Recommended defenses: behavioral detection and stronger identity verification; **subtly altering responses** to high-confidence distillers, for example with differential privacy, reduced reasoning depth, or a downgraded model, varied across requests so the change is hard to notice and without telling the suspected distiller, while safety researchers and third-party evaluators are told of any change; and cross-organization sharing of infrastructure and behavioral indicators among model providers, cloud platforms and aggregators. It also lists ATLAS mitigations such as per-key rate limits, telemetry logging, output obfuscation (withholding logits, shortening responses), red-teaming for extraction, and limiting public release of architecture and prompt templates. The differential-privacy discussion stresses a finite privacy budget and the noise-versus-utility tradeoff.
+
+This is the policy side of the extraction attacks in [chapter 20](/guide/security/) and of distillation as a training technique ([post-training](/guide/post-training/)).
 
 ## Frameworks you will see cited
 
@@ -72,11 +105,12 @@ These are from background knowledge, not from the sources above:
 
 ## Sources
 
+- [NSA: Model Context Protocol (MCP): Security Design Considerations for AI-Driven Automation](https://media.defense.gov/2026/Jun/02/2003943289/-1/-1/0/CSI_MCP_SECURITY.PDF) (primary; read in full)
+- [NSA, CISA, FBI: China-Based AI Companies Conducting Industrial-Scale Distillation Campaigns Against U.S. AI Companies](https://media.defense.gov/2026/Sep/08/2003992823/-1/-1/0/CSA_CHINA_BASED_AI_COMPANIES_MALICIOUS_DISTILLATION_AGAINST_US.PDF) (primary; read in full)
 - [CISA: Joint Guidance on Deploying AI Systems Securely](https://cisa.gov/news-events/alerts/2024/04/15/joint-guidance-deploying-ai-systems-securely)
 - [Alston & Bird: AI Data Security joint guidance summary](https://alston.com/en/insights/publications/2025/06/joint-guidance-ai-data-security)
 - [HSToday: NSA's AISC releases joint guidance on AI data security](https://www.hstoday.us/federal-pages/dhs/nsas-aisc-releases-joint-guidance-on-the-risks-and-best-practices-in-ai-data-security/)
 - [Crowell: first joint guidance on securing agentic AI](https://www.crowell.com/en/insights/client-alerts/american-and-allied-cyber-agencies-issue-first-joint-guidance-on-securing-agentic-ai)
-- [AI Security Wire: NSA MCP security guidance](https://aisecuritywire.com/defensive-techniques/nsa-mcp-security-guidance-agentic-ai-2026/)
 - [ExecutiveGov: NSA cyber hygiene guidance for AI-enhanced threats](https://www.executivegov.com/articles/nsa-cyber-hygiene-guidance-ai-threats)
 - [SecurityWeek: NSA is starting an Artificial Intelligence Security Center](https://www.securityweek.com/national-security-agency-is-starting-an-artificial-intelligence-security-center/)
-- [NSA AISC page](https://www.nsa.gov/AISC/) (the primary source; not fetchable during research)
+- [NSA AISC page](https://www.nsa.gov/AISC/) (the index of NSA advisories and guidance is linked from here; older AI documents on it have not yet been checked against the primary PDFs)
