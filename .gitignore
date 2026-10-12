@@ -1,0 +1,13 @@
+# Reproducible dependencies and generated static output
+guide/node_modules/
+guide/dist/
+guide/.astro/
+guide/.impeccable/
+
+# Legacy local-only progress data
+data/
+
+# Local environment files
+.env
+.env.*
+!.env.example

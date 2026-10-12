@@ -1,0 +1,33 @@
+// Single source of truth for the guide's structure. id, slug, part, title, minutes, prerequisites, subtitle, notation terms.
+export const PARTS = {
+  'I. Foundations': 'Functions, gradients, networks, probability and tokens. Everything later is built from these.',
+  'II. The transformer': 'Attention, the block, position, and the complete model.',
+  'III. Fast attention and inference': 'Why generation is memory-bound, and the designs that cut the cost.',
+  'IV. Scaling the network': 'Experts and low-precision numbers.',
+  'V. Training': 'Pretraining at scale, post-training and adaptation.',
+  'VI. Systems': 'Prompting, retrieval, tools and agents.',
+  'VII. Security and evaluation': 'The attacks and defenses, tied back to the papers, and how to measure any of it honestly.',
+};
+export const CH = [
+  ['c01', 'gradient-descent', 'I. Foundations', 'Functions, parameters and gradient descent', 30, [], 'Models, loss, and the gradient that trains them', ['gradient', 'learning rate', 'minibatch', 'overfitting']],
+  ['c02', 'neural-networks', 'I. Foundations', 'Neural networks and the multilayer perceptron', 35, ['c01'], 'Layers, activations and what a hidden unit does', ['activation', 'MLP']],
+  ['c03', 'backpropagation', 'I. Foundations', 'Backpropagation and optimizers', 40, ['c02'], 'The chain rule at scale, and how weights get updated', ['backpropagation', 'momentum', 'Adam']],
+  ['c04', 'softmax-and-loss', 'I. Foundations', 'Probability, softmax and next-token prediction', 30, ['c01'], 'Turning scores into probabilities, and probabilities into text', ['softmax', 'logits', 'cross-entropy', 'perplexity']],
+  ['c05', 'tokens-and-embeddings', 'I. Foundations', 'Tokens and embeddings', 30, ['c04'], 'From strings to integers to vectors', ['token', 'BPE', 'embedding']],
+  ['c06', 'attention', 'II. The transformer', 'Attention', 45, ['c02', 'c04', 'c05'], 'Queries, keys and values: a soft lookup across positions', ['attention', 'causal mask', 'multi-head']],
+  ['c07', 'transformer-block', 'II. The transformer', 'The transformer block', 40, ['c02', 'c06'], 'Residual stream, normalization and the gated MLP', ['residual stream', 'RMSNorm', 'SwiGLU']],
+  ['c08', 'rope', 'II. The transformer', 'Position and rotary embeddings', 40, ['c06'], 'Rotating vectors so attention knows who is near whom', ['RoPE', 'YaRN']],
+  ['c09', 'full-model', 'II. The transformer', 'The full model and its training loop', 35, ['c03', 'c07', 'c08'], 'Shapes, loss and the cost of one training step', ['teacher forcing']],
+  ['c10', 'kv-cache', 'III. Fast attention and inference', 'Generating text: the KV cache and inference cost', 35, ['c09'], 'Why decoding is memory-bound and what the cache costs', ['KV cache', 'prefill', 'speculative decoding']],
+  ['c11', 'gqa-and-mla', 'III. Fast attention and inference', 'Grouped-query and latent attention', 35, ['c08', 'c10'], 'Cutting the cache without cutting quality', ['GQA', 'MLA']],
+  ['c12', 'flashattention', 'III. Fast attention and inference', 'FlashAttention', 30, ['c06', 'c10'], 'Exact attention without the n×n matrix', ['online softmax']],
+  ['c13', 'sparse-and-linear-attention', 'III. Fast attention and inference', 'Local, sparse and linear attention; state-space models', 45, ['c06', 'c10'], 'Windows, sparsity, recurrence and hybrids', ['attention sink', 'linear attention', 'delta rule', 'state-space model']],
+  ['c14', 'mixture-of-experts', 'IV. Scaling the network', 'Mixture of experts', 40, ['c07', 'c09'], 'More parameters, same compute per token', ['mixture of experts', 'router', 'active parameters']],
+  ['c15', 'low-precision', 'IV. Scaling the network', 'Floating point and quantization', 40, ['c09'], 'Bits, scales and what low precision does to a model', ['BF16', 'quantization', 'MXFP4']],
+  ['c16', 'pretraining', 'V. Training', 'Pretraining at scale', 40, ['c09', 'c14', 'c15'], 'Data, scaling laws and training across thousands of GPUs', ['scaling laws', 'ZeRO']],
+  ['c17', 'post-training', 'V. Training', 'Post-training: instruction tuning, preferences and reinforcement learning', 50, ['c04', 'c16'], 'From text continuer to assistant and reasoner', ['SFT', 'RLHF', 'DPO', 'GRPO']],
+  ['c18', 'lora', 'V. Training', 'Adapting models: LoRA, QLoRA and distillation', 25, ['c07', 'c15'], 'Training a few million parameters instead of billions', ['LoRA', 'QLoRA', 'distillation']],
+  ['c19', 'applications', 'VI. Systems', 'Prompting, retrieval, tools, agents and MCP', 40, ['c17'], 'How models become applications, and where trust breaks', ['RAG', 'agent', 'MCP', 'prompt injection']],
+  ['c20', 'security', 'VII. Security and evaluation', 'Attacks on language models and their defenses', 60, ['c11', 'c19'], 'A lifecycle map of attacks, with the papers behind each', ['FGSM', 'PGD', 'backdoor', 'membership inference', 'differential privacy', 'jailbreak']],
+  ['c21', 'evaluation', 'VII. Security and evaluation', 'Evaluating models and systems', 45, ['c04', 'c20'], 'Questions, test sets, statistics and the ways evaluations lie', ['confidence interval', 'benchmark contamination']],
+];

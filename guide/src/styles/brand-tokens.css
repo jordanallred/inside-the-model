@@ -1,0 +1,16 @@
+:root {
+ --itm-deep-space: #0B1020;
+ --itm-indigo: #6366F1;
+ --itm-sky: #3B82F6;
+ --itm-teal: #14B8A6;
+ --itm-violet: #A78BFA;
+ --itm-peach: #FB923C;
+ --itm-sand: #F8FAFC;
+ --itm-slate: #334155;
+ --itm-font-heading: "Plus Jakarta Sans", Inter, sans-serif;
+ --itm-font-body: Inter, sans-serif;
+ --itm-font-code: "JetBrains Mono", monospace;
+ --itm-radius-sm: 8px;
+ --itm-radius-md: 12px;
+ --itm-radius-lg: 20px;
+}

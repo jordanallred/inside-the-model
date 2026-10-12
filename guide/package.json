@@ -1,0 +1,22 @@
+{
+  "name": "language-models-guide",
+  "type": "module",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "node tools/check-js.mjs && node tools/check-brand.mjs && astro build",
+    "preview": "astro preview",
+    "gen": "node tools/gen.mjs",
+    "check": "node tools/check-links.mjs && node tools/check-brand.mjs && node tools/check-public-deploy.mjs",
+    "verify": "node tools/verify-trace.mjs"
+  },
+  "dependencies": {
+    "@astrojs/markdown-remark": "7.3.2",
+    "@astrojs/starlight": "0.42.6",
+    "astro": "7.3.8",
+    "katex": "0.19.0",
+    "rehype-katex": "7.0.1",
+    "remark-math": "6.0.0"
+  }
+}

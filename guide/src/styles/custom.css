@@ -1,0 +1,85 @@
+/* Minimal additions to Starlight's default theme: long display math scrolls, glossary tooltips, and the interactive widgets.
+   Everything else (fonts, colors, headings, asides, tables, code) is Starlight's own. */
+
+/* Semantic colors for the charts in widgets, plus aliases onto Starlight's tokens so widgets follow light and dark mode. */
+:root {
+  --ok: var(--itm-teal); --warn: var(--itm-peach); --bad: var(--itm-peach);
+  --c1: var(--itm-sky); --c2: var(--itm-peach); --c3: var(--itm-teal); --c4: var(--itm-violet);
+  --bg: var(--sl-color-bg);
+  --fg: var(--sl-color-text);
+  --muted: var(--sl-color-gray-3);
+  --line: var(--sl-color-hairline);
+  --accent: var(--sl-color-text-accent);
+  --accent-fg: var(--sl-color-text-invert);
+  --surface: color-mix(in srgb, var(--sl-color-bg) 94%, var(--sl-color-white));
+  --tint: color-mix(in srgb, var(--sl-color-bg) 88%, var(--sl-color-white));
+  --mono: var(--sl-font-mono);
+  --body: var(--sl-font);
+}
+:root[data-theme='light'] {
+  --ok: var(--itm-teal); --warn: var(--itm-peach); --bad: var(--itm-peach);
+  --c1: var(--itm-sky); --c2: var(--itm-peach); --c3: var(--itm-teal); --c4: var(--itm-violet);
+}
+
+.katex-display { overflow-x: auto; overflow-y: hidden; }
+
+/* Glossary: the first use of a term in a chapter opens its definition. */
+.term { border-bottom: 1px dotted var(--sl-color-text-accent); cursor: help; }
+#pop {
+  position: absolute; z-index: 80; max-width: min(22rem, calc(100vw - 24px));
+  background: var(--sl-color-bg-nav); color: var(--sl-color-text); border: 1px solid var(--sl-color-hairline);
+  border-radius: 0.5rem; padding: 0.6rem 0.9rem; font-size: var(--sl-text-sm); line-height: 1.5;
+  box-shadow: var(--sl-shadow-md);
+}
+#pop b { display: block; color: var(--sl-color-white); }
+
+/* Reading progress marks in the sidebar. */
+#starlight__sidebar a.ch-done::after { content: " ✓"; color: var(--ok); }
+#starlight__sidebar a.ch-skipped { opacity: 0.6; }
+
+/* ---- interactive widgets ---- */
+.widget { background: var(--surface); border: 1px solid var(--line); border-radius: var(--itm-radius-md); padding: 0.9rem 1rem; margin: 1.25rem 0; overflow: hidden; font-size: var(--sl-text-sm); line-height: 1.55; }
+.widget .wt { font-weight: 600; margin-bottom: 0.5rem; color: var(--sl-color-white); }
+.widget canvas { width: 100%; height: auto; display: block; background: var(--bg); border: 1px solid var(--line); border-radius: var(--itm-radius-sm); margin: 0.5rem 0; }
+.widget .src, .widget p.src { color: var(--muted); margin: 0.5rem 0 0; }
+.widget .kicker { color: var(--muted); font-size: var(--sl-text-xs); }
+.widget .stat { font-family: var(--mono); color: var(--muted); }
+.widget .btn { background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: var(--itm-radius-sm); font: inherit; font-weight: 600; padding: 0.5rem 0.9rem; cursor: pointer; }
+.widget .btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.widget select, .widget input[type=text], .widget textarea { background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: var(--itm-radius-sm); padding: 0.4rem 0.6rem; font: inherit; max-width: 100%; min-width: 0; }
+.widget textarea { width: 100%; font-family: var(--mono); font-size: var(--sl-text-sm); }
+.widget input[type=range] { width: 100%; accent-color: var(--accent); }
+.widget input[type=checkbox] { accent-color: var(--accent); }
+.widget label { overflow-wrap: anywhere; min-width: 0; }
+.widget .row { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; margin: 0.6rem 0; }
+.widget .row > * { min-width: 0; }
+.widget .ctl { display: grid; grid-template-columns: minmax(6rem, 11rem) 1fr 5rem; gap: 0.6rem; align-items: center; margin: 0.35rem 0; }
+.widget .ctl select { width: 100%; }
+.widget .ctl output { font-family: var(--mono); text-align: right; }
+.widget .shape { font-family: var(--mono); font-size: var(--sl-text-xs); line-height: 1.6; background: var(--tint); border-radius: var(--itm-radius-sm); padding: 0.6rem 0.75rem; margin: 0.5rem 0; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+.widget .brow { display: grid; grid-template-columns: 7.5rem 1fr 6.5rem; gap: 0.5rem; align-items: center; margin: 0.3rem 0; font-family: var(--mono); font-size: var(--sl-text-xs); }
+.widget .brow span:last-child { text-align: right; }
+.widget .bar { height: 1rem; background: var(--tint); border-radius: 3px; overflow: hidden; }
+.widget .bar i { display: block; height: 100%; }
+.widget .chips { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.widget .chip { font-family: var(--mono); font-size: var(--sl-text-xs); background: var(--tint); border: 1px solid var(--line); border-radius: 0.3rem; padding: 0.15rem 0.45rem; }
+.widget .chip small { color: var(--muted); }
+.widget .chipbtn { border: 1px solid var(--line); background: none; color: var(--muted); border-radius: 999px; padding: 0.3rem 0.75rem; font: inherit; cursor: pointer; }
+.widget .chipbtn[aria-pressed=true] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.widget .grid { border-collapse: collapse; font-family: var(--mono); font-size: var(--sl-text-xs); }
+.widget .grid th { font-weight: 400; color: var(--muted); padding: 2px 4px; white-space: nowrap; border: 0; background: none; }
+.widget .grid td { width: 2.1rem; height: 1.9rem; border: 1px solid var(--line); text-align: center; padding: 0; position: relative; }
+.widget .grid td i { position: absolute; inset: 0; background: var(--accent); }
+.widget .grid td.m { background: repeating-linear-gradient(45deg, var(--tint), var(--tint) 3px, transparent 3px, transparent 6px); }
+.widget .gscroll { overflow-x: auto; max-width: 100%; }
+.widget .hgrid { display: flex; gap: 4px; flex-wrap: wrap; }
+.widget .hbox { width: 1.6rem; height: 1.6rem; border-radius: var(--itm-radius-sm); font-size: 0.65rem; font-weight: 600; display: flex; align-items: center; justify-content: center; color: #fff; }
+.widget .ex { display: inline-block; font-family: var(--mono); font-size: var(--sl-text-xs); padding: 0.15rem 0.4rem; border-radius: 4px; margin: 2px; border: 1px solid var(--line); background: var(--surface); }
+.widget .ex.on { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.widget .sec { background: color-mix(in srgb, var(--warn) 10%, var(--surface)); border-radius: var(--itm-radius-sm); padding: 0.55rem 0.75rem; margin: 0.75rem 0; }
+.widget .sec b.h { color: var(--warn); }
+@media (max-width: 30rem) {
+  .widget .ctl { grid-template-columns: 1fr 4.5rem; }
+  .widget .ctl label { grid-column: 1 / -1; }
+  .widget .brow { grid-template-columns: 5.5rem 1fr 5rem; }
+}
