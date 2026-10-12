@@ -336,8 +336,8 @@ code, pre, .widget .grid, .widget .stat { font-variant-numeric: tabular-nums; }
 .xp-nav .xp-pos { color: var(--muted); font-size: var(--sl-text-xs); white-space: nowrap; }
 .xp-nav select { flex: 1 1 14rem; }
 .xp-pipe { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 0.4rem; }
-.xp-pipe .blk { flex: 0 0 auto; padding: 0.3rem 0.55rem; }
-.xp-pipe .blk:not(.on) small { display: none; }
+.xp-pipe .blk { flex: 1 1 0; min-width: 7rem; padding: 0.3rem 0.55rem; }
+.xp-pipe .arr { flex: 0 0 auto; }
 .xp-sel { gap: 0.5rem 1.25rem; color: var(--muted); font-size: var(--sl-text-xs); padding-top: 0.15rem; }
 .xp-sel .chipbtn { padding: 0.1rem 0.55rem; font-size: var(--sl-text-xs); }
 :root[data-theme='light'] .xp .btn.quiet { background: none; border-color: transparent; box-shadow: none; color: var(--itm-slate); }
@@ -345,3 +345,19 @@ code, pre, .widget .grid, .widget .stat { font-variant-numeric: tabular-nums; }
 
 /* overflow-x:auto also clips vertically, which cut off the 2px selection ring on the active stage. */
 .xp-pipe { padding: 4px 4px 0.5rem; margin: -4px -4px 0; }
+
+/* Test yourself: a <legend> straddles its fieldset's top border, which cut the card and let long questions spill out of it.
+   Floating the legend moves it inside the card; each option becomes a full-width row. */
+.ch-q { margin: 0.9rem 0; padding: 1rem 1.1rem; background: var(--bg); box-shadow: 0 1px 2px rgb(11 16 32 / 0.08); }
+.ch-q legend { float: left; width: 100%; padding: 0; margin: 0 0 0.6rem; max-width: none; font-size: var(--sl-text-base, 1rem); line-height: 1.45; color: var(--sl-color-white); }
+.ch-q legend + * { clear: both; }
+.ch-o { display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.7rem; margin: 0.25rem 0; border: 1px solid var(--line); border-radius: var(--itm-radius-sm); background: var(--surface); }
+.ch-o:hover { border-color: var(--accent); }
+.ch-o:has(input:checked) { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.ch-o input { margin: 0; flex: none; }
+.ch-q .btn[data-ck] { margin-top: 0.6rem; }
+.ch-score { margin: 0.25rem 0 0.5rem; }
+:root[data-theme='light'] .ch-o { background: #fff; border-color: var(--btn-edge); }
+:root[data-theme='light'] .ch-q { border-color: var(--btn-edge); }
+:root[data-theme='light'] .ch-q.ok { border-color: var(--ok); }
+:root[data-theme='light'] .ch-q.no { border-color: var(--bad); }
