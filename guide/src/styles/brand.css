@@ -311,3 +311,34 @@ code, pre, .widget .grid, .widget .stat { font-variant-numeric: tabular-nums; }
 
 /* The selected pipeline block tints its background, so its caption must not stay muted gray (3.6:1 in dark). */
 .xp .blk.on small { color: var(--fg); }
+
+/* Light mode: --surface is a gray close to the page and --line is a pale hairline, so buttons sitting on a widget vanished into it.
+   Idle controls get a white face, a slate border (4:1 against the gray surface) and a small shadow so they read as pressable. Selected and primary states keep the Indigo fill. */
+:root[data-theme='light'] {
+  --btn-face: #fff;
+  --btn-edge: #64748b;
+}
+:root[data-theme='light'] :is(.xp .btn:not(.primary), .widget .btn:not(.primary), .xp .chipbtn[aria-pressed=false], .widget .chipbtn[aria-pressed=false], .xp .tok:not(.on), .xp .blk:not(.on)) {
+  background: var(--btn-face);
+  border-color: var(--btn-edge);
+  color: var(--itm-deep-space);
+  box-shadow: 0 1px 2px rgb(11 16 32 / 0.18);
+}
+:root[data-theme='light'] :is(.xp .btn:not(.primary, :disabled), .widget .btn:not(.primary), .xp .chipbtn, .xp .tok, .xp .blk):hover { border-color: var(--itm-indigo); }
+:root[data-theme='light'] :is(.xp select, .xp input[type=text], .widget select, .widget input[type=text]) { border-color: var(--btn-edge); background: #fff; }
+:root[data-theme='light'] .xp-tabs button:not(.on) { color: var(--itm-slate); }
+:root[data-theme='light'] .xp-tabs { border-bottom-color: var(--btn-edge); }
+:root[data-theme='light'] .xp .chipbtn[aria-pressed=false] { color: var(--itm-slate); }
+
+/* Explorer calm-down: one strong control (Next), a single-line pipeline, and a quieter options row. */
+.xp .btn.quiet { background: none; border-color: transparent; box-shadow: none; color: var(--muted); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; padding-inline: 0.5rem; }
+.xp .btn.quiet:hover { color: var(--fg); }
+.xp-nav .xp-pos { color: var(--muted); font-size: var(--sl-text-xs); white-space: nowrap; }
+.xp-nav select { flex: 1 1 14rem; }
+.xp-pipe { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 0.4rem; }
+.xp-pipe .blk { flex: 0 0 auto; padding: 0.3rem 0.55rem; }
+.xp-pipe .blk:not(.on) small { display: none; }
+.xp-sel { gap: 0.5rem 1.25rem; color: var(--muted); font-size: var(--sl-text-xs); padding-top: 0.15rem; }
+.xp-sel .chipbtn { padding: 0.1rem 0.55rem; font-size: var(--sl-text-xs); }
+:root[data-theme='light'] .xp .btn.quiet { background: none; border-color: transparent; box-shadow: none; color: var(--itm-slate); }
+@media (max-width: 44rem) { .xp .btn.quiet { min-height: 2.75rem; } .xp-sel .chipbtn { min-width: 2.75rem; min-height: 2.75rem; } }

@@ -124,9 +124,9 @@
       '<div class="xp-tour" data-x="tour" hidden role="region" aria-label="Guided tour"></div>' +
       '<div class="xp-pipe" data-x="pipe" role="group" aria-label="Model pipeline: jump to a stage"></div>' +
       '<div class="xp-strip" data-x="strip" role="group" aria-label="Tokens: pick the token to inspect"></div>' +
-      '<div class="xp-nav"><button class="btn" data-a="tour">Guided tour</button><button class="btn" data-a="reset">Reset</button><button class="btn" data-a="prev">← Previous</button><button class="btn primary" data-a="next">Next →</button>' +
-      '<select data-x="step" aria-label="Jump to operation"></select><span class="xp-pos" data-x="pos"></span></div>' +
-      '<div class="xp-sel"><span>Layer <span class="chips" data-x="layers" role="group" aria-label="Layer"></span></span><span>Head <span class="chips" data-x="heads" role="group" aria-label="Head"></span></span><span>Weights <span class="chips" data-x="wts" role="group" aria-label="Weights"></span></span>' +
+      '<div class="xp-nav"><button class="btn" data-a="prev">← Previous</button><button class="btn primary" data-a="next">Next →</button><span class="xp-pos" data-x="pos"></span>' +
+      '<select data-x="step" aria-label="Jump to operation"></select><button class="btn quiet" data-a="tour">Guided tour</button><button class="btn quiet" data-a="reset">Reset</button></div>' +
+      '<div class="xp-sel" role="group" aria-label="Which layer, head and weights to show"><span>Layer <span class="chips" data-x="layers" role="group" aria-label="Layer"></span></span><span>Head <span class="chips" data-x="heads" role="group" aria-label="Head"></span></span><span>Weights <span class="chips" data-x="wts" role="group" aria-label="Weights"></span></span>' +
       '<span class="xp-prec">Decimals <input type="range" data-x="prec" min="2" max="8" value="3" aria-label="Displayed decimals"><output data-x="precout">3</output></span></div>' +
       '<div class="xp-tabs" role="group" aria-label="View"><button data-view="visual" aria-pressed="true">Visual</button><button data-view="math" aria-pressed="false">Math</button><button data-view="code" aria-pressed="false">Code</button></div>' +
       '<div class="xp-main"><div class="xp-view" data-x="view" role="region" aria-label="Operation view"></div><aside class="xp-prov" data-x="prov" aria-label="Operation details"></aside></div>' +
