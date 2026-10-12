@@ -55,11 +55,23 @@ for (const [name, value] of [
   }
 }
 if (!/meta (?:name|property)="twitter:card" content="summary_large_image"/.test(home)) failures.push('home page lacks a large X/Twitter card');
-if (!home.includes('"@type":"WebSite"')) failures.push('home page lacks WebSite JSON-LD');
-if (!home.includes('"@type":"LearningResource"')) failures.push('home page lacks LearningResource JSON-LD');
+const jsonLdMatch = home.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
+if (!jsonLdMatch) {
+  failures.push('home page lacks JSON-LD');
+} else {
+  try {
+    const graph = JSON.parse(jsonLdMatch[1])['@graph'];
+    const webSite = graph?.find(entry => entry['@type'] === 'WebSite');
+    const learningResource = graph?.find(entry => entry['@type'] === 'LearningResource');
+    if (webSite?.url !== siteUrl) failures.push('WebSite JSON-LD lacks the expected site URL');
+    if (learningResource?.url !== siteUrl) failures.push('LearningResource JSON-LD lacks the expected site URL');
+  } catch {
+    failures.push('home page has invalid JSON-LD');
+  }
+}
 if (!/meta name="robots" content="noindex"/.test(notFound)) failures.push('404 page is indexable');
 if (!robots.includes(`Sitemap: ${siteUrl}/sitemap-index.xml`)) failures.push('robots.txt lacks the expected sitemap URL');
-if (!sitemap.includes(siteUrl)) failures.push('sitemap does not use the expected site URL');
+if (!sitemap.includes(`<loc>${siteUrl}/sitemap-0.xml</loc>`)) failures.push('sitemap does not use the expected site URL');
 if (!fs.existsSync(socialCard)) failures.push('missing social-card.png');
 
 if (failures.length) {
