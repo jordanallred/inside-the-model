@@ -78,7 +78,7 @@
 .widget .ex.on { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
 .widget .sec { background: color-mix(in srgb, var(--warn) 10%, var(--surface)); border-radius: var(--itm-radius-sm); padding: 0.55rem 0.75rem; margin: 0.75rem 0; }
 .widget .sec b.h { color: var(--warn); }
-.interaction-frame { margin: 0.75rem 0 1rem; padding: 0.7rem 0.8rem; border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: var(--itm-radius-sm); background: var(--tint); }
+.interaction-frame { margin: 0.75rem 0 1rem; padding: 0.7rem 0.8rem; border: 1px solid var(--line); border-radius: var(--itm-radius-sm); background: var(--tint); }
 .interaction-topline { display: flex; justify-content: space-between; gap: 0.7rem; align-items: center; color: var(--muted); font: 600 var(--sl-text-xs)/1 var(--body); letter-spacing: 0.06em; text-transform: uppercase; }
 .interaction-reset, .interaction-scenario { border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--fg); font: 600 var(--sl-text-xs)/1.2 var(--body); padding: 0.35rem 0.6rem; cursor: pointer; }
 .interaction-reset { color: var(--muted); }
