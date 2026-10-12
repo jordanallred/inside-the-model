@@ -342,3 +342,6 @@ code, pre, .widget .grid, .widget .stat { font-variant-numeric: tabular-nums; }
 .xp-sel .chipbtn { padding: 0.1rem 0.55rem; font-size: var(--sl-text-xs); }
 :root[data-theme='light'] .xp .btn.quiet { background: none; border-color: transparent; box-shadow: none; color: var(--itm-slate); }
 @media (max-width: 44rem) { .xp .btn.quiet { min-height: 2.75rem; } .xp-sel .chipbtn { min-width: 2.75rem; min-height: 2.75rem; } }
+
+/* overflow-x:auto also clips vertically, which cut off the 2px selection ring on the active stage. */
+.xp-pipe { padding: 4px 4px 0.5rem; margin: -4px -4px 0; }
