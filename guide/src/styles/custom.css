@@ -78,6 +78,15 @@
 .widget .ex.on { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
 .widget .sec { background: color-mix(in srgb, var(--warn) 10%, var(--surface)); border-radius: var(--itm-radius-sm); padding: 0.55rem 0.75rem; margin: 0.75rem 0; }
 .widget .sec b.h { color: var(--warn); }
+.interaction-frame { margin: 0.75rem 0 1rem; padding: 0.7rem 0.8rem; border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: var(--itm-radius-sm); background: var(--tint); }
+.interaction-topline { display: flex; justify-content: space-between; gap: 0.7rem; align-items: center; color: var(--muted); font: 600 var(--sl-text-xs)/1 var(--body); letter-spacing: 0.06em; text-transform: uppercase; }
+.interaction-reset, .interaction-scenario { border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--fg); font: 600 var(--sl-text-xs)/1.2 var(--body); padding: 0.35rem 0.6rem; cursor: pointer; }
+.interaction-reset { color: var(--muted); }
+.interaction-mission { margin: 0.45rem 0; font-weight: 600; }
+.interaction-scenarios { display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; margin: 0.55rem 0; color: var(--muted); font-size: var(--sl-text-xs); }
+.interaction-scenario.is-active, .interaction-scenario:hover, .interaction-scenario:focus-visible { color: var(--accent-fg); background: var(--accent); border-color: var(--accent); }
+.interaction-observation { border-top: 1px solid var(--line); color: var(--muted); font-size: var(--sl-text-xs); margin: 0.6rem 0 0; padding-top: 0.55rem; }
+.interaction-observation b { color: var(--fg); }
 @media (max-width: 30rem) {
   .widget .ctl { grid-template-columns: 1fr 4.5rem; }
   .widget .ctl label { grid-column: 1 / -1; }

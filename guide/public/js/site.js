@@ -76,7 +76,7 @@
         if (!f) { w.insertAdjacentHTML('beforeend', '<p class="src">Missing widget: ' + esc(w.dataset.w) + '</p>'); return; }
         if (w.dataset.title) w.insertAdjacentHTML('afterbegin', '<div class="wt">' + esc(w.dataset.title) + '</div>');
         const box = document.createElement('div'); w.appendChild(box);
-        try { f(box); } catch (e) { box.innerHTML = '<p class="src">Widget error: ' + esc(e.message) + '</p>'; console.error(e); }
+        try { f(box); window.ITMInteractions?.decorate(w, w.dataset.w); } catch (e) { box.innerHTML = '<p class="src">Widget error: ' + esc(e.message) + '</p>'; console.error(e); }
       });
       if (/^\/(guide\/[^/]+|labs\/[^/]+)\/?$/.test(location.pathname)) wrapTerms(root);
       const c = chapterByPath();

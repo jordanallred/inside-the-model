@@ -65,7 +65,7 @@ export default defineConfig({
             ],
           }),
         },
-      ].concat(['papers', 'glossary', 'itm-weights', 'itm-model', 'itm-train', 'explorer', 'trainer', 'home', 'compare', 'widgets', 'widgets2', 'chapters', 'site'].map(f => ({ tag: 'script', attrs: { src: `/js/${f}.js`, defer: true } }))),
+      ].concat(['papers', 'glossary', 'itm-weights', 'itm-model', 'itm-train', 'explorer', 'trainer', 'home', 'compare', 'widgets', 'widgets2', 'chapters', 'interaction', 'site'].map(f => ({ tag: 'script', attrs: { src: `/js/${f}.js`, defer: true } }))),
       sidebar: [
         { label: 'Start here', items: [{ slug: 'index', label: 'Overview' }, { slug: 'explorer', label: 'Model Explorer' }] },
         ...guideGroups,
