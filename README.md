@@ -26,10 +26,18 @@ Cloudflare Pages is the recommended host for this static site. Connect the repos
 | Root directory | `guide` |
 | Build command | `npm ci && npm run build && npm run check` |
 | Build output directory | `dist` |
-| Environment variable | `SITE_URL=https://your-domain.example` |
+| Environment variable | Optional: `SITE_URL=https://insidethemodel.app` |
 | Node version | `22` (also pinned in `.nvmrc`) |
 
-The platform publishes each build to a `pages.dev` URL and can create previews for branches. After purchasing a domain, add it through the project’s **Custom domains** screen. For an apex domain, point its nameservers to Cloudflare; for a subdomain managed elsewhere, add the CNAME Cloudflare provides. Keep `SITE_URL` set to the final HTTPS canonical domain, including no trailing path.
+The platform publishes each build to a `pages.dev` URL and can create previews for branches. After purchasing a domain, add it through the project’s **Custom domains** screen. For an apex domain, point its nameservers to Cloudflare; for a subdomain managed elsewhere, add the CNAME Cloudflare provides. The site defaults to `https://insidethemodel.app` as its canonical production URL, so builds retain valid canonical tags and a sitemap even if the variable is absent. Set `SITE_URL` to an alternative HTTPS origin only when deliberately building a preview or another deployment environment.
+
+## Public-launch checks
+
+After the production deployment is live:
+
+1. Verify `insidethemodel.app` in [Google Search Console](https://search.google.com/search-console/) and submit `https://insidethemodel.app/sitemap-index.xml`.
+2. Use Search Console’s URL Inspection on the home page to request indexing and confirm Google can read the canonical URL.
+3. Refresh the rich preview cache in the [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/) and [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/). The card should show the Inside the Model artwork, title, and description.
 
 ## Edit it
 

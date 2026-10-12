@@ -5,6 +5,7 @@ import starlight from '@astrojs/starlight';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { CH, PARTS } from './src/chapters.mjs';
+import { siteUrl, socialCardUrl } from './src/site-config.mjs';
 
 const num = Object.fromEntries(CH.map((c, i) => [c[0], i + 1]));
 const guideGroups = Object.keys(PARTS).map(part => ({
@@ -19,9 +20,7 @@ const labItems = fs.readdirSync(labsDir).filter(f => f.endsWith('.md') && f !== 
   .map(x => ({ slug: 'labs/' + x.f.replace(/\.md$/, ''), label: x.t }));
 
 export default defineConfig({
-  // Set SITE_URL in the hosting platform (for example, https://example.com).
-  // Astro uses it for canonical URLs, social metadata, and the sitemap.
-  site: process.env.SITE_URL,
+  site: siteUrl,
   vite: { resolve: { alias: { '/brand': fileURLToPath(new URL('./public/brand', import.meta.url)) } } },
   markdown: { remarkPlugins: [remarkMath], rehypePlugins: [rehypeKatex] },
   integrations: [
@@ -34,6 +33,38 @@ export default defineConfig({
       head: [
         { tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' } },
         { tag: 'link', attrs: { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400..600&family=JetBrains+Mono:wght@400..600&family=Plus+Jakarta+Sans:wght@700;800&display=swap' } },
+        { tag: 'meta', attrs: { property: 'og:image', content: socialCardUrl } },
+        { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
+        { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
+        { tag: 'meta', attrs: { property: 'og:image:alt', content: 'Inside the Model: See exactly how LLMs work' } },
+        { tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
+        { tag: 'meta', attrs: { name: 'twitter:image', content: socialCardUrl } },
+        { tag: 'meta', attrs: { name: 'twitter:image:alt', content: 'Inside the Model: See exactly how LLMs work' } },
+        {
+          tag: 'script',
+          attrs: { type: 'application/ld+json' },
+          content: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@graph': [
+              {
+                '@type': 'WebSite',
+                name: 'Inside the Model',
+                url: siteUrl,
+                description: 'An interactive guide to the calculations, code, training, and inference behind large language models.',
+                inLanguage: 'en',
+              },
+              {
+                '@type': 'LearningResource',
+                name: 'Inside the Model',
+                url: siteUrl,
+                description: 'An interactive guide to the calculations, code, training, and inference behind large language models.',
+                learningResourceType: 'Interactive guide',
+                educationalLevel: 'Beginner to intermediate',
+                inLanguage: 'en',
+              },
+            ],
+          }),
+        },
       ].concat(['papers', 'glossary', 'itm-weights', 'itm-model', 'itm-train', 'explorer', 'trainer', 'home', 'compare', 'widgets', 'widgets2', 'chapters', 'site'].map(f => ({ tag: 'script', attrs: { src: `/js/${f}.js`, defer: true } }))),
       sidebar: [
         { label: 'Start here', items: [{ slug: 'index', label: 'Overview' }, { slug: 'explorer', label: 'Model Explorer' }] },
