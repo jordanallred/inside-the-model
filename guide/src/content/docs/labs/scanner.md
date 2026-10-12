@@ -17,4 +17,6 @@ python -m garak --help          # check current flags; they change between versi
 python -m garak --model_type huggingface --model_name gpt2 --probes promptinject
 ~~~
 
+Each of the three `promptinject` probes sends 256 prompts with 5 generations each, so the scan makes 3,840 attempts. On a laptop CPU it took about 80 minutes; add `--generations 1` to cut the work to a fifth. In one run garak marked all three probes FAIL, with attack success rates of about 20% (`HijackHateHumans`), 28% (`HijackKillHumans`) and 11% (`HijackLongPrompt`), each with an interval of roughly ±2 points. The per-attempt outputs are in the `.hitlog.jsonl` file next to the report. Read them before trusting the percentages: GPT-2 is a base model that continues text rather than following instructions, so ask what "attack success" is actually measuring here.
+
 Read the report. Which probes succeeded? Which successes are meaningful for a real deployment and which are noise? Being able to critique scanner output is a more useful skill than being able to run it.
