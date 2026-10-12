@@ -25,9 +25,9 @@ The site remains a static Astro/Starlight deployment on Cloudflare Pages.
 
 `SITE_URL` remains an optional build-time override for previews and alternative environments. `https://insidethemodel.app` is the fallback in `astro.config.mjs`, preventing a missing Cloudflare variable from removing canonical URLs and the sitemap in production.
 
-The source tree adds three static discovery assets:
+The source tree adds a generated crawler route and two static discovery assets:
 
-- A `robots.txt` that permits crawlers and points to the canonical sitemap.
+- A static `robots.txt` route that permits crawlers and points to the configured sitemap origin.
 - A 1200 × 630 PNG social card in `public/`, built from the existing brand identity and describing the site as an interactive guide to how LLMs work.
 - A default Open Graph and X/Twitter metadata block referencing that card with absolute URLs generated from `site`.
 
@@ -56,7 +56,7 @@ Run the generated-site link, brand, JavaScript, and public-deployment checks aft
 
 - `guide/astro.config.mjs`
 - `guide/src/content/docs/404.md`
-- `guide/public/robots.txt`
+- `guide/src/pages/robots.txt.ts`
 - `guide/public/social-card.png`
 - `guide/tools/check-public-deploy.mjs`
 - `README.md`
