@@ -14,7 +14,7 @@ you can derive that the gradient of softmax cross-entropy with respect to the lo
 :::
 
 :::note[Inspect a real next-token distribution]
-See a real next-token distribution. Switch between trained and random weights to see what learning changes. [Open in the Model Explorer](/explorer/#step=25&t=8&v=visual).
+See a real next-token distribution. Switch between trained and random weights to see what learning changes. [Open in the Model Explorer](/explorer/#step=25&t=9&v=visual).
 :::
 
 ## Probability distributions over a finite set
@@ -67,7 +67,7 @@ $$
 P(x_1,\dots,x_n)=\prod_{t=1}^{n}P\bigl(x_t\mid x_1,\dots,x_{t-1}\bigr)
 $$
 
-A **language model** is a function that, given the prefix, outputs $P(x_{t} | prefix)$ over the vocabulary. Training minimizes the average negative log-likelihood of the real next token at every position, over huge amounts of text. There is no other supervision signal in pretraining.
+A **language model** is a function that, given the prefix, outputs $P(x_{t} | prefix)$ over the vocabulary. Training minimizes the average negative log-likelihood of the real next token at every position, over huge amounts of text. Next-token prediction is the main training signal in pretraining; a few models add small auxiliary objectives ([Chapter 9](/guide/full-model/)).
 
 ### Perplexity
 

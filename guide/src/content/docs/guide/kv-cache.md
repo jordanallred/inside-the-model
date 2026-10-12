@@ -61,7 +61,7 @@ The cache grows linearly with context and with the number of concurrent users, a
 
 At every decoding step the GPU must stream all the active weights and every sequence's cache from memory. If memory bandwidth is BW, a step cannot be faster than (weight bytes + cache bytes) / BW. Arithmetic is small by comparison (2 FLOPs per parameter per sequence). Two consequences:
 
--   **Batching is nearly free until compute binds.** Weights are read once per step no matter how many sequences share the step, so serving 64 users at once multiplies throughput by close to 64 while each user's speed barely changes.
+-   **Batching is nearly free until compute binds.** Weights are read once per step no matter how many sequences share the step, so serving 64 users at once multiplies throughput by close to 64 while each user's speed barely changes, as long as the per-sequence caches stay small next to the weights.
 -   **Smaller numbers are faster.** Quantizing weights from 16 to 4 bits ([Chapter 15](/guide/low-precision/)) cuts the bytes streamed, and so raises decode speed, almost proportionally.
 
 <div class="widget not-content" data-w="roofline" data-title="Decode speed: memory-bound or compute-bound?"></div>
@@ -105,6 +105,6 @@ The cache is stored state derived from every user's prompt, living next to the w
 ## Papers
 
 -   <cite data-p="kwon2023"></cite> Paged memory for the KV cache.
--   <cite data-p="leviathan2022"></cite> Speculative decoding; section 2 has the correctness proof.
+-   <cite data-p="leviathan2022"></cite> Speculative decoding; section 2.3 states the sampling rule and Appendix A.1 proves that it matches the target distribution.
 -   <cite data-p="shazeer2019"></cite> The paper that identified decoding's memory-bandwidth problem and proposed sharing keys and values.
 -   <cite data-p="song2024"></cite> and <cite data-p="weiss2024"></cite> Side channels in serving systems.

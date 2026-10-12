@@ -13,8 +13,8 @@ Chapter 7 of 21 · II. The transformer · about 40 minutes. Builds on: [2. Neura
 you can write the pre-norm transformer block from memory, give the formula for RMSNorm and for a SwiGLU MLP, and estimate the parameter count of a dense model from its width, depth and vocabulary.
 :::
 
-:::note[Inspect a full block]
-See one full block with real numbers: the output projection and first residual add of layer 0. [Open in the Model Explorer](/explorer/#step=9&t=3&l=0&v=visual).
+:::note[Inspect a block's pieces]
+See a block's pieces with real numbers, starting at the output projection and first residual add of layer 0. [Open in the Model Explorer](/explorer/#step=9&t=3&l=0&v=visual).
 :::
 
 ## The block and the residual stream
@@ -55,7 +55,7 @@ $$
 
 There are two parallel up-projections. One passes through the activation and acts as a per-feature "gate" that multiplies the other. Three matrices instead of two means each hidden unit costs 1.5× as much, so the hidden width is reduced (about $8 / 3\cdot d$ instead of 4d) to keep parameter counts comparable: Llama 3 8B uses $d = 4096$ and hidden width 14,336 (3.5d).
 
-What does the MLP do? <cite data-p="geva2020" data-s></cite> argue it acts as a key–value memory: each row of the first matrix is a "key" that fires on a certain pattern in the input, and each column of the second matrix is a "value" written into the residual stream when its key fires. Much of a model's stored factual knowledge appears to sit in these matrices. This is also why mixture-of-experts models ([Chapter 14](/guide/mixture-of-experts/)) split the MLP rather than attention.
+What does the MLP do? <cite data-p="geva2020" data-s></cite> argue it acts as a key–value memory: each row of the first matrix is a "key" that fires on a certain pattern in the input, and each column of the second matrix is a "value" written into the residual stream when its key fires. Much of a model's stored factual knowledge appears to sit in these matrices. Mixture-of-experts models ([Chapter 14](/guide/mixture-of-experts/)) split the MLP rather than attention, since it holds most of the parameters and works on each token independently.
 
 ## Counting parameters
 
@@ -76,7 +76,7 @@ Use the calculator. Choose a preset and check the result against the published s
 
 <div class="widget not-content" data-w="dparams" data-title="Parameter counter for dense transformers"></div>
 
-Two things to notice. First, the MLP holds about two thirds of the layer parameters. Second, grouped-query attention ([Chapter 11](/guide/gqa-and-mla/)) reduces the key/value matrices, so real models have fewer than $4d^{2}$ attention parameters per layer.
+Two things to notice. First, the MLP holds most of the layer parameters: two thirds in the classic design and about 80% in Llama 3 8B. Second, grouped-query attention ([Chapter 11](/guide/gqa-and-mla/)) reduces the key/value matrices, so real models have fewer than $4d^{2}$ attention parameters per layer.
 
 ## Variations you will meet
 

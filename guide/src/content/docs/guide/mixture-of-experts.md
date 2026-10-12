@@ -98,7 +98,7 @@ Routing makes computation depend on the input. In batched serving with finite ex
 ## Papers
 
 -   <cite data-p="shazeer2017"></cite> The sparsely-gated MoE layer.
--   <cite data-p="fedus2021"></cite> Switch Transformers: simple routing and the balancing loss (sections 2.2–2.3).
+-   <cite data-p="fedus2021"></cite> Switch Transformers: simple routing and the balancing loss (sections 2.1–2.2).
 -   <cite data-p="jiang2024"></cite> Mixtral.
 -   <cite data-p="dai2024"></cite> Fine-grained and shared experts.
 -   <cite data-p="wang2024"></cite> Auxiliary-loss-free balancing.

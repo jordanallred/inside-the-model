@@ -15,7 +15,7 @@ you can explain sliding-window attention and attention sinks, the idea of learne
 
 ## Beyond full attention
 
-Full attention costs $O(n^{2})$ in time and its cache grows with $n$. Four families of ideas relax that.
+Full attention costs $O(n^{2})$ in time and its cache grows with $n$. Several families of ideas relax that, covered in the six sections below.
 
 ## 1\. Local (sliding-window) attention
 

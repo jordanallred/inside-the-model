@@ -44,7 +44,7 @@ To encode new text, split it into characters and apply the merges in the order t
 
 ### Vocabulary size is a design choice
 
-Larger vocabularies shorten sequences (fewer tokens per document) but increase the embedding and output matrices and give each rare token fewer training examples. Recent open models use between about 100K and 250K tokens: for example, Llama 3 has 128,256 tokens <cite data-p="grattafiori2024" data-s></cite>, gpt-oss uses a 201,088-token byte-pair tokenizer (o200k\_harmony) <cite data-p="openai2025oss" data-s></cite>, and DeepSeek-V3 has 129,280. The same sentence costs different numbers of tokens in different languages, which affects cost and context budget.
+Larger vocabularies shorten sequences (fewer tokens per document) but increase the embedding and output matrices and give each rare token fewer training examples. Recent open models use between about 100K and 250K tokens: for example, Llama 3 has a 128K-token vocabulary (128,000 in the paper's hyperparameter table, 128,256 entries in the released checkpoints) <cite data-p="grattafiori2024" data-s></cite>, gpt-oss uses a 201,088-token byte-pair tokenizer (o200k\_harmony) <cite data-p="openai2025oss" data-s></cite>, and DeepSeek-V3 has 129,280. The same sentence costs different numbers of tokens in different languages, which affects cost and context budget.
 
 ## Special tokens and chat formats
 

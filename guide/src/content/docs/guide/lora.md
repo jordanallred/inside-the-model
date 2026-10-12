@@ -15,7 +15,7 @@ you can write the LoRA update, state why it saves memory, describe QLoRA's ingre
 
 ## Fine-tuning is expensive in memory
 
-Updating all $N$ weights needs gradients and optimizer state for all of them: with Adam about 12 extra bytes per parameter plus the weights themselves ([Chapter 9](/guide/full-model/)). For an 8-billion-parameter model that is on the order of 100+ GB. Parameter-efficient methods train a small number of new parameters while freezing the original ones.
+Updating all $N$ weights needs gradients and optimizer state for all of them: with Adam and mixed precision that is about 16 bytes per parameter in all, weights included ([Chapter 9](/guide/full-model/)). For an 8-billion-parameter model that is about 128 GB before activations. Parameter-efficient methods train a small number of new parameters while freezing the original ones.
 
 ## LoRA: learn a low-rank change
 

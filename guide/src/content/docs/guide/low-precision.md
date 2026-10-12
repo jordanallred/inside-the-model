@@ -55,7 +55,7 @@ The Open Compute Project's **microscaling** (MX) formats <cite data-p="rouhani20
 
 <div class="widget not-content" data-w="quant" data-title="Quantization error with and without block scales"></div>
 
-gpt-oss quantizes its mixture-of-experts weights (over 90% of its parameters) to MXFP4. The model card gives 4.25 bits per parameter and checkpoints of 60.8 GiB (120b) and 12.8 GiB (20b), which is why the 120b model fits on a single 80 GB GPU <cite data-p="openai2025oss" data-s></cite>. Check: $116.8\text{B}\times4.25/8\approx62$ GB.
+gpt-oss quantizes its mixture-of-experts weights (over 90% of its parameters) to MXFP4. The model card gives 4.25 bits per parameter and checkpoints of 60.8 GiB (120b) and 12.8 GiB (20b), which is why the 120b model fits on a single 80 GB GPU <cite data-p="openai2025oss" data-s></cite>. Check: the 114.7B mixture-of-experts parameters at 4.25 bits take $114.7\text{B}\times4.25/8\approx60.9$ GB; the other 2.12B (attention and embeddings) stay in BF16 and add $2.12\text{B}\times2\approx4.24$ GB. The total is about 65.2 GB, or 60.7 GiB, which matches the 60.8 GiB checkpoint.
 
 ## Check yourself
 

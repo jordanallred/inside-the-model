@@ -73,7 +73,7 @@ $$
 
 The parameter count is unchanged: $4\cdot d^{2}$ ($W_Q$, $W_K$, $W_V$, $W_O$ each $d \times d$) whatever $h$ is. [Chapter 11](/guide/gqa-and-mla/) shows how modern models share keys and values across heads to shrink the inference cache.
 
-Do heads really learn different jobs? Here are all four heads of the small model from the [Model Explorer](/explorer/), trained on a toy grammar. Pick a prompt and compare the patterns: some heads mostly read themselves or the previous token, some read the start-of-sequence token as a resting place. Switch to random weights to see how much of this structure comes from training.
+Do heads really learn different jobs? Here are all four heads of the small model from the [Model Explorer](/explorer/), trained on a toy grammar. Pick a prompt and compare the patterns: layer 0, head 0 mostly reads the token itself, while the other heads spread their attention across the previous token, the start-of-sequence token and earlier words. Switch to random weights to see how much of this structure comes from training.
 
 <div class="widget not-content" data-w="attnreal" data-title="Real attention patterns, every head"></div>
 
