@@ -90,8 +90,8 @@ When run, the first three differences are around $10^{-15}$ (rounding error), th
 
 ## Exercises
 
-1. **Find the head.** For the prompt `a big dog chased the small cat . then it`, print which token each head of each layer reads most strongly. Compare with the arcs in the [attention chapter](/guide/attention/)'s widget.
+1. **Find the head.** For the prompt `a big dog chased the small cat . then it`, print which token each head of each layer reads most strongly. Compare with the heat maps in the [attention chapter](/guide/attention/)'s widget.
 2. **Add a KV cache.** Generate one token at a time, storing each layer's keys and values, and show the logits equal the full computation ([chapter 10](/guide/kv-cache/)). How many numbers does the cache hold per token for this model?
 3. **Ablate a head.** Zero the output of layer 0, head 0 before it is mixed by $W_O$. How much does the next-token distribution after `the cat sat on the` change? Is the change larger for layer 0 or layer 1?
-4. **Replace the positions.** Remove the sinusoidal positions. Which predictions break first, and why can the model still tell `the cat chased the dog` from `the dog chased the cat` through the causal mask alone?
-5. **One gradient step.** Compute the loss on a sentence, then estimate the gradient of one weight with a finite difference. Compare with the value the [training widget](/guide/backpropagation/) reports for that matrix.
+4. **Replace the positions.** Remove the sinusoidal positions. Which predictions break first? Can the model still tell `the cat chased the dog` from `the dog chased the cat`? Test it, and explain what the causal mask alone can and cannot reveal about word order.
+5. **One gradient step.** Compute the loss on a sentence, then estimate the gradient of every entry of one weight matrix with finite differences. Compare its norm with the gradient size the [training widget](/guide/backpropagation/) reports for that matrix.

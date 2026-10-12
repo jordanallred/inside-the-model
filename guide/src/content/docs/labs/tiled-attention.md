@@ -50,7 +50,7 @@ print("max difference:", np.abs(reference(Q, K, V) - tiled(Q, K, V)).max())   # 
 
 ## Exercises
 
-1. Change the block size to 1, 7 and 64. What breaks, and what stays the same? (For 7 you must fix the loop bounds: why?)
+1. Change the block size to 1, 7 and 64. The result should not change, but other things do: what? (64 is not a multiple of 7, so the last block is shorter. Check that the code handles it, and explain which lines make that work.)
 2. Count how many score entries each version holds in memory at once.
 3. Add a counter for how many block pairs are visited. Compare to the full $n^2$ and explain the saving from causality.
 4. Make the first block of keys "sink" tokens that every query always attends to, and add a sliding window ([chapter 13](/guide/sparse-and-linear-attention/)). Does the tiling still work?
