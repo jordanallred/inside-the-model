@@ -87,7 +87,7 @@ $$
 
 Each expert has $3\times2880\times2880=24.9$M parameters.
 
-There are 128 experts per layer, so 3.19B parameters per layer and 114.66B across all 36 layers, which is 98.2% of the model. Only 4 of 128 run per token.
+There are 128 experts per layer, so 3.19B parameters per layer and 114.66B across all 36 layers, which is 98.1% of the model. Only 4 of 128 run per token.
 
 ## 8. Back to words
 
@@ -103,7 +103,7 @@ The 5.13B active parameters are 36 layers of attention (0.96B) and 4 experts per
 
 ## 10. MXFP4 and the checkpoint size
 
-The expert weights are stored in MXFP4: 4-bit floats in blocks of 32 sharing an 8-bit scale, 4.25 bits per value ([chapter 15](/guide/low-precision/)). Check the card's checkpoint size from first principles: $114.66\text{B}\times4.25/8\approx60.9$ GB for the experts, plus about $2.1\text{B}\times2$ bytes $\approx4.3$ GB for everything else in bf16, for $65.2$ GB, which is $60.7$ GiB. The card reports 60.8 GiB, and that is why the model fits on one 80 GB GPU <cite data-p="openai2025oss" data-s></cite>.
+The expert weights are stored in MXFP4: 4-bit floats in blocks of 32 sharing an 8-bit scale, 4.25 bits per value ([chapter 15](/guide/low-precision/)). Check the card's checkpoint size from first principles: $114.66\text{B}\times4.25/8\approx60.9$ GB for the experts, plus about $2.12\text{B}\times2$ bytes $\approx4.24$ GB for everything else in bf16, for $65.2$ GB, which is $60.7$ GiB. The card reports 60.8 GiB, and that is why the model fits on one 80 GB GPU <cite data-p="openai2025oss" data-s></cite>.
 
 ## 11. Memory while generating
 

@@ -3,13 +3,13 @@ title: The newest open models
 description: What is reported about the largest recent open-weight releases, and what could not be confirmed.
 ---
 
-:::caution[Treat every number here as unconfirmed]
-As of mid-October 2026, sources disagree about which open model is "the latest". The models below are described only in secondary sources (aggregator pages and summaries of vendor blogs). Their primary technical reports and configuration files were not available when this page was written. Read the model cards before quoting anything.
+:::caution[Treat the Qwen, GLM and Mistral numbers as unconfirmed]
+As of mid-October 2026, sources disagree about which open model is "the latest". The Kimi K3 row was checked against its technical report and model card. The other models are described here only from secondary sources (aggregator pages and summaries of vendor blogs); their technical reports and configuration files were not read for this page. Some of those primary sources exist (GLM-5 has published weights and a model card), and others do not yet (Mistral Large 4's weights are still announced, not released). Read the model cards before quoting anything.
 :::
 
 | Model | Reported | Status |
 | --- | --- | --- |
-| Kimi K3 (Moonshot) | about 2.8T parameters, mixture of experts; "Kimi Delta Attention" mixed with gated MLA layers (one summary: 69 and 24 layers); "Attention Residuals"; "LatentMoE" routing (one summary: 16 of 896 experts); 1M-token context; native MXFP4 weights; a license that is not a standard permissive one | secondary sources, partly conflicting |
+| Kimi K3 (Moonshot) | 2.78T parameters, 104.2B active; 93 layers (1 dense); hybrid of Kimi Delta Attention and gated latent attention at 3:1 per block (69 KDA + 24 MLA layers); "Attention Residuals"; Stable LatentMoE with 896 routed experts, 16 active per token, plus 2 shared; 1M-token context; MoE expert weights in MXFP4 through quantization-aware training; released under a custom "Kimi K3 License" | primary: technical report and model card (the license terms were not read, and secondary sources disagree on how they compare with K2's) |
 | Qwen 3.8 (Alibaba) | about 2.4T-parameter flagship; a distilled 27B variant under Apache 2.0 | secondary |
 | GLM-5.x (Z.ai) | mixture of experts under the MIT license; one report gives 744B total and about 40B active | secondary, inconsistent |
 | Mistral Large 4 | sparse mixture of experts, about 1.05T total; weights announced for the end of October | not yet released per sources |
@@ -24,7 +24,7 @@ $$
 S_t=S_{t-1}\bigl(I-\beta_t k_t k_t^{\top}\bigr)+\beta_t v_t k_t^{\top},\qquad o_t=S_t\,q_t
 $$
 
-The weakness of pure linear layers is lossy recall of exact details from far back, so recent models are hybrids: mostly linear layers for cheap long context, with an occasional full or latent-attention layer for exact retrieval. [Chapter 13](/guide/sparse-and-linear-attention/) derives this and lets you experiment with it. The Kimi names above appear to refer to this idea, but the exact K3 design could not be confirmed.
+The weakness of pure linear layers is lossy recall of exact details from far back, so recent models are hybrids: mostly linear layers for cheap long context, with an occasional full or latent-attention layer for exact retrieval. [Chapter 13](/guide/sparse-and-linear-attention/) derives this and lets you experiment with it. Kimi K3's technical report confirms this design: its Kimi Delta Attention is the delta rule with a per-channel forget gate, used in three layers out of every four, with a gated latent-attention layer closing each block and one more at the end of the backbone so the final layer attends globally.
 
 ## What to do when you meet a model you have not read about
 
