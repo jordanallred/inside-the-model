@@ -7,6 +7,7 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { CH, PARTS } from '../src/chapters.mjs';
+import { renderHome } from './home-template.mjs';
 
 const DOCS = 'src/content/docs';
 const num = Object.fromEntries(CH.map((c, i) => [c[0], i + 1]));
@@ -54,83 +55,6 @@ ${rows.map(r => `| ${r.p.y} | ${r.p.a.replace(/\.$/, '')}. [${r.p.t.replace(/\|/
 `);
 
 /* home page */
-const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-const mins = CH.reduce((a, c) => a + c[4], 0);
-let home = `---
-title: See exactly how LLMs work
-description: An interactive guide to the calculations, code, training, and inference behind large language models.
-template: splash
-head:
-  - tag: style
-    content: ":root { --sl-content-width: 74rem; }"
-hero:
-  tagline: From text to tensors to understanding. An interactive guide to the calculations, code, training, and inference behind large language models.
-  image:
-    html: '<div class="widget hv not-content" data-w="homehero"></div>'
-  actions:
-    - text: Open the Model Explorer
-      link: /explorer/
-      icon: right-arrow
-    - text: Start the guide
-      link: /guide/gradient-descent/
-      variant: secondary
-    - text: Hands-on labs
-      link: /labs/
-      variant: minimal
----
-
-<div class="home-stats">
-<div><b>${CH.length}</b><span>chapters, about ${(mins / 60).toFixed(1)} hours</span></div>
-<div><b>${labs.length}</b><span>hands-on labs</span></div>
-<div><b>2</b><span>layer-by-layer teardowns</span></div>
-<div><b>${rows.length}</b><span>papers, each linked</span></div>
-</div>
-
-## Every number is inspectable
-
-A small transformer runs in your browser, and every value it computes is on the screen. Nothing is animated for effect: if a number appears, you can see where it came from.
-
-<div class="home-cards">
-<a class="hc hc-flow" href="/explorer/"><span class="hc-k">Trace</span><b>Follow a token through 26 operations</b><span>Step from prompt to next-token probabilities. Pick the token, layer and head, and share the exact state as a link.</span></a>
-<a class="hc hc-attn" href="/explorer/#step=5&t=3&l=0&h=0&v=math"><span class="hc-k">Math</span><b>Recompute it by hand</b><span>The real q, k and v values are substituted into each equation, so one attention score can be checked on paper.</span></a>
-<a class="hc hc-in" href="/explorer/#step=7&t=3&l=0&h=0&v=code"><span class="hc-k">Code</span><b>Read the reference implementation</b><span>The operation you are inspecting is highlighted in plain JavaScript, with downloadable test fixtures.</span></a>
-<a class="hc hc-out" href="/explorer/#step=25&t=5&l=1&h=0&v=visual&w=random"><span class="hc-k">Compare</span><b>Trained against random weights</b><span>Run the identical arithmetic with and without learning, and see exactly what training changes.</span></a>
-</div>
-
-The browser engine is checked against an independent NumPy implementation to within 1e-9, and the hand-written backpropagation is checked against finite differences. The model is deliberately tiny and says so wherever it differs from production systems.
-
-## Start where you are
-
-<div class="home-paths">
-<a href="/guide/gradient-descent/"><b>Curious beginner</b><span>Start with functions and gradients. Needs calculus and linear algebra, but no machine-learning background.</span></a>
-<a href="/explorer/"><b>Software engineer</b><span>Connect tensor shapes and operations to code in the Explorer and the labs.</span></a>
-<a href="/teardown/"><b>ML practitioner</b><span>Verify the mathematics, then compare against real open-weight models.</span></a>
-<a href="/labs/"><b>Instructor or student</b><span>Share reproducible examples by link, then check understanding with the challenges and labs.</span></a>
-</div>
-
-## Curriculum
-
-Each chapter opens with a box saying who can skip it, works through numbers before stating general rules, includes widgets you can poke, and ends with the research behind it.
-
-<div class="home-parts">
-`;
-let part = 0;
-for (const [name, desc] of Object.entries(PARTS)) {
-  part++;
-  const items = CH.map((c, i) => [c, i]).filter(([c]) => c[2] === name);
-  home += `<section class="part"><span class="part-n">${String(part).padStart(2, '0')}</span><h3>${esc(name.replace(/^[IVX]+\. /, ''))}</h3><p>${esc(desc)}</p><ol>` +
-    items.map(([c, i]) => `<li><em>${i + 1}.</em><a href="/guide/${c[1]}/">${esc(c[3])}</a><span>${c[4]} min</span></li>`).join('') + `</ol></section>\n`;
-}
-home += `</div>
-
-## Also here
-
-- [Model teardowns](/teardown/): follow one token through gpt-oss-120b and DeepSeek-V3, layer by layer, with their real configurations.
-- [Hands-on labs](/labs/): ${labs.length} exercises that make the chapters concrete.
-- [Public security guidance for AI systems](/reference/security-guidance/): what NSA, CISA and allied agencies have published.
-- [All papers](/reference/papers/): every reference, with the chapters that cite it.
-
-Every paper is linked (all but three textbooks to arXiv), and every arXiv id and title was checked against the arXiv API. Statements about specific models come from their technical reports or model cards, and anything that could not be confirmed is marked. Reading progress stays private to this browser.
-`;
+const home = renderHome({ CH, PARTS, labs, rows });
 fs.writeFileSync(`${DOCS}/index.md`, home);
 console.log(`generated: ${CH.length} chapters, ${labs.length} labs, ${rows.length} papers`);
