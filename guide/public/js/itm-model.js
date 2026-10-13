@@ -1,8 +1,10 @@
-/* Inside the Model: reference toy transformer (itm-toy-1.0).
+/* Inside the Model: the browser engine for the toy transformer (itm-toy).
+   A JavaScript port of the reference implementation, public/code/itm_model.py (NumPy), so the Explorer can recompute
+   everything live in the reader’s browser. npm run verify (tools/verify-trace.mjs) checks the two agree to 1e-9, and that
+   the constants in CFG below equal public/trace/model.json, the architecture both implementations share.
    Pure, deterministic, float64, no dependencies. Works in the browser (window.ITM) and in Node (globalThis.ITM).
-   Architecture: decoder-only, pre-RMSNorm, 2 layers, 2 heads, sinusoidal positions, GELU(tanh) MLP, tied unembedding, no biases.
-   Weights are trained offline on a tiny synthetic grammar (tools/train_model.py) and loaded from itm-weights.js. If that file is
-   absent the engine falls back to seeded random weights, which still demonstrate the computation but predict nothing meaningful. */
+   Weights are trained offline (tools/train_model.py) and loaded from itm-weights.js. seeded() gives the random,
+   untrained weights the Explorer offers for contrast; verify-trace runs those through the reference as well. */
 (function (root) {
   const CFG = {
     version: 'itm-toy-2.0', seed: 20261012,
@@ -17,7 +19,7 @@
     'the cat sat on the',
   ];
 
-  /* mulberry32 PRNG, Box-Muller normals. The Python reference (tools/reference_model.py) implements the same generator. */
+  /* mulberry32 PRNG, Box-Muller normals, for the untrained comparison weights. */
   function rng(seed) {
     let a = seed >>> 0;
     return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };

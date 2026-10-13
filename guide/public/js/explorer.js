@@ -1,4 +1,4 @@
-/* Model Explorer: steps through the full forward pass of the itm-toy model (see itm-model.js).
+/* Model Explorer: steps through the full forward pass of the itm-toy model (browser engine itm-model.js, reference public/code/itm_model.py).
    Every number shown comes from ITM.forward(); nothing here invents values. Views: Picture, Numbers, Code.
    State (prompt, step, token, head, view, weights) lives in the URL hash so an example can be shared.
    Step indices are part of that URL contract: chapters link to e.g. #step=7, so STEPS must keep its order. */
@@ -39,25 +39,25 @@
   GROUPS.push({ n: 'Output', c: 'var(--c2)', s: [23, 24, 25] });
   const colorOf = s => { const S = STEPS[s]; return S.l === undefined ? (s < 3 ? 'var(--c1)' : 'var(--c2)') : ATTN.includes(S.k) ? 'var(--c4)' : 'var(--c3)'; };
 
-  /* ---- reference source shown in the Code view; the active operation is highlighted ---- */
-  const CODE = {
-    tokens: 'const ids = [0, ...words.map(w => vocab.indexOf(w))];            // 0 = <bos>',
-    embed: 'const tokEmb = ids.map(i => E[i]);                               // [T, 16]',
-    pos: 'x = tokEmb[t][j] + 0.5 * posEnc(t, j);                             // sin for even j, cos for odd j',
-    ln1: 'ln1 = rmsnorm(x);   // x / sqrt(mean(x*x) + 1e-5), per token',
-    qkv: 'q = ln1 @ Wq;  k = ln1 @ Wk;  v = ln1 @ Wv;                         // head h uses columns [8h, 8h+8)',
-    scores: 'scaled[i][j] = dot(q[i], k[j]) / Math.sqrt(8);',
-    mask: 'masked[i][j] = j > i ? -Infinity : scaled[i][j];',
-    softmax: 'weights[i] = softmax(masked[i]);                                 // exp(s - max) / sum',
-    headout: 'out[i][n] = sum_j weights[i][j] * v[j][n];',
-    oproj: 'attnOut = concat(head0.out, head1.out) @ Wo;  resid1 = x + attnOut;',
-    ln2: 'ln2 = rmsnorm(resid1);',
-    mlp: 'hidden = ln2 @ W1;  act = gelu(hidden);  mlpOut = act @ W2;',
-    resid2: 'resid2 = resid1 + mlpOut;                                        // input to the next layer',
-    lnf: 'lnf = rmsnorm(resid2_of_last_layer);',
-    logits: 'logits = lnf @ transpose(E);                                     // [T, 25]',
-    probs: 'probs = logits.map(softmax);',
-  };
+  /* ---- Code view: the NumPy reference itself (public/code/itm_model.py), fetched once. Each step's lines follow a
+     "# step: <key>" comment there, so the highlight cannot drift from the code that verify-trace checks. ---- */
+  const PY_URL = '/code/itm_model.py';
+  const HELPER = { pos: 'positions', ln1: 'rmsnorm', ln2: 'rmsnorm', lnf: 'rmsnorm', softmax: 'softmax', mlp: 'gelu', probs: 'softmax' };
+  let PY = null, pyFailed = false;
+  const indent = l => l.length - l.trimStart().length;
+  /* [start, end) of a step's block: from its marker to the next marker, blank line, dedent or return */
+  function pyBlock(k) {
+    const i = PY.findIndex(l => l.trim() === '# step: ' + k); if (i < 0) return null;
+    let j = i + 1;
+    while (j < PY.length && PY[j].trim() && !/^\s*(# step: |return\b)/.test(PY[j]) && indent(PY[j]) >= indent(PY[i])) j++;
+    return [i, j];
+  }
+  function pyDef(name) {
+    const i = PY.findIndex(l => l.startsWith('def ' + name + '(')); if (i < 0) return null;
+    let j = i + 1; while (j < PY.length && (!PY[j].trim() || indent(PY[j]) > 0)) j++;
+    while (j > i && !PY[j - 1].trim()) j--;
+    return [i, j];
+  }
 
   /* ---- small helpers ---- */
   const fmt = (x, p) => (x === -Infinity ? MINUS + '∞' : (x < 0 ? MINUS : '') + Math.abs(x).toFixed(p));
@@ -345,10 +345,23 @@
     }
 
     function codeView() {
-      const k = STEPS[st.step].k;
-      return '<p class="src">The reference implementation, <a href="/js/itm-model.js">itm-model.js</a>: plain JavaScript in float64. The line for this step is highlighted.</p><pre class="mx-code"><code>' +
-        Object.keys(CODE).map(n => '<span class="' + (n === k ? 'on' : '') + '"' + (n === k ? ' aria-current="true"' : '') + '>' + esc(CODE[n]) + '</span>').join('\n') + '</code></pre>' +
-        '<div class="mx-acts"><button type="button" class="mx-btn" data-a="copy">Copy this line</button> <a class="mx-btn" href="/trace/golden.json" download>Download the golden fixture</a></div>';
+      const intro = '<p class="src">The reference implementation, <a href="' + PY_URL + '">itm_model.py</a>, in NumPy. Your browser runs a JavaScript port of it so the Explorer can recompute live; the two are checked to agree to within 1e-9.</p>';
+      const dl = '<div class="mx-acts"><a class="mx-btn" href="' + PY_URL + '" download>Download itm_model.py</a><a class="mx-btn" href="/trace/model.json" download>model.json</a><a class="mx-btn" href="/trace/weights.json" download>weights.json</a></div>';
+      if (!PY) {
+        if (!pyFailed) fetch(PY_URL).then(r => (r.ok ? r.text() : Promise.reject(r.status))).then(t => { PY = t.replace(/\r\n/g, '\n').split('\n'); }).catch(() => { pyFailed = true; }).then(() => { if (st.view === 'code') render(); });
+        return intro + (pyFailed ? '<p class="mx-warn">The code could not be loaded here. Download it below.</p>' : '<p class="src">Loading the code…</p>') + dl;
+      }
+      const k = STEPS[st.step].k, on = pyBlock(k), aux = HELPER[k] ? pyDef(HELPER[k]) : null;
+      const from = PY.findIndex(l => l.startsWith('def rmsnorm(')), to = PY.findIndex(l => l.startsWith("if __name__"));
+      const show = PY.slice(from, to > 0 ? to : PY.length);
+      while (show.length && !show[show.length - 1].trim()) show.pop();
+      const line = (l, n) => {
+        const cls = on && n >= on[0] && n < on[1] ? 'on' : aux && n >= aux[0] && n < aux[1] ? 'aux' : '', c = l.indexOf('#');
+        const body = c >= 0 ? esc(l.slice(0, c)) + '<em>' + esc(l.slice(c)) + '</em>' : esc(l);
+        return '<span' + (cls ? ' class="' + cls + '"' : '') + (cls === 'on' && n === on[0] ? ' aria-current="true"' : '') + '>' + (body || ' ') + '</span>';
+      };
+      return intro + '<pre class="mx-code" data-x="code"><code>' + show.map((l, i) => line(l, i + from)).join('') + '</code></pre>' +
+        '<p class="src">Highlighted: this step' + (aux ? ', plus the helper it calls, <code>' + HELPER[k] + '()</code>' : '') + '.</p>' + dl.replace('<div class="mx-acts">', '<div class="mx-acts"><button type="button" class="mx-btn" data-a="copy">Copy this step’s code</button>');
     }
 
     /* ---- render ---- */
@@ -394,8 +407,9 @@
           '<dt>Operation</dt><dd><code>' + (S.l === undefined ? '' : 'L' + S.l + '.') + (HEADD[S.k] ? 'H' + st.h + '.' : '') + S.k + '</code></dd><dt>Inputs</dt><dd>' + esc(D.inputs) + '</dd><dt>Output shape</dt><dd><code>' + esc(D.shape) + '</code> float64</dd><dt>Equation</dt><dd><code>' + esc(D.eq) + '</code></dd>' +
           '<dt>Model</dt><dd><code>' + CFG.version + '</code>: 2 layers, 2 heads, d<sub>model</sub> = 16, 25-entry vocabulary</dd>' +
           '<dt>Weights</dt><dd>' + (ws0.meta.trained ? 'trained for ' + ws0.meta.steps + ' Adam steps on a toy grammar; held-out loss ' + ws0.meta.heldOutLoss + ' (uniform guessing ' + ws0.meta.uniformLoss + ')' : 'random initialization, never trained') + '; checksum <code>' + ws0.sum + '</code></dd>' +
-          '<dt>Precision</dt><dd>computed in float64' + (ws0.meta.trained ? '; attention weights and logits match an independent NumPy implementation to 1e-9' : '; these random weights are not part of the NumPy check') + '</dd></dl>' +
+          '<dt>Reference</dt><dd><a href="' + PY_URL + '">itm_model.py</a> (NumPy). This page runs a JavaScript port of it; attention weights, final hidden states and logits agree to within 1e-9, for these ' + (ws0.meta.trained ? 'trained' : 'untrained') + ' weights too</dd><dt>Precision</dt><dd>computed in float64</dd></dl>' +
           '<button type="button" class="mx-btn" data-a="copylink">Copy a link to exactly this view</button></details>';
+      const code = $('code'), cur = code && code.querySelector('.on'); if (cur) code.scrollTop = Math.max(0, cur.offsetTop - 48);
       $('announce').textContent = 'Step ' + (st.step + 1) + ' of ' + STEPS.length + ': ' + where(st.step) + ', ' + INFO[S.k].t + '. Following ' + wd[st.t] + '.';
       try { history.replaceState(null, '', '#' + new URLSearchParams({ p: st.prompt, step: st.step, t: st.t, l: S.l === undefined ? 0 : S.l, h: st.h, v: st.view, w: st.w }).toString()); } catch (e) {}
     }
@@ -417,7 +431,11 @@
       else if (d.a === 'how') { st.t = 99; return go(25); }
       else if (d.a === 'map') st.map = !st.map;
       else if (d.a === 'copylink') { try { navigator.clipboard.writeText(location.href); b.textContent = 'Link copied'; } catch (x) {} return; }
-      else if (d.a === 'copy') { try { navigator.clipboard.writeText(CODE[STEPS[st.step].k]); b.textContent = 'Copied'; } catch (x) {} return; }
+      else if (d.a === 'copy') {
+        const r = PY && pyBlock(STEPS[st.step].k); if (!r) return;
+        const ls = PY.slice(r[0] + 1, r[1]), cut = Math.min(...ls.map(indent));
+        try { navigator.clipboard.writeText(ls.map(l => l.slice(cut)).join('\n')); b.textContent = 'Copied'; } catch (x) {} return;
+      }
       else return;
       render();
     });

@@ -197,10 +197,13 @@
 .mx-view > p { margin: 0.6rem 0 0.3rem; }
 .mx .grid.mx-num { margin: 0.4rem 0 !important; }
 .mx .grid.mx-num td { width: auto; min-width: 4.2rem; padding: 0.15rem 0.45rem; height: 1.7rem; }
-.mx-code { background: var(--tint); border-radius: var(--itm-radius-sm); padding: 0.6rem 0; overflow-x: auto; font-size: var(--sl-text-xs); margin: 0.6rem 0 !important; }
+.mx-code { position: relative; background: var(--tint); border-radius: var(--itm-radius-sm); padding: 0.6rem 0; overflow: auto; max-height: 30rem; font-size: var(--sl-text-xs); margin: 0.6rem 0 !important; }
 .mx-code code { display: block; background: none; }
-.mx-code span { display: block; padding: 0.15rem 0.9rem; border-left: 3px solid transparent; white-space: pre; }
-.mx-code span.on { background: color-mix(in srgb, var(--accent) 22%, transparent); border-left-color: var(--accent); font-weight: 600; }
+.mx-code span { display: block; padding: 0.1rem 0.9rem; border-left: 3px solid transparent; white-space: pre; line-height: 1.55; }
+.mx-code span.on { background: color-mix(in srgb, var(--c4) 28%, var(--tint)); border-left-color: var(--c4); font-weight: 600; color: var(--fg); }
+.mx-code span.aux { background: color-mix(in srgb, var(--c4) 11%, var(--tint)); border-left-color: color-mix(in srgb, var(--c4) 55%, transparent); }
+.mx-code em { font-style: normal; color: var(--muted); }
+.mx-code span.on em { color: inherit; opacity: 0.75; }
 .mx-acts { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .mx-acts .mx-btn { flex-direction: row; align-items: center; }
 

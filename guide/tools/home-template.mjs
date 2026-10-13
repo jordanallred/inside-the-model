@@ -74,12 +74,12 @@ head:
   <div class="home-inspection-intro">
     <h2 id="home-inspection-title">Every number has a way back</h2>
     <p>The Explorer does not animate a story over a black box. It exposes the values the model actually computed, then lets you inspect the same operation as a diagram, an equation, or code.</p>
-    <p class="home-verification">The browser engine is checked against an independent NumPy implementation to within 1e-9. Hand-written backpropagation is checked against finite differences.</p>
+    <p class="home-verification">The browser engine is checked against the NumPy reference implementation to within 1e-9. Hand-written backpropagation is checked against finite differences.</p>
   </div>
   <div class="home-inspection-list">
     <a class="home-inspection-row home-inspection-trace" href="/explorer/"><span>Trace</span><b>Follow a token through 26 operations</b><small>Pick the token, layer, and head. Share the exact state as a link.</small></a>
     <a class="home-inspection-row home-inspection-math" href="/explorer/#step=5&amp;t=3&amp;l=0&amp;h=0&amp;v=math"><span>Math</span><b>Recompute one attention score by hand</b><small>See the real q, k, and v values substituted into each equation.</small></a>
-    <a class="home-inspection-row home-inspection-code" href="/explorer/#step=7&amp;t=3&amp;l=0&amp;h=0&amp;v=code"><span>Code</span><b>Read the reference implementation</b><small>The current operation is highlighted in plain JavaScript with test fixtures.</small></a>
+    <a class="home-inspection-row home-inspection-code" href="/explorer/#step=7&amp;t=3&amp;l=0&amp;h=0&amp;v=code"><span>Code</span><b>Read the reference implementation</b><small>The current operation is highlighted in the NumPy reference, with downloadable test fixtures.</small></a>
     <a class="home-inspection-row home-inspection-compare" href="/explorer/#step=25&amp;t=5&amp;l=1&amp;h=0&amp;v=visual&amp;w=random"><span>Compare</span><b>See what training changes</b><small>Run the same arithmetic with trained and random weights.</small></a>
   </div>
 </section>

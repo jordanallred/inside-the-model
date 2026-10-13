@@ -7,7 +7,7 @@ head:
     content: ":root { --sl-content-width: 76rem; }"
 ---
 
-A real, tiny decoder-only transformer, run in your browser. Type a prompt and see which word it predicts next, then follow any word through the 26 steps of the forward pass that produced that prediction. Every number on this page is computed by the [reference code](/js/itm-model.js). Its attention weights, final hidden states and logits are checked against an independent NumPy implementation to within 1e-9, and the canonical traces are available as a [golden fixture](/trace/golden.json). The trained [weights](/trace/weights.json) are downloadable too.
+A real, tiny decoder-only transformer, run in your browser. Type a prompt and see which word it predicts next, then follow any word through the 26 steps of the forward pass that produced that prediction. Every number on this page is computed live by a JavaScript port of the [NumPy reference implementation](/code/itm_model.py), which you can download and run. The two agree to within 1e-9 on every attention weight, final hidden state and logit, and the canonical traces are available as a [golden fixture](/trace/golden.json). The trained [weights](/trace/weights.json) are downloadable too.
 
 <div class="widget not-content" data-w="explorer" data-title="Model Explorer"></div>
 

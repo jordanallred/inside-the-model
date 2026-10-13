@@ -1,0 +1,18 @@
+{
+  "version": "itm-toy-2.0",
+  "vocab": ["<bos>", "the", "a", "cat", "dog", "bird", "sat", "ran", "slept", "on", "under", "mat", "bed", "and", "chased", "saw", ".", "big", "small", "red", "then", "to", "home", "it", "was"],
+  "dModel": 16,
+  "nHeads": 2,
+  "dHead": 8,
+  "dMlp": 32,
+  "nLayers": 2,
+  "maxCtx": 16,
+  "eps": 1e-5,
+  "posScale": 0.5,
+  "prompts": [
+    "the cat sat on the mat . the dog",
+    "a big dog chased the small cat . then it",
+    "the bird saw a red cat and the dog",
+    "the cat sat on the"
+  ]
+}

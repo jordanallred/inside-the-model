@@ -1,14 +1,13 @@
 """Trains the itm-toy model on a small synthetic grammar, in pure NumPy with hand-written backprop.
-Writes public/js/itm-weights.js (loaded by the browser engine) and public/trace/weights.json (loaded by the NumPy reference).
+Writes public/js/itm-weights.js (loaded by the browser engine) and public/trace/weights.json (loaded by the NumPy reference, public/code/itm_model.py).
 Usage:  python -I tools/train_model.py            train and write weights
         python -I tools/train_model.py --check    gradient-check the backward pass only"""
-import json, math, re, sys
+import json, math, sys
 import numpy as np
 
-src = open('public/js/itm-model.js', encoding='utf8').read()
-VOCAB = json.loads(re.search(r"vocab: (\[.*?\])", src).group(1).replace("'", '"'))
-PROMPTS = json.loads(re.sub(r",\s*\]", "]", re.search(r"prompts = (\[.*?\]);", src, re.S).group(1)).replace("'", '"'))
-V, D, H, DH, DM, NL, T, EPS, POS = len(VOCAB), 16, 2, 8, 32, 2, 16, 1e-5, 0.5
+CFG = json.load(open('public/trace/model.json', encoding='utf8'))      # the architecture, shared with the reference and the browser engine
+VOCAB, PROMPTS = CFG['vocab'], CFG['prompts']
+V, D, H, DH, DM, NL, T, EPS, POS = len(VOCAB), CFG['dModel'], CFG['nHeads'], CFG['dHead'], CFG['dMlp'], CFG['nLayers'], CFG['maxCtx'], CFG['eps'], CFG['posScale']
 SEED, STEPS, BATCH, LR = 20261012, 4000, 64, 6e-3
 WORD = {w: i for i, w in enumerate(VOCAB)}
 
