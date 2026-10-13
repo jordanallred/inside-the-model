@@ -296,25 +296,27 @@
 
   /* Chapter widget: the real attention patterns of every head, for a chosen prompt. Same engine and weights as the Explorer. */
   window.W.attnreal = el => {
-    const { ITM } = window; if (!ITM) { el.insertAdjacentHTML('beforeend', '<p class="src">The model engine failed to load.</p>'); return; }
+    const { ITM, K } = window; if (!ITM) { el.insertAdjacentHTML('beforeend', '<p class="src">The model engine failed to load.</p>'); return; }
     const V = ITM.CFG.vocab, P = ITM.CFG.prompts;
-    el.innerHTML = '<div class="row"><label>Prompt <select data-k="p">' + P.map((q, i) => '<option value="' + i + '">' + esc(q) + '</option>').join('') + '</select></label>' +
-      '<label><input type="checkbox" data-k="r"> random weights (nothing learned)</label></div><div class="ar-grid" data-out></div>' +
-      '<p class="src">Real attention weights from the Model Explorer\u2019s 2-layer, 2-head model. Row = the token doing the looking, column = the token it reads; darker means more weight, hatched cells are blocked by the causal mask. Open any head in the Explorer to see the scores, the mask and the arithmetic behind it.</p>';
-    const draw = () => {
-      const text = P[+el.querySelector('[data-k="p"]').value], rand = el.querySelector('[data-k="r"]').checked;
-      const tk = ITM.tokenize(text), W = (rand ? ITM.seeded() : ITM.weights()).W, tr = ITM.forward(W, tk.ids), w = tk.ids.map(i => V[i]);
+    const S = { p: 0, r: false, q: -1 };
+    el.innerHTML = '<div class="row"><label>Prompt <select data-k="p">' + P.map((q, i) => '<option value="' + i + '">' + esc(q) + '</option>').join('') + '</select></label>' + K.toggle('r', 'random weights (nothing learned)') + '</div>' +
+      '<p class="wk-cap">Pick a token to compare what it reads in all four heads at once.</p><div class="wk-toks" data-x="toks" role="group" aria-label="Token doing the looking"></div><div class="ar-grid" data-out></div>' +
+      '<p class="src">Real attention weights from the Model Explorer’s 2-layer, 2-head model. Row = the token doing the looking, column = the token it reads; darker means more weight, hatched cells are blocked by the causal mask.</p>';
+    const ui = K.bind(el, S, draw, { change: k => { if (k === 'p') S.q = -1; } });
+    el.addEventListener('click', e => { const b = e.target.closest('[data-q]'); if (b) ui.update('q', +b.dataset.q); });
+    function draw() {
+      const text = P[S.p], tk = ITM.tokenize(text), W = (S.r ? ITM.seeded() : ITM.weights()).W, tr = ITM.forward(W, tk.ids), w = tk.ids.map(i => V[i]), q = S.q < 0 || S.q >= w.length ? w.length - 1 : S.q;
+      el.querySelector('[data-x="toks"]').innerHTML = w.map((t, i) => '<button type="button" class="wk-tok" data-q="' + i + '" aria-pressed="' + (i === q) + '">' + esc(t) + '</button>').join('');
       let h = '';
       tr.layers.forEach((L, l) => L.heads.forEach((H, hd) => {
-        const link = '/explorer/#' + new URLSearchParams({ p: text, step: l * 10 + 7, t: tk.ids.length - 1, l, h: hd, v: 'visual', w: rand ? 'random' : 'trained' }).toString();
-        const best = H.weights.map((r, i) => { const j = r.indexOf(Math.max(...r)); return w[i] + ' \u2192 ' + w[j] + ' (' + r[j].toFixed(2) + ')'; }).join('\n');
+        const link = '/explorer/#' + new URLSearchParams({ p: text, step: l * 10 + 7, t: q, l, h: hd, v: 'visual', w: S.r ? 'random' : 'trained' }).toString(), row = H.weights[q], j = row.indexOf(Math.max(...row));
         h += '<figure class="ar"><figcaption>Layer ' + l + ', head ' + hd + '</figcaption><table class="grid"><thead><tr><th></th>' + w.map(t => '<th scope="col">' + esc(t) + '</th>').join('') + '</tr></thead><tbody>' +
-          H.weights.map((r, i) => '<tr><th scope="row">' + esc(w[i]) + '</th>' + r.map((v, j) => j > i ? '<td class="m"></td>' : '<td title="' + esc(w[i] + ' reads ' + w[j] + ': ' + v.toFixed(3)) + '"><i style="opacity:' + Math.min(1, v).toFixed(3) + '"></i></td>').join('') + '</tr>').join('') +
-          '</tbody></table><details><summary>Strongest read per token</summary><pre>' + esc(best) + '</pre></details><a href="' + link + '">Inspect in the Model Explorer</a></figure>';
+          H.weights.map((r, i) => '<tr' + (i === q ? ' style="outline:2px solid var(--accent);outline-offset:-1px"' : '') + '><th scope="row" class="wk-click" data-q="' + i + '">' + esc(w[i]) + '</th>' + r.map((v, c) => (c > i ? '<td class="m"></td>' : '<td data-q="' + i + '" title="' + esc(w[i] + ' reads ' + w[c] + ': ' + v.toFixed(3)) + '"><i style="opacity:' + Math.min(1, v).toFixed(3) + '"></i></td>')).join('') + '</tr>').join('') +
+          '</tbody></table><p class="wk-cap">“' + esc(w[q]) + '” reads <b>' + esc(w[j]) + '</b> most (' + row[j].toFixed(2) + ')' + (j === q ? ': itself' : j === 0 ? ': the start token' : j === q - 1 ? ': the previous token' : '') + '</p><a href="' + link + '">Inspect in the Model Explorer</a></figure>';
       }));
       el.querySelector('[data-out]').innerHTML = h;
-    };
-    el.addEventListener('change', draw); draw();
+    }
+    draw();
   };
 
   /* Test-yourself challenges. Every answer is computed from the live trace, so questions and answers cannot drift from the model. */
@@ -361,25 +363,29 @@
 
   /* Chapter widget: what a mask does to the model's real attention scores. */
   window.W.attnmask = el => {
-    const { ITM } = window; if (!ITM) { el.insertAdjacentHTML('beforeend', '<p class="src">The model engine failed to load.</p>'); return; }
+    const { ITM, K } = window; if (!ITM) { el.insertAdjacentHTML('beforeend', '<p class="src">The model engine failed to load.</p>'); return; }
     const V = ITM.CFG.vocab, P = ITM.CFG.prompts;
-    el.innerHTML = '<div class="row"><label>Prompt <select data-k="p">' + P.map((q, i) => '<option value="' + i + '">' + esc(q) + '</option>').join('') + '</select></label>' +
-      '<label>Layer <select data-k="l"><option>0</option><option>1</option></select></label><label>Head <select data-k="h"><option>0</option><option>1</option></select></label>' +
-      '<label><input type="checkbox" data-k="c" checked> causal mask</label></div>' +
-      '<div class="ctl"><label>sliding window (0 = off)</label><input type="range" data-k="w" min="0" max="10" step="1" value="0" aria-label="Sliding window size"><output data-k="wo">0</output></div>' +
-      '<div class="gscroll" data-out></div><p class="src" data-note></p>';
-    const draw = () => {
-      const g = k => el.querySelector('[data-k="' + k + '"]'), tk = ITM.tokenize(P[+g('p').value]), tr = ITM.forward(ITM.weights().W, tk.ids), w = tk.ids.map(i => V[i]);
-      const H = tr.layers[+g('l').value].heads[+g('h').value], causal = g('c').checked, win = +g('w').value; g('wo').textContent = win;
-      const txt = []; let h = '<table class="grid"><thead><tr><th></th>' + w.map(t => '<th scope="col">' + esc(t) + '</th>').join('') + '</tr></thead><tbody>', blocked = 0;
-      H.scaled.forEach((row, i) => {
-        const ok = row.map((_, j) => (!causal || j <= i) && (!win || Math.abs(i - j) < win)), p = ITM.math.softmax(row.map((s, j) => (ok[j] ? s : -Infinity)));
-        h += '<tr><th scope="row">' + esc(w[i]) + '</th>' + p.map((v, j) => { if (!ok[j]) { blocked++; return '<td class="m" title="blocked"></td>'; } return '<td title="' + esc(w[i] + ' reads ' + w[j] + ': ' + v.toFixed(3)) + '"><i style="opacity:' + Math.min(1, v).toFixed(3) + '"></i></td>'; }).join('') + '</tr>';
-        txt.push(w[i] + ': ' + p.map((v, j) => (ok[j] ? w[j] + ' ' + v.toFixed(2) : null)).filter(Boolean).join(', '));
+    const S = { p: 0, k: 0, c: true, w: 0, q: -1 };
+    el.innerHTML = '<div class="row"><label>Prompt <select data-k="p">' + P.map((q, i) => '<option value="' + i + '">' + esc(q) + '</option>').join('') + '</select></label></div>' +
+      K.seg('k', 'head', [['0', 'L0 H0'], ['1', 'L0 H1'], ['2', 'L1 H0'], ['3', 'L1 H1']]) + '<div class="wk-bar">' + K.toggle('c', 'causal mask') + '</div>' + K.seg('w', 'sliding window', [['0', 'off'], ['2', '2'], ['3', '3'], ['4', '4']]) +
+      '<p class="wk-cap">Click a row to see that token’s weights before and after masking.</p><div class="gscroll" data-out></div><div data-x="row" aria-live="polite"></div>' +
+      K.details('About these numbers', '<p class="src">These are the real scores of the Explorer’s trained model, re-normalized under the mask you pick. The model was trained only with the causal mask, so the other settings show what the same scores would give, not a model trained that way.</p>');
+    const ui = K.bind(el, S, draw, { change: k => { if (k === 'p') S.q = -1; } });
+    el.addEventListener('click', e => { const b = e.target.closest('[data-q]'); if (b) ui.update('q', +b.dataset.q); });
+    function draw() {
+      const tk = ITM.tokenize(P[S.p]), tr = ITM.forward(ITM.weights().W, tk.ids), w = tk.ids.map(i => V[i]), n = w.length, q = S.q < 0 || S.q >= n ? Math.min(n - 1, 4) : S.q;
+      const H = tr.layers[S.k >> 1].heads[S.k & 1], allow = (i, j) => (!S.c || j <= i) && (!S.w || Math.abs(i - j) < S.w);
+      let blocked = 0, h = '<table class="grid"><thead><tr><th></th>' + w.map(t => '<th scope="col">' + esc(t) + '</th>').join('') + '</tr></thead><tbody>';
+      const rows = H.scaled.map((row, i) => ITM.math.softmax(row.map((s, j) => (allow(i, j) ? s : -Infinity))));
+      rows.forEach((p, i) => {
+        h += '<tr' + (i === q ? ' style="outline:2px solid var(--accent);outline-offset:-1px"' : '') + '><th scope="row" class="wk-click" data-q="' + i + '">' + esc(w[i]) + '</th>' + p.map((v, j) => { if (!allow(i, j)) { blocked++; return '<td class="m" data-q="' + i + '" title="blocked"></td>'; } return '<td data-q="' + i + '" title="' + esc(w[i] + ' reads ' + w[j] + ': ' + v.toFixed(3)) + '"><i style="opacity:' + Math.min(1, v).toFixed(3) + '"></i></td>'; }).join('') + '</tr>';
       });
-      el.querySelector('[data-out]').innerHTML = h + '</tbody></table><details><summary>Weights as numbers</summary><pre>' + esc(txt.join('\n')) + '</pre></details>';
-      el.querySelector('[data-note]').textContent = blocked + ' of ' + (w.length * w.length) + ' cells are blocked. Hatched = not allowed; darker = more weight; every row of allowed cells sums to 1. These are the real scores of the Explorer\u2019s trained model, re-normalized under the mask you pick. The model was trained only with the causal mask, so the other settings show what the same scores would give, not a model trained that way.';
-    };
-    el.addEventListener('input', draw); el.addEventListener('change', draw); draw();
+      el.querySelector('[data-out]').innerHTML = h + '</tbody></table>';
+      const raw = ITM.math.softmax(H.scaled[q]), masked = rows[q], lost = raw.reduce((s, v, j) => s + (allow(q, j) ? 0 : v), 0);
+      el.querySelector('[data-x="row"]').innerHTML = '<div class="kicker">row “' + esc(w[q]) + '”: grey = softmax of all scores, violet = after the mask (renormalized)</div>' +
+        w.map((t, j) => '<div class="brow"><span>' + esc(t) + '</span><div class="bar" style="position:relative"><i style="position:absolute;left:0;top:0;height:50%;width:' + (raw[j] * 100).toFixed(1) + '%;background:var(--muted);opacity:.6"></i><i style="position:absolute;left:0;top:50%;height:50%;width:' + (masked[j] * 100).toFixed(1) + '%;background:var(--c4)"></i></div><span>' + (allow(q, j) ? masked[j].toFixed(2) : 'blocked') + '</span></div>').join('') +
+        K.stats([{ l: 'blocked cells', v: blocked + ' of ' + n * n }, { l: 'probability the mask removed from this row', v: lost.toFixed(2), s: 'shared out among the allowed tokens' }, { l: 'allowed weights sum to', v: masked.reduce((a, b) => a + b, 0).toFixed(3), tone: 'ok' }]);
+    }
+    draw();
   };
 })();

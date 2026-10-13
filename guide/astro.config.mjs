@@ -29,7 +29,7 @@ export default defineConfig({
       logo: { src: '/brand/logo-horizontal-light.svg', alt: 'Inside the Model', replacesTitle: true },
       favicon: '/favicon.svg',
       description: 'An interactive guide to the calculations, code, training, and inference behind large language models.',
-      customCss: ['katex/dist/katex.min.css', './src/styles/brand-tokens.css', './src/styles/custom.css', './src/styles/brand.css'],
+      customCss: ['katex/dist/katex.min.css', './src/styles/brand-tokens.css', './src/styles/custom.css', './src/styles/brand.css', './src/styles/widgets.css'],
       head: [
         { tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' } },
         { tag: 'link', attrs: { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400..600&family=JetBrains+Mono:wght@400..600&family=Plus+Jakarta+Sans:wght@700;800&display=swap' } },
@@ -65,7 +65,7 @@ export default defineConfig({
             ],
           }),
         },
-      ].concat(['papers', 'glossary', 'itm-weights', 'itm-model', 'itm-train', 'explorer', 'trainer', 'home', 'compare', 'widgets', 'widgets2', 'chapters', 'interaction', 'site'].map(f => ({ tag: 'script', attrs: { src: `/js/${f}.js`, defer: true } }))),
+      ].concat(['papers', 'glossary', 'itm-weights', 'itm-model', 'itm-train', 'explorer', 'trainer', 'home', 'compare', 'kit', 'widgets', 'widgets2', 'chapters', 'interaction', 'site'].map(f => ({ tag: 'script', attrs: { src: `/js/${f}.js`, defer: true } }))),
       sidebar: [
         { label: 'Start here', items: [{ slug: 'index', label: 'Overview' }, { slug: 'explorer', label: 'Model Explorer' }] },
         ...guideGroups,

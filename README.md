@@ -52,7 +52,7 @@ All content is Markdown in `guide/src/content/docs/`:
 | `explorer.md` | the Model Explorer page; its engine is `public/js/itm-model.js` and its UI is `public/js/explorer.js` |
 | `reference/` | public security guidance (hand-written) and the paper index (generated) |
 
-Math is LaTeX: `$...$` inline, `$$...$$` for display. The interactive widgets live in `guide/public/js/` and are placed in a page with `<div class="widget not-content" data-w="name" data-title="Title"></div>`. Every cited paper is an entry in `guide/public/js/papers.js` and is cited in a page with `<cite data-p="key" data-s></cite>`.
+Math is LaTeX: `$...$` inline, `$$...$$` for display. The interactive widgets live in `guide/public/js/` and are placed in a page with `<div class="widget not-content" data-w="name" data-title="Title"></div>`. They are built from the shared kit in `guide/public/js/kit.js` (state binding, segmented choices, stat cards, SVG charts with draggable and keyboard-operable handles, step/play transport; styles in `guide/src/styles/widgets.css`). Each widget registers `set`, `act` and `reset` on its box so the learning frame in `interaction.js` can drive its "Try" scenarios by state key. Every cited paper is an entry in `guide/public/js/papers.js` and is cited in a page with `<cite data-p="key" data-s></cite>`.
 
 After editing, run `npm run build` and refresh the local preview.
 

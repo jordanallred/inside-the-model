@@ -64,7 +64,7 @@ $$
 
 Each hidden unit is a "ramp": zero until $x$ reaches $-b_{1j} / w_{1j}$, then rising with slope $w_{1j}$. The output is a weighted sum of ramps, so the function is piecewise linear with a bend wherever a ramp starts. With enough ramps you can approximate any continuous function on an interval to any accuracy. This is the content of the **universal approximation theorem**. It says expressiveness is available, not that gradient descent will find it or that it will generalize.
 
-Try it. The network below starts with random ramps. Press "Train" and watch gradient descent ([Chapter 1](/guide/gradient-descent/)) bend them into the target. Turn on "show each hidden unit's contribution" to see the individual ramps whose sum is the orange curve. Then try one hidden unit, or switch to tanh or SiLU.
+Try it. The network below starts with random ramps. Press Train and watch gradient descent ([Chapter 1](/guide/gradient-descent/)) bend them into the target. Turn on "show each hidden unit's contribution" to see the individual ramps whose sum is the orange curve. Then try one hidden unit, switch to tanh or SiLU, or drag across the chart to draw a target of your own.
 
 <div class="widget not-content" data-w="mlp" data-title="Train a one-hidden-layer network to fit a curve"></div>
 

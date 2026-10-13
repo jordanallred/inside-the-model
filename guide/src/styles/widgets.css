@@ -1,0 +1,124 @@
+/* Widget kit (public/js/kit.js): segmented choices, stat cards, verdicts, transport, and SVG charts with draggable handles.
+   Colors come from the semantic tokens in custom.css so every figure follows the light and dark themes. */
+
+.widget .ctl label small { color: var(--muted); font-weight: 400; }
+
+/* Segmented choice: one decision, all options visible. */
+.wk-seg { display: flex; align-items: center; gap: 0.35rem 0.6rem; flex-wrap: wrap; margin: 0.45rem 0; }
+.wk-seg-l { color: var(--muted); font-size: var(--sl-text-xs); min-width: 0; }
+.wk-seg-b { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: var(--itm-radius-sm); overflow: hidden; background: var(--bg); }
+.wk-seg-b button { border: 0; border-right: 1px solid var(--line); background: none; color: var(--fg); font: 600 var(--sl-text-xs)/1.2 var(--body); padding: 0.45rem 0.7rem; cursor: pointer; min-height: 2.1rem; }
+.wk-seg-b button:last-child { border-right: 0; }
+.wk-seg-b button:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.wk-seg-b button[aria-checked=true] { background: var(--accent); color: var(--accent-fg); }
+.wk-seg-b button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.wk-seg.wide .wk-seg-l { flex-basis: 100%; }
+
+/* Switch-style checkbox. */
+.wk-toggle { display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: var(--sl-text-sm); min-height: 2.1rem; }
+.wk-toggle input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.wk-toggle span { width: 2.1rem; height: 1.2rem; border-radius: 999px; background: color-mix(in srgb, var(--muted) 45%, transparent); position: relative; transition: background 0.15s; flex: none; }
+.wk-toggle span::after { content: ""; position: absolute; top: 0.15rem; left: 0.15rem; width: 0.9rem; height: 0.9rem; border-radius: 50%; background: var(--sl-color-white); transition: transform 0.15s; box-shadow: 0 1px 2px rgb(0 0 0 / 0.3); }
+.wk-toggle input:checked + span { background: var(--accent); }
+.wk-toggle input:checked + span::after { transform: translateX(0.9rem); background: var(--accent-fg); }
+.wk-toggle input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Stat cards: the few numbers that matter, large; the arithmetic lives in "Show the arithmetic". */
+.wk-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: 0.5rem; margin: 0.6rem 0; }
+.wk-stat { background: var(--bg); border: 1px solid var(--line); border-radius: var(--itm-radius-sm); padding: 0.45rem 0.65rem; min-width: 0; }
+.wk-stat > span { display: block; color: var(--muted); font-size: 0.7rem; line-height: 1.3; }
+.wk-stat > b { display: block; font: 700 1.15rem/1.25 var(--mono); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; color: var(--sl-color-white); }
+.wk-stat > small { display: block; color: var(--muted); font-size: 0.7rem; line-height: 1.35; }
+.wk-stat.is-ok { border-color: var(--ok); box-shadow: inset 3px 0 0 var(--ok); }
+.wk-stat.is-warn { border-color: var(--warn); box-shadow: inset 3px 0 0 var(--warn); }
+.wk-stat.is-accent { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+
+/* Verdict: one sentence that says what the figure currently shows. */
+.wk-say { margin: 0.5rem 0 !important; padding: 0.5rem 0.75rem; border-radius: var(--itm-radius-sm); border-left: 3px solid var(--muted); background: var(--bg); font-size: var(--sl-text-sm); }
+.wk-say.is-ok { border-left-color: var(--ok); }
+.wk-say.is-warn { border-left-color: var(--warn); background: color-mix(in srgb, var(--warn) 8%, var(--bg)); }
+.wk-say.is-info { border-left-color: var(--accent); }
+
+.wk-more { margin: 0.5rem 0; font-size: var(--sl-text-sm); }
+.wk-more > summary { cursor: pointer; color: var(--muted); font-size: var(--sl-text-xs); font-weight: 600; }
+.wk-more[open] > summary { margin-bottom: 0.3rem; }
+
+.wk-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; margin: 0.5rem 0; }
+.wk-bar .wk-spacer { flex: 1; }
+.wk-bar .wk-count { font: 600 var(--sl-text-xs) var(--mono); color: var(--muted); }
+.wk-play { min-width: 6.5rem; }
+
+/* Charts. */
+.wk-fig { margin: 0.5rem 0; min-width: 0; }
+.wk-fig > svg { display: block; max-width: 100%; height: auto; overflow: visible; }
+.wk-fig figcaption, .wk-cap { color: var(--muted); font-size: var(--sl-text-xs); margin: 0.2rem 0 0; }
+.wk-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0.4rem 1rem; }
+.wk-two > * { min-width: 0; }
+.wk-fig text { font: 11px var(--mono); fill: var(--muted); }
+.wk-fig text.wk-lab { fill: var(--fg); font-weight: 600; }
+.wk-fig text.wk-axl { font: 600 11px var(--body); fill: var(--muted); }
+.wk-fig text.wk-big { font: 700 13px var(--mono); fill: var(--fg); }
+.wk-fig .wk-axis { stroke: var(--muted); stroke-width: 1; }
+.wk-fig .wk-grid { stroke: var(--line); stroke-width: 1; }
+.wk-fig .wk-ln { fill: none; stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.wk-fig .wk-dash { fill: none; stroke-width: 1.5; stroke-dasharray: 5 4; }
+.wk-fig .wk-band { opacity: 0.16; }
+.wk-drag { touch-action: none; user-select: none; -webkit-user-select: none; }
+.wk-h { cursor: grab; outline: none; }
+.is-dragging, .is-dragging .wk-h { cursor: grabbing; }
+.wk-h .wk-h-hit { fill: transparent; }
+.wk-h .wk-h-dot { fill: var(--sl-color-white); stroke: var(--accent); stroke-width: 3; }
+:root[data-theme='light'] .wk-h .wk-h-dot { fill: #fff; }
+.wk-h:hover .wk-h-dot, .wk-h:focus-visible .wk-h-dot { stroke-width: 4; }
+.wk-h:focus-visible .wk-h-hit { stroke: var(--accent); stroke-width: 2; stroke-dasharray: 3 3; }
+.wk-h.is-c1 .wk-h-dot { stroke: var(--c1); }
+.wk-h.is-c2 .wk-h-dot { stroke: var(--c2); }
+.wk-h.is-c3 .wk-h-dot { stroke: var(--c3); }
+.wk-h.is-c4 .wk-h-dot { stroke: var(--c4); }
+.wk-click { cursor: pointer; }
+
+/* Token pills and matrices. */
+.wk-toks { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.3rem 0; }
+.wk-tok { font: 600 var(--sl-text-xs) var(--mono); border: 1px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 0.35rem; padding: 0.2rem 0.45rem; }
+.wk-tok.is-new { border-color: var(--c3); box-shadow: 0 0 0 2px color-mix(in srgb, var(--c3) 45%, transparent); background: color-mix(in srgb, var(--c3) 14%, var(--bg)); }
+.wk-tok small { color: var(--muted); font-weight: 400; }
+button.wk-tok { cursor: pointer; }
+button.wk-tok[aria-pressed=true] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.wk-mats { display: flex; flex-wrap: wrap; gap: 0.75rem 1rem; align-items: flex-start; margin: 0.5rem 0; }
+.wk-mat { min-width: 0; }
+.wk-mat > div { font-size: 0.7rem; color: var(--muted); margin-bottom: 0.2rem; white-space: nowrap; }
+.wk-mat table { border-collapse: separate; border-spacing: 2px; font: 0.72rem var(--mono); font-variant-numeric: tabular-nums; }
+.wk-mat td { min-width: 2.6rem; height: 1.6rem; text-align: right; padding: 0 0.3rem; border-radius: 3px; border: 1px solid var(--line); color: var(--fg); }
+.wk-mat td.is-off { background: repeating-linear-gradient(45deg, var(--tint), var(--tint) 3px, transparent 3px, transparent 6px); color: var(--muted); text-align: center; }
+.wk-mat td.is-hl { outline: 2px solid var(--accent); outline-offset: 0; }
+.wk-mat th { font-weight: 400; color: var(--muted); padding: 0 0.25rem; font-size: 0.65rem; }
+.wk-mat input { width: 3.1rem; font: 0.75rem var(--mono); padding: 0.15rem 0.25rem; background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: 3px; text-align: right; }
+.wk-op { align-self: center; color: var(--muted); font: 600 var(--sl-text-sm) var(--mono); }
+.wk-eq { font: var(--sl-text-xs)/1.6 var(--mono); background: var(--tint); border-radius: var(--itm-radius-sm); padding: 0.45rem 0.7rem; margin: 0.4rem 0; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+.wk-eq b { color: var(--sl-color-white); }
+
+/* Cards (retrieval documents, answers). */
+.wk-cards { display: grid; gap: 0.4rem; margin: 0.5rem 0; }
+.wk-card { border: 1px solid var(--line); border-radius: var(--itm-radius-sm); padding: 0.45rem 0.7rem; background: var(--bg); font-size: var(--sl-text-sm); min-width: 0; }
+.wk-card.is-on { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.wk-card.is-bad { border-color: var(--warn); box-shadow: inset 3px 0 0 var(--warn); }
+.wk-card.is-dim { opacity: 0.55; }
+.wk-card mark { background: color-mix(in srgb, var(--c4) 35%, transparent); color: inherit; border-radius: 2px; padding: 0 1px; }
+.wk-card .wk-meta { display: flex; justify-content: space-between; gap: 0.5rem; color: var(--muted); font: 0.7rem var(--mono); margin-bottom: 0.15rem; }
+.wk-badge { font: 700 0.65rem var(--body); letter-spacing: 0.04em; text-transform: uppercase; color: var(--warn); }
+.wk-prompt { font: var(--sl-text-xs)/1.6 var(--mono); border: 1px solid var(--line); border-radius: var(--itm-radius-sm); padding: 0.5rem 0.7rem; background: var(--bg); white-space: pre-wrap; overflow-wrap: anywhere; }
+.wk-prompt .is-sys { color: var(--c3); font-weight: 600; }
+.wk-prompt .is-user { color: var(--c1); font-weight: 600; }
+.wk-prompt .is-inj { background: color-mix(in srgb, var(--warn) 25%, transparent); outline: 1px solid var(--warn); border-radius: 2px; }
+
+@media (max-width: 30rem) {
+  .wk-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wk-mat td { min-width: 2.2rem; }
+}
+@media (pointer: coarse), (max-width: 40rem) {
+  .wk-seg-b button { min-height: 2.75rem; min-width: 2.75rem; }
+  .wk-toggle { min-height: 2.75rem; }
+}
+@media (prefers-reduced-motion: reduce) { .wk-toggle span, .wk-toggle span::after { transition: none; } }
+.wk-sw { display: inline-block; width: 0.7em; height: 0.7em; border-radius: 2px; margin: 0 0.3em 0 0.15em; vertical-align: baseline; }
+.widget .btn:disabled { opacity: 0.45; cursor: not-allowed; }

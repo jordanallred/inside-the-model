@@ -67,7 +67,7 @@ Each partial derivative is an average of the errors, weighted by the input the p
 
 ## Try it: the learning rate decides everything
 
-Below, a function with two valleys. Press "25 steps" and change the learning rate and starting point. Notice three behaviors: a small rate is slow but safe, a moderate rate lands in whichever valley is downhill from the start, and a large rate overshoots and diverges.
+Below, a function with two valleys. Drag the starting point, set the learning rate, and press Play. Notice three behaviors: a small rate is slow but safe, a moderate rate lands in whichever valley is downhill from the start, and a large rate overshoots and diverges.
 
 <div class="widget not-content" data-w="gd" data-title="Gradient descent on f(x) = x⁴/4 − x² + 0.3x"></div>
 
