@@ -47,6 +47,7 @@
     }
     el.addEventListener('click', e => { const b = e.target.closest('[data-id]'); if (!b) return; const id = b.dataset.id; if (st.on[id] && Object.values(st.on).filter(Boolean).length === 1) return; st.on[id] = !st.on[id]; b.setAttribute('aria-pressed', st.on[id]); draw(); });
     el.addEventListener('change', e => { if (e.target.dataset.k === 'm') { st.m = e.target.value; draw(); } });
+    el._itm = { reset() { M.forEach(m => { st.on[m.id] = true; }); st.m = 'params'; el.querySelectorAll('[data-id]').forEach(b => b.setAttribute('aria-pressed', 'true')); el.querySelector('[data-k=m]').value = st.m; draw(); } }; el.dataset.itm = '';
     el.querySelector('[data-k=m]').value = st.m; draw();
   };
 })();

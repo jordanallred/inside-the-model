@@ -302,6 +302,7 @@
         K.say('ok', '<b>Merge ' + S.n + ':</b> <span class="wk-tok">' + esc(m[0]) + '</span> + <span class="wk-tok">' + esc(m[1]) + '</span> → <span class="wk-tok is-new">' + esc(m[0] + m[1]) + '</span>, the most frequent pair (' + m[2] + ' times).');
       pick(el, 'words').innerHTML = '<div class="kicker">each distinct word, as tokens (×count)</div>' + seqs.map(q => '<div class="wk-toks">' + q.s.map((t, i) => '<span class="wk-tok' + (q.born[i] === S.n - 1 && S.n ? ' is-new' : '') + '">' + esc(t) + '</span>').join('') + '<small class="src">×' + q.c + '</small></div>').join('');
       const chars = seqs.reduce((s, q) => s + q.s.join('').length * q.c, 0), toks = seqs.reduce((s, q) => s + q.s.length * q.c, 0), toks0 = snaps[0].reduce((s, q) => s + q.s.length * q.c, 0);
+      if (!toks) { pick(el, 'out').innerHTML = K.say('warn', 'The training text is empty. Type a few words to learn merges from.'); pick(el, 'probe').innerHTML = ''; return; }
       pick(el, 'out').innerHTML = K.stats([{ l: 'tokens in corpus', v: toks, s: 'from ' + toks0 + ' characters' }, { l: 'symbols per token', v: (chars / toks).toFixed(2), tone: 'accent' }, { l: 'vocabulary', v: base + S.n, s: base + ' characters + ' + S.n + ' merges' }]) +
         (S.n ? '<div class="kicker">merge rules, in order</div><div class="wk-toks">' + merges.slice(0, S.n).map((x, i) => '<span class="wk-tok' + (i === S.n - 1 ? ' is-new' : '') + '"><small>' + (i + 1) + '.</small> ' + esc(x[0]) + ' + ' + esc(x[1]) + '</span>').join('') + '</div>' : '');
       const pw = (S.probe || '').trim().split(/\s+/)[0] || '', enc = pw ? encode(pw) : [];
@@ -365,7 +366,8 @@
     const ui = K.bind(el, S, render);
     el.addEventListener('click', e => { const b = e.target.closest('[data-q]'); if (b) ui.update('q', +b.dataset.q); });
     function render() {
-      const toks = S.s.trim().split(/\s+/).filter(Boolean).slice(0, 12), n = toks.length; if (!n) return;
+      const toks = S.s.trim().split(/\s+/).filter(Boolean).slice(0, 12), n = toks.length;
+      if (!n) { K.box(pick(el, 'arc'), 1); pick(el, 'arc').innerHTML = pick(el, 'row').innerHTML = pick(el, 'grid').innerHTML = ''; pick(el, 'out').innerHTML = K.say('info', 'Type a sentence to see which words each token can read.'); return; }
       const q = Math.min(S.q, n - 1), allow = (i, j) => (!S.c || j <= i) && (!S.w || Math.abs(i - j) < S.w);
       const P = toks.map((_, i) => { const raw = toks.map((_, j) => (allow(i, j) ? T.hash(i + 1, j + 7) * 3 - 1.2 - 0.12 * Math.abs(i - j) + (j === 0 ? 1.2 : 0) : -1e9)); return T.softmax(raw).map((v, j) => (allow(i, j) ? v : 0)); });
       let reach = new Set([q]);

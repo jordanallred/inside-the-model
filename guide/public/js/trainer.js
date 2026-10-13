@@ -44,6 +44,8 @@
     el.addEventListener('click', e => { const b = e.target.closest('[data-a]'); if (!b) return; if (b.dataset.a === 'reset') reset(); else step(+b.dataset.a); });
     el.addEventListener('change', e => { if (e.target.dataset.k === 'p' || e.target.dataset.k === 's') reset(); });
     el.addEventListener('input', e => { if (e.target.dataset.k === 'lr') get('lrout').textContent = lr().toFixed(3); });
+    /* "Start over" in the learning frame restores the controls too, not just the weights */
+    el._itm = { reset() { get('p').value = '0'; get('s').value = 'seeded'; get('lr').value = '-1'; reset(); } }; el.dataset.itm = '';
     reset();
   };
 })();

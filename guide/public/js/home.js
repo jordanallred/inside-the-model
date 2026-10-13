@@ -37,7 +37,8 @@
       el.querySelector('.hv-heads').innerHTML = [0, 1, 2, 3].map(k => '<button class="hv-chip" data-k="' + k + '" aria-pressed="' + (k === st.k) + '">L' + (k >> 1) + ' H' + (k & 1) + '</button>').join('');
       q('attention').innerHTML = w.map((_, i) => '<span>' + (i <= t ? wt[i].toFixed(2) : '–') + '</span>').join('');
       const top = pr.map((p, i) => [p, i]).sort((a, b) => b[0] - a[0]).slice(0, 3);
-      q('out').innerHTML = '<div class="hv-next">After “' + esc(tk.ids.slice(1, t + 1).map(i => V[i]).join(' ') || 'start') + '” the model rates next:</div>' +
+      const seen = tk.ids.slice(1, t + 1).map(i => V[i]).join(' ');
+      q('out').innerHTML = '<div class="hv-next">After ' + (seen ? '“' + esc(seen) + '”' : 'the start token') + ' the model rates next:</div>' +
         top.map(([p, i]) => '<div class="hv-bar"><span>' + esc(V[i]) + '</span><span class="hv-track"><i style="width:' + (p * 100).toFixed(1) + '%"></i></span><em>' + (p * 100).toFixed(0) + '%</em></div>').join('');
       q('logits').textContent = 'logits (top 3)   ' + top.map(([, i]) => V[i] + '  ' + tr.logits[t][i].toFixed(2)).join('   |   ');
       q('go').href = '/explorer/#' + new URLSearchParams({ p: text, step: L * 10 + 7, t, l: L, h, v: 'visual' }).toString();
