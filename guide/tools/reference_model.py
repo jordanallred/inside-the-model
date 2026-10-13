@@ -5,6 +5,7 @@ import json, sys
 from pathlib import Path
 import numpy as np
 
+sys.dont_write_bytecode = True                      # keep __pycache__ out of public/, which is published as-is
 sys.path.insert(0, str(Path('public/code').resolve()))
 import itm_model as M
 
