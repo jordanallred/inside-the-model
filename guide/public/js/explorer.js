@@ -1,6 +1,7 @@
-/* Model Explorer: steps through the full forward pass of the itm-toy-1.0 model (see itm-model.js).
-   Every number shown comes from ITM.forward(); nothing here invents values. Views: Visual, Math, Code.
-   State (prompt, step, token, layer, head) lives in the URL hash so an example can be shared. */
+/* Model Explorer: steps through the full forward pass of the itm-toy model (see itm-model.js).
+   Every number shown comes from ITM.forward(); nothing here invents values. Views: Picture, Numbers, Code.
+   State (prompt, step, token, head, view, weights) lives in the URL hash so an example can be shared.
+   Step indices are part of that URL contract: chapters link to e.g. #step=7, so STEPS must keep its order. */
 (function () {
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const MINUS = '−';
@@ -10,53 +11,33 @@
   for (let l = 0; l < 2; l++) ['ln1', 'qkv', 'scores', 'mask', 'softmax', 'headout', 'oproj', 'ln2', 'mlp', 'resid2'].forEach(k => STEPS.push({ k, l }));
   STEPS.push({ k: 'lnf' }, { k: 'logits' }, { k: 'probs' });
   const HEADD = { qkv: 1, scores: 1, mask: 1, softmax: 1, headout: 1 };
+  const ATTN = ['ln1', 'qkv', 'scores', 'mask', 'softmax', 'headout', 'oproj'];
 
-  const LABEL = {
-    tokens: 'Prompt to token IDs', embed: 'Embedding lookup', pos: 'Add positions', ln1: 'RMSNorm before attention', qkv: 'Project to Q, K, V', scores: 'Scaled dot-product scores',
-    mask: 'Causal mask', softmax: 'Softmax over keys', headout: 'Weighted sum of values', oproj: 'Output projection and residual', ln2: 'RMSNorm before MLP',
-    mlp: 'MLP with GELU', resid2: 'Second residual', lnf: 'Final RMSNorm', logits: 'Logits (tied unembedding)', probs: 'Next-token probabilities',
-  };
-  const PURPOSE = {
-    tokens: 'Words become integer IDs through a fixed 25-entry vocabulary (23 words, a period and &lt;bos&gt;). &lt;bos&gt; is always prepended. Real models use subword tokenizers (BPE) with vocabularies of 30k to 200k entries.',
-    embed: 'Each ID selects one row of the embedding matrix E. This is a table lookup, not a calculation.',
-    pos: 'Attention has no built-in sense of order, so a sinusoidal position pattern (scaled by 0.5) is added to each embedding. The sum is the residual stream x⁰.',
-    ln1: 'Pre-norm: each token vector is rescaled to unit root-mean-square before attention reads it. The residual stream itself is left untouched.',
-    qkv: 'Three learned linear maps turn each normalized vector into a query (what I look for), a key (what I offer) and a value (what I send). Each head owns 8 of the 16 columns.',
-    scores: 'Every query is dot-multiplied with every key, then divided by √8 so score size does not grow with head width. This table is still unmasked.',
-    mask: 'A token may not read tokens after it. Future positions are set to −∞ so softmax gives them exactly zero weight.',
-    softmax: 'Each row of scores becomes a probability distribution over the positions that token may read. Each row sums to 1.',
-    headout: 'Each head returns, for every token, the weight-averaged value vectors of the tokens it attends to.',
-    oproj: 'The two heads are concatenated and mixed by W_o, then added back onto the residual stream.',
-    ln2: 'Same RMSNorm again, before the MLP.',
-    mlp: 'A per-token two-layer network: expand 16 to 32 dimensions, apply GELU, project back to 16. No information moves between tokens here.',
-    resid2: 'The MLP output is added to the residual stream. This vector is the layer’s output.',
-    lnf: 'One last RMSNorm before reading out the vocabulary.',
-    logits: 'Each normalized vector is dotted with every embedding row (weights are tied), giving one score per vocabulary entry.',
-    probs: 'Softmax over the logits gives the next-token distribution. With the trained weights the top candidates tend to fit the toy grammar. Switch Weights to Random to run the identical computation with nothing learned.',
+  /* m: label in the step map; t: stage title; tech: the standard name; why: what the operation is for */
+  const INFO = {
+    tokens: { m: 'Words to IDs', t: 'Words become numbers', tech: 'tokenization', why: 'The model cannot read letters. Each word is replaced by its fixed position in a 25-entry vocabulary, and a start marker &lt;bos&gt; goes in front. Real models split text into subword pieces from vocabularies of 30k to 200k entries.' },
+    embed: { m: 'Look up vectors', t: 'Each ID picks a vector', tech: 'embedding lookup', why: 'Each ID selects one row of the embedding matrix E: 16 learned numbers that stand for that word. This is a table lookup, not a calculation.' },
+    pos: { m: 'Add positions', t: 'Add word order', tech: 'sinusoidal positions', why: 'Attention has no built-in sense of order, so a fixed wave pattern that depends on the position is added to each vector. The result is the <b>residual stream</b>: the running vector each token carries through the whole model.' },
+    ln1: { m: 'Normalize', t: 'Normalize before attention', tech: 'RMSNorm', why: 'Each token’s vector is rescaled so its typical size (root mean square) is 1. Its direction is kept; only its length changes. Attention reads this normalized copy, and the stream itself is left untouched.' },
+    qkv: { m: 'Queries, keys, values', t: 'Make queries, keys and values', tech: 'Q, K, V projections', why: 'Three learned matrices turn each token’s vector into a <b>query</b> (what it is looking for), a <b>key</b> (what it offers) and a <b>value</b> (what it passes on if chosen). Each of the 2 heads gets its own 8 numbers of each.' },
+    scores: { m: 'Score every pair', t: 'Score every pair of tokens', tech: 'scaled dot product', why: 'The query is compared with every key by a dot product, then divided by √8 so scores do not grow with head size. A high score means “this key matches what I am looking for”.' },
+    mask: { m: 'Hide the future', t: 'Hide the future', tech: 'causal mask', why: 'A token may only read itself and the tokens before it. Scores for later tokens become −∞, so they will get exactly zero weight. This is what makes the model predict the next word instead of copying it.' },
+    softmax: { m: 'Attention weights', t: 'Turn scores into attention', tech: 'softmax', why: 'The row of scores becomes weights that are positive and add up to 1: how much this token draws from each token it can see.' },
+    headout: { m: 'Blend the values', t: 'Blend the values', tech: 'weighted sum of values', why: 'The head’s output is the average of the value vectors, weighted by attention. This is the moment information actually moves from other tokens into this one.' },
+    oproj: { m: 'Add to the stream', t: 'Add attention to the stream', tech: 'output projection + residual', why: 'Both heads’ outputs are joined and mixed by the matrix W<sub>o</sub>, then <i>added</i> to the residual stream. Adding instead of replacing lets every layer make a small edit.' },
+    ln2: { m: 'Normalize', t: 'Normalize before the MLP', tech: 'RMSNorm', why: 'The same rescaling again, this time for the feed-forward network to read.' },
+    mlp: { m: 'Feed-forward network', t: 'Process each token on its own', tech: 'MLP with GELU', why: 'A small two-layer network runs on each token separately: widen 16 numbers to 32, bend them with GELU, project back to 16. Nothing moves between tokens here; that was attention’s job.' },
+    resid2: { m: 'Add to the stream', t: 'Add the MLP to the stream', tech: 'residual add', why: 'The MLP’s output is added to the stream. The sum is this layer’s output.' },
+    lnf: { m: 'Normalize', t: 'Final normalize', tech: 'final RMSNorm', why: 'One last rescaling before the model reads out its prediction.' },
+    logits: { m: 'Score every word', t: 'Score every word in the vocabulary', tech: 'tied unembedding', why: 'The final vector is compared, by dot product, with every word’s embedding row (the same matrix E as step 2). Words whose embedding points the same way get a high score, called a <b>logit</b>.' },
+    probs: { m: 'Probabilities', t: 'Choose the next word', tech: 'softmax over the vocabulary', why: 'Softmax turns the 25 logits into probabilities that add up to 1. This distribution is the model’s answer.' },
   };
 
-  /* ---- pipeline diagram: which block each step belongs to ---- */
-  const BLOCKS = [
-    { n: 'Tokens', sub: 'text to IDs', c: 'var(--c1)', has: (S) => S.k === 'tokens' },
-    { n: 'Embed + position', sub: 'IDs to vectors', c: 'var(--c1)', has: (S) => S.k === 'embed' || S.k === 'pos' },
-  ];
-  for (let l = 0; l < 2; l++) {
-    BLOCKS.push({ n: 'Layer ' + l + ' attention', sub: 'tokens read each other', c: 'var(--c4)', has: S => S.l === l && ['ln1', 'qkv', 'scores', 'mask', 'softmax', 'headout', 'oproj'].includes(S.k) });
-    BLOCKS.push({ n: 'Layer ' + l + ' MLP', sub: 'each token thinks alone', c: 'var(--c3)', has: S => S.l === l && ['ln2', 'mlp', 'resid2'].includes(S.k) });
-  }
-  BLOCKS.push({ n: 'Output', sub: 'vocabulary scores', c: 'var(--c2)', has: S => ['lnf', 'logits', 'probs'].includes(S.k) });
-
-  /* ---- guided tour: each stop sets the explorer state and explains what to look at ---- */
-  const TOUR = [
-    { s: 0, t: 3, v: 'visual', x: 'Welcome. This is a complete, tiny language model running in your browser. Every table you see is a real number the model computed. First, the sentence becomes integers: each word has a fixed ID. Pick any token above to follow it through the whole model.' },
-    { s: 2, t: 3, v: 'visual', x: 'Each ID selects a 16-number vector (its embedding), and a position pattern is added so the model knows word order. The selected row, “sat”, is the vector we will follow.' },
-    { s: 4, t: 3, v: 'visual', x: 'Attention starts here. From each token’s vector the model makes a query (what am I looking for?), a key (what do I offer?) and a value (what do I send?). Try switching head 0 and head 1: they have different weights.' },
-    { s: 6, t: 3, v: 'visual', x: 'The mask. A token may only read itself and earlier tokens, so every score to its right becomes −∞ (the hatched cells). This is what makes the model predict the next word instead of peeking at it.' },
-    { s: 7, t: 3, v: 'visual', x: 'Softmax turns each row of scores into weights that sum to 1. Read the highlighted row: it says how much “sat” draws from each earlier token. Switch to Math to see the exact sums, or Code to see the line that does it.' },
-    { s: 8, t: 3, v: 'math', x: 'The head output is a weighted average of the value vectors. This is the whole point of attention: information from other tokens flows into this token’s vector. You can recompute it by hand from the table.' },
-    { s: 11, t: 3, v: 'visual', x: 'After attention comes the MLP, which works on each token separately. Together, attention (move information between tokens) and MLP (process it) make one layer. This model stacks two.' },
-    { s: 25, t: 99, v: 'visual', x: 'Finally the last token’s vector is compared with every word in the vocabulary, giving next-token probabilities. The trained weights favor words that fit the toy grammar. Use the Weights switch to run the same steps with random weights and see that the arithmetic is identical but the prediction is not. That is the whole forward pass.' },
-  ];
+  /* ---- step map groups; colors match the rest of the guide (input sky, attention violet, MLP teal, output peach) ---- */
+  const GROUPS = [{ n: 'Input', c: 'var(--c1)', s: [0, 1, 2] }];
+  for (let l = 0; l < 2; l++) GROUPS.push({ n: 'Layer ' + l, l, subs: [{ n: 'Attention', c: 'var(--c4)', s: [3, 4, 5, 6, 7, 8, 9].map(i => i + l * 10) }, { n: 'MLP', c: 'var(--c3)', s: [10, 11, 12].map(i => i + l * 10) }] });
+  GROUPS.push({ n: 'Output', c: 'var(--c2)', s: [23, 24, 25] });
+  const colorOf = s => { const S = STEPS[s]; return S.l === undefined ? (s < 3 ? 'var(--c1)' : 'var(--c2)') : ATTN.includes(S.k) ? 'var(--c4)' : 'var(--c3)'; };
 
   /* ---- reference source shown in the Code view; the active operation is highlighted ---- */
   const CODE = {
@@ -78,219 +59,383 @@
     probs: 'probs = logits.map(softmax);',
   };
 
-  /* ---- small HTML helpers ---- */
+  /* ---- small helpers ---- */
   const fmt = (x, p) => (x === -Infinity ? MINUS + '∞' : (x < 0 ? MINUS : '') + Math.abs(x).toFixed(p));
-  function vecTable(rows, p, labels) {
-    const n = rows[0].v.length;
-    return '<div class="gscroll"><table class="grid vt"><thead><tr><th></th>' + Array.from({ length: n }, (_, i) => '<th scope="col">' + (labels ? esc(labels[i]) : i) + '</th>').join('') + '</tr></thead><tbody>' +
-      rows.map(r => '<tr><th scope="row">' + r.l + '</th>' + r.v.map(x => '<td>' + fmt(x, p) + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
+  const pct = x => (x >= 0.995 ? (x * 100).toFixed(0) : x >= 0.1 ? (x * 100).toFixed(0) : (x * 100).toFixed(1)) + '%';
+  const norm = v => Math.sqrt(v.reduce((s, x) => s + x * x, 0));
+  const argmax = a => a.reduce((b, x, i) => (x > a[b] ? i : b), 0);
+  const absMax = arrs => { let m = 0; arrs.forEach(a => a.forEach(v => { if (isFinite(v)) m = Math.max(m, Math.abs(v)); })); return m || 1; };
+  const tint = (x, mx) => '--a:' + Math.min(1, Math.abs(x) / mx).toFixed(3) + ';--s:' + (x < 0 ? 'var(--c2)' : 'var(--c1)');
+
+  /* One vector as a row of colored cells: blue positive, orange negative, stronger = larger. Hover gives the value. */
+  function strip(v, mx, name) {
+    return '<div class="mx-vec" style="--n:' + v.length + '" role="img" aria-label="' + esc(name + ', ' + v.length + ' numbers') + '">' +
+      v.map((x, i) => '<span title="' + esc(name) + ' [' + i + '] = ' + fmt(x, 3) + '" style="' + tint(x, mx) + '"></span>').join('') + '</div>';
   }
-  function heat(rows, p, o) {
-    o = o || {};
-    let mx = 0; rows.forEach(r => r.forEach(v => { if (isFinite(v)) mx = Math.max(mx, Math.abs(v)); })); mx = mx || 1;
-    const rl = o.rowLabels, cl = o.colLabels, n = rows[0].length;
-    return '<div class="gscroll"><table class="grid hm"><caption class="sr-only">' + esc(o.name || '') + '</caption><thead><tr><th></th>' +
-      Array.from({ length: n }, (_, j) => '<th scope="col">' + esc(cl ? cl[j] : j) + '</th>').join('') + '</tr></thead><tbody>' +
-      rows.map((r, i) => '<tr' + (i === o.sel ? ' class="sel" aria-current="true"' : '') + '><th scope="row">' + esc(rl ? rl[i] : i) + '</th>' + r.map((v, j) => {
-        const masked = o.causal && j > i, a = isFinite(v) ? Math.min(1, Math.abs(v) / mx) : 0;
-        const cls = masked ? ' class="m"' : '', bg = a ? ' style="--a:' + (a * 0.85).toFixed(3) + ';--s:' + (v < 0 ? 'var(--c2)' : 'var(--c1)') + '"' : '';
-        return '<td' + cls + bg + '><i></i><span>' + (masked && !isFinite(v) ? MINUS + '∞' : fmt(v, p)) + '</span></td>';
-      }).join('') + '</tr>').join('') + '</tbody></table></div>';
+  /* A vertical sum or transform: rows of { op, l (label HTML), sub, v } drawn on one shared color scale. */
+  function eqn(rows, mx) {
+    mx = mx || absMax(rows.filter(r => r.v).map(r => r.v));
+    return '<div class="mx-eqn">' + rows.map(r => '<div class="mx-op" aria-hidden="true">' + (r.op || '') + '</div><div class="mx-lbl">' + r.l + (r.sub ? '<small>' + r.sub + '</small>' : '') + '</div><div class="mx-cell">' + (r.html || strip(r.v, mx, r.name || r.l.replace(/<[^>]+>/g, ''))) + '</div>').join('') + '</div>';
   }
+  /* A whole matrix as small colored cells, one row per token. */
+  function mini(rows, o) {
+    o = o || {}; const mx = o.mx || absMax(rows);
+    return '<div class="mx-scroll"><table class="mx-mini' + (o.wide ? ' wide' : '') + '"><caption class="sr-only">' + esc(o.name || '') + '</caption>' +
+      (o.cl ? '<thead><tr><th></th>' + o.cl.map((c, j) => '<th scope="col"' + (j === o.selCol ? ' class="on"' : '') + '><span>' + esc(c) + '</span></th>').join('') + '</tr></thead>' : '') + '<tbody>' +
+      rows.map((r, i) => '<tr class="' + (i === o.sel ? 'sel' : o.hl && o.hl.includes(i) ? 'hl' : '') + '"><th scope="row">' + esc(o.rl ? o.rl[i] : i) + '</th>' +
+        r.map((v, j) => (o.causal && j > i ? '<td class="m" title="blocked"></td>' : '<td title="' + esc((o.rl ? o.rl[i] : i) + (o.cl ? ' / ' + o.cl[j] : ' [' + j + ']') + ' = ' + fmt(v, 3)) + '"><i style="' + (o.pos ? '--a:' + Math.min(1, v).toFixed(3) + ';--s:var(--c4)' : tint(v, mx)) + '"></i></td>')).join('') + '</tr>').join('') +
+      '</tbody></table></div>';
+  }
+  /* Horizontal bars, one per item: { l, v, on }. */
+  function hbars(items, o) {
+    const mx = o.signed ? absMax([items.map(x => x.v)]) : Math.max(...items.map(x => x.v), 1e-9);
+    return '<div class="mx-hb' + (o.signed ? ' signed' : '') + '">' + items.map(x => {
+      const w = Math.abs(x.v) / mx * (o.signed ? 50 : 100);
+      return '<div class="mx-hbr' + (x.on ? ' on' : '') + '"><span class="mx-hbl">' + esc(x.l) + '</span><span class="mx-hbt"><i style="width:' + w.toFixed(2) + '%;' + (o.signed ? (x.v < 0 ? 'right:50%;' : 'left:50%;') : 'left:0;') + 'background:' + (o.signed && x.v < 0 ? 'var(--c2)' : o.c) + '"></i></span><span class="mx-hbv">' + (o.pct ? pct(x.v) : fmt(x.v, 2)) + '</span></div>';
+    }).join('') + '</div>';
+  }
+  const LEGEND = '<p class="mx-legend"><span class="sw pos"></span>positive <span class="sw neg"></span>negative. Stronger color means a larger number; hover or tap a cell for its value.</p>';
 
   window.W = window.W || {};
   window.W.explorer = el => {
     const { ITM } = window; if (!ITM) { el.insertAdjacentHTML('beforeend', '<p class="src">The model engine failed to load.</p>'); return; }
     const { CFG } = ITM, V = CFG.vocab;
-    const st = { prompt: CFG.prompts[0], step: 0, t: 99, l: 0, h: 0, view: 'visual', p: 3, w: 'trained' };
-    try {
-      const q = new URLSearchParams(location.hash.slice(1));
-      if (q.get('p')) st.prompt = q.get('p');
-      ['step', 't', 'l', 'h'].forEach(k => { if (q.get(k) !== null && !isNaN(+q.get(k))) st[k] = +q.get(k); });
-      if (['visual', 'math', 'code'].includes(q.get('v'))) st.view = q.get('v');
-      if (q.get('w') === 'random') st.w = 'random';
-    } catch (e) {}
-    let tk, tr, tour = -1;
-    const hadHash = !!location.hash.slice(1);
-    const applyTour = i => { const T = TOUR[i]; tour = i; st.prompt = CFG.prompts[0]; st.step = T.s; st.t = T.t; st.view = T.v; if (STEPS[T.s].l !== undefined) st.l = STEPS[T.s].l; };
-    const endTour = () => { tour = -1; try { localStorage.setItem('itm-xp-toured', '1'); } catch (e) {} };
-    const ws = () => (st.w === 'random' ? ITM.seeded() : ITM.weights());
-    const compute = () => { tk = ITM.tokenize(st.prompt); tr = ITM.forward(ws().W, tk.ids); st.t = Math.max(0, Math.min(tr.T - 1, st.t)); st.step = Math.max(0, Math.min(STEPS.length - 1, st.step)); st.l = Math.max(0, Math.min(1, st.l)); st.h = Math.max(0, Math.min(1, st.h)); };
-    const words = () => tk.ids.map(i => V[i]);
+    const st = { prompt: CFG.prompts[0], step: 0, t: 99, h: 0, view: 'visual', p: 3, w: 'trained', more: false, map: false };
+    function readHash() {
+      try {
+        const q = new URLSearchParams(location.hash.slice(1));
+        if (q.get('p')) st.prompt = q.get('p');
+        ['step', 't', 'h'].forEach(k => { if (q.get(k) !== null && !isNaN(+q.get(k))) st[k] = +q.get(k); });
+        if (['visual', 'math', 'code'].includes(q.get('v'))) st.view = q.get('v');
+        st.w = q.get('w') === 'random' ? 'random' : 'trained';
+      } catch (e) {}
+    }
+    readHash();
+    let tk, tr, wd;
+    const ws = w => ((w || st.w) === 'random' ? ITM.seeded() : ITM.weights());
+    const compute = () => {
+      tk = ITM.tokenize(st.prompt); tr = ITM.forward(ws().W, tk.ids); wd = tk.ids.map(i => V[i]);
+      st.t = Math.max(0, Math.min(tr.T - 1, Math.round(st.t))); st.step = Math.max(0, Math.min(STEPS.length - 1, Math.round(st.step))); st.h = st.h === 1 ? 1 : 0;
+    };
+    const q = w => '“' + esc(w) + '”';
+    /* the last few words up to position end, starting after the most recent period: “…the dog” */
+    const phrase = end => { const w = wd.slice(1, end + 1); let c = w.slice(-4); const d = c.lastIndexOf('.'); if (d >= 0 && d < c.length - 1) c = c.slice(d + 1); return w.length ? q((c.length < w.length ? '…' : '') + c.join(' ')) : 'the start token'; };
 
-    el.innerHTML = '<div class="xp" tabindex="-1">' +
-      '<div class="xp-top"><label class="xp-prompt">Prompt <select data-x="preset" aria-label="Example prompt">' + CFG.prompts.map((p, i) => '<option value="' + i + '">' + esc(p) + '</option>').join('') + '<option value="custom">Custom…</option></select></label>' +
-      '<input type="text" data-x="text" aria-label="Prompt text" spellcheck="false" maxlength="120"><span class="xp-note" data-x="note" role="status"></span></div>' +
-      '<div class="xp-tour" data-x="tour" hidden role="region" aria-label="Guided tour"></div>' +
-      '<div class="xp-pipe" data-x="pipe" role="group" aria-label="Model pipeline: jump to a stage"></div>' +
-      '<div class="xp-strip" data-x="strip" role="group" aria-label="Tokens: pick the token to inspect"></div>' +
-      '<div class="xp-nav"><button class="btn" data-a="prev">← Previous</button><button class="btn primary" data-a="next">Next →</button><span class="xp-pos" data-x="pos"></span>' +
-      '<select data-x="step" aria-label="Jump to operation"></select><button class="btn quiet" data-a="tour">Guided tour</button><button class="btn quiet" data-a="reset">Reset</button></div>' +
-      '<div class="xp-sel" role="group" aria-label="Which layer, head and weights to show"><span>Layer <span class="chips" data-x="layers" role="group" aria-label="Layer"></span></span><span>Head <span class="chips" data-x="heads" role="group" aria-label="Head"></span></span><span>Weights <span class="chips" data-x="wts" role="group" aria-label="Weights"></span></span>' +
-      '<span class="xp-prec">Decimals <input type="range" data-x="prec" min="2" max="8" value="3" aria-label="Displayed decimals"><output data-x="precout">3</output></span></div>' +
-      '<div class="xp-tabs" role="group" aria-label="View"><button data-view="visual" aria-pressed="true">Visual</button><button data-view="math" aria-pressed="false">Math</button><button data-view="code" aria-pressed="false">Code</button></div>' +
-      '<div class="xp-main"><div class="xp-view" data-x="view" role="region" aria-label="Operation view"></div><aside class="xp-prov" data-x="prov" aria-label="Operation details"></aside></div>' +
-      '<p class="src xp-foot" data-x="foot"></p><div class="sr-only" role="status" data-x="announce"></div></div>';
-    const $ = k => el.querySelector('[data-x="' + k + '"]');
+    el.innerHTML = '<div class="mx" tabindex="-1">' +
+      '<div class="mx-bar">' +
+        '<div class="mx-row"><label class="mx-k" for="mx-in">Prompt</label><input id="mx-in" class="mx-in" type="text" data-x="text" spellcheck="false" autocomplete="off" maxlength="120"></div>' +
+        '<div class="mx-row mx-ex"><span class="mx-k">Examples</span>' + CFG.prompts.map((p, i) => '<button type="button" class="mx-chip" data-ex="' + i + '">' + esc(p) + '</button>').join('') +
+          '<details class="mx-vocab"><summary>Words it knows</summary><div class="mx-vocabw">' + V.slice(1).map(w => '<button type="button" class="mx-chip" data-add="' + esc(w) + '">' + esc(w) + '</button>').join('') + '<p class="src">Click a word to add it to the prompt. Anything else is skipped: this model only knows these ' + (V.length - 1) + '.</p></div></details></div>' +
+        '<p class="mx-warn" data-x="warn" role="status"></p>' +
+        '<div class="mx-row mx-tokrow"><span class="mx-k" id="mx-follow">Follow</span><div class="mx-toks" data-x="toks" role="group" aria-labelledby="mx-follow"></div></div>' +
+        '<div class="mx-pred" data-x="pred"></div>' +
+      '</div>' +
+      '<div class="mx-body"><nav class="mx-map" data-x="map" aria-label="Steps of the forward pass"></nav><section class="mx-stage" data-x="stage" aria-label="Current step"></section></div>' +
+      '<div class="sr-only" role="status" data-x="announce"></div></div>';
+    const root = el.querySelector('.mx'), $ = k => el.querySelector('[data-x="' + k + '"]');
 
-    function stepKey(s) { return STEPS[s].k; }
-    function opId(s) { const S = STEPS[s]; return (S.l === undefined ? '' : 'L' + S.l + '.') + (HEADD[S.k] ? 'H' + st.h + '.' : '') + S.k; }
-
-    /* ---- per-step description: tensors shown, shape, inputs, equation ---- */
-    function describe(s, p) {
-      const S = STEPS[s], k = S.k, L = tr.layers[S.l === undefined ? 0 : S.l], H = L.heads[st.h], T = tr.T, d = CFG.dModel, rl = words().map((w, i) => i + ' ' + w);
-      const lay = n => (S.l === 0 ? 'x⁰' : 'resid2 of layer 0');
+    /* ---- per-step facts for the details panel and the Numbers view ---- */
+    function describe(s) {
+      const S = STEPS[s], k = S.k, L = tr.layers[S.l === undefined ? 0 : S.l], H = L.heads[st.h], T = tr.T, rl = wd.map((w, i) => i + ' ' + w);
+      const lay = () => (S.l === 0 ? 'x⁰' : 'resid2 of layer 0');
       switch (k) {
-        case 'tokens': return { shape: '[' + T + ']', dtype: 'int', inputs: 'prompt text', eq: 'ids_t = vocab.indexOf(word_t)', mats: [{ n: 'token IDs', rows: tk.ids.map(i => [i]), cl: ['id'], rl }], vec: null };
-        case 'embed': return { shape: '[' + T + ', 16]', inputs: 'ids, E [25, 16]', eq: 'e_t = E[ids_t]', mats: [{ n: 'e', rows: tr.tokEmb, rl }], vec: [{ l: 'e_t = E[' + tk.ids[st.t] + ']', v: tr.tokEmb[st.t] }] };
-        case 'pos': return { shape: '[' + T + ', 16]', inputs: 'e, PE', eq: 'x⁰_t = e_t + 0.5 · PE(t)', mats: [{ n: 'x⁰', rows: tr.x0, rl }], vec: [{ l: 'e_t', v: tr.tokEmb[st.t] }, { l: '0.5·PE(' + st.t + ')', v: tr.pe[st.t].map(x => 0.5 * x) }, { l: 'x⁰_t', v: tr.x0[st.t] }] };
+        case 'tokens': return { shape: '[' + T + ']', inputs: 'prompt text', eq: 'ids_t = vocab.indexOf(word_t)' };
+        case 'embed': return { shape: '[' + T + ', 16]', inputs: 'ids, E [25, 16]', eq: 'e_t = E[ids_t]', vec: [{ l: 'e_t = E[' + tk.ids[st.t] + ']', v: tr.tokEmb[st.t] }] };
+        case 'pos': return { shape: '[' + T + ', 16]', inputs: 'e, PE', eq: 'x⁰_t = e_t + 0.5 · PE(t)', vec: [{ l: 'e_t', v: tr.tokEmb[st.t] }, { l: '0.5·PE(' + st.t + ')', v: tr.pe[st.t].map(x => 0.5 * x) }, { l: 'x⁰_t', v: tr.x0[st.t] }] };
         case 'ln1': case 'ln2': case 'lnf': {
           const src = k === 'ln1' ? L.xIn : k === 'ln2' ? L.resid1 : tr.layers[1].resid2, out = k === 'ln1' ? L.ln1 : k === 'ln2' ? L.ln2 : tr.lnf, rms = ITM.math.rmsOf(src[st.t]);
-          return { shape: '[' + T + ', 16]', inputs: (k === 'ln1' ? lay() : k === 'ln2' ? 'resid1' : 'resid2 of layer 1') + ', no learned scale', eq: 'y = x / √(mean(x²) + 10⁻⁵)', mats: [{ n: 'normalized', rows: out, rl }],
-            vec: [{ l: 'x_t', v: src[st.t] }, { l: 'y_t', v: out[st.t] }], extra: 'RMS term for token ' + st.t + ': √(mean(x²) + 10⁻⁵) = ' + fmt(rms, p) };
+          return { shape: '[' + T + ', 16]', inputs: (k === 'ln1' ? lay() : k === 'ln2' ? 'resid1' : 'resid2 of layer 1') + ', no learned scale', eq: 'y = x / √(mean(x²) + 10⁻⁵)', src, out, rms,
+            vec: [{ l: 'x_t', v: src[st.t] }, { l: 'y_t', v: out[st.t] }], extra: 'RMS term for token ' + st.t + ': √(mean(x²) + 10⁻⁵) = ' + fmt(rms, st.p) };
         }
-        case 'qkv': return { shape: '3 × [' + T + ', 8] per head', inputs: 'ln1, W_q, W_k, W_v columns ' + st.h * 8 + '–' + (st.h * 8 + 7), eq: 'q = y·W_q,  k = y·W_k,  v = y·W_v',
-          mats: [{ n: 'q (head ' + st.h + ')', rows: H.q, rl }, { n: 'k', rows: H.k, rl }, { n: 'v', rows: H.v, rl }], vec: [{ l: 'q_' + st.t, v: H.q[st.t] }, { l: 'k_' + st.t, v: H.k[st.t] }, { l: 'v_' + st.t, v: H.v[st.t] }] };
-        case 'scores': return { shape: '[' + T + ', ' + T + ']', inputs: 'q, k', eq: 's_ij = q_i · k_j / √8', mats: [{ n: 'scaled scores (unmasked)', rows: H.scaled, rl, cl: words().map((w, j) => j + ' ' + w), causal: true, sel: st.t }], scoreTable: true };
-        case 'mask': return { shape: '[' + T + ', ' + T + ']', inputs: 'scaled scores', eq: 's_ij = ' + MINUS + '∞  when j > i', mats: [{ n: 'masked scores', rows: H.masked, rl, cl: words().map((w, j) => j + ' ' + w), causal: true, sel: st.t }] };
-        case 'softmax': return { shape: '[' + T + ', ' + T + ']', inputs: 'masked scores', eq: 'w_ij = exp(s_ij − max_j s_ij) / Σ_j exp(s_ij − max_j s_ij)', mats: [{ n: 'attention weights', rows: H.weights, rl, cl: words().map((w, j) => j + ' ' + w), causal: true, sel: st.t }], softTable: true };
-        case 'headout': return { shape: '[' + T + ', 8]', inputs: 'weights, v', eq: 'o_i = Σ_j w_ij · v_j', mats: [{ n: 'head output', rows: H.out, rl }], outTable: true };
-        case 'oproj': return { shape: '[' + T + ', 16]', inputs: 'concat(heads), W_o, ' + lay(), eq: 'resid1 = x + concat(o⁰, o¹)·W_o', mats: [{ n: 'attention output', rows: L.attnOut, rl }, { n: 'resid1', rows: L.resid1, rl }], vec: [{ l: 'concat_t', v: L.concat[st.t] }, { l: 'attnOut_t', v: L.attnOut[st.t] }, { l: 'x_t', v: L.xIn[st.t] }, { l: 'resid1_t', v: L.resid1[st.t] }] };
-        case 'mlp': return { shape: '[' + T + ', 32] → [' + T + ', 16]', inputs: 'ln2, W_1 [16, 32], W_2 [32, 16]', eq: 'm = GELU(y·W_1)·W_2', mats: [{ n: 'hidden (before GELU)', rows: L.hidden, rl }, { n: 'after GELU', rows: L.act, rl }, { n: 'MLP output', rows: L.mlpOut, rl }], vec: [{ l: 'hidden_t', v: L.hidden[st.t] }, { l: 'GELU(hidden_t)', v: L.act[st.t] }], vec2: [{ l: 'mlpOut_t', v: L.mlpOut[st.t] }] };
-        case 'resid2': return { shape: '[' + T + ', 16]', inputs: 'resid1, MLP output', eq: 'resid2 = resid1 + m', mats: [{ n: 'layer output', rows: L.resid2, rl }], vec: [{ l: 'resid1_t', v: L.resid1[st.t] }, { l: 'm_t', v: L.mlpOut[st.t] }, { l: 'resid2_t', v: L.resid2[st.t] }] };
-        case 'logits': return { shape: '[' + T + ', 25]', inputs: 'final norm, E', eq: 'logits_t = y_t · Eᵀ', mats: [{ n: 'logits', rows: tr.logits, rl, cl: V }], vec: null };
-        case 'probs': return { shape: '[' + T + ', 25]', inputs: 'logits', eq: 'p_t = softmax(logits_t)', mats: [{ n: 'probabilities', rows: tr.probs, rl, cl: V }], probs: true };
+        case 'qkv': return { shape: '3 × [' + T + ', 8] per head', inputs: 'ln1, W_q, W_k, W_v columns ' + st.h * 8 + '–' + (st.h * 8 + 7), eq: 'q = y·W_q,  k = y·W_k,  v = y·W_v', vec: [{ l: 'q_' + st.t, v: H.q[st.t] }, { l: 'k_' + st.t, v: H.k[st.t] }, { l: 'v_' + st.t, v: H.v[st.t] }] };
+        case 'scores': return { shape: '[' + T + ', ' + T + ']', inputs: 'q, k', eq: 's_ij = q_i · k_j / √8' };
+        case 'mask': return { shape: '[' + T + ', ' + T + ']', inputs: 'scaled scores', eq: 's_ij = ' + MINUS + '∞  when j > i' };
+        case 'softmax': return { shape: '[' + T + ', ' + T + ']', inputs: 'masked scores', eq: 'w_ij = exp(s_ij − max_j s_ij) / Σ_j exp(s_ij − max_j s_ij)' };
+        case 'headout': return { shape: '[' + T + ', 8]', inputs: 'weights, v', eq: 'o_i = Σ_j w_ij · v_j' };
+        case 'oproj': return { shape: '[' + T + ', 16]', inputs: 'concat(heads), W_o, ' + lay(), eq: 'resid1 = x + concat(o⁰, o¹)·W_o', vec: [{ l: 'concat_t', v: L.concat[st.t] }, { l: 'attnOut_t', v: L.attnOut[st.t] }, { l: 'x_t', v: L.xIn[st.t] }, { l: 'resid1_t', v: L.resid1[st.t] }] };
+        case 'mlp': return { shape: '[' + T + ', 32] → [' + T + ', 16]', inputs: 'ln2, W_1 [16, 32], W_2 [32, 16]', eq: 'm = GELU(y·W_1)·W_2', vec: [{ l: 'hidden_t', v: L.hidden[st.t] }, { l: 'GELU(hidden_t)', v: L.act[st.t] }], vec2: [{ l: 'mlpOut_t', v: L.mlpOut[st.t] }] };
+        case 'resid2': return { shape: '[' + T + ', 16]', inputs: 'resid1, MLP output', eq: 'resid2 = resid1 + m', vec: [{ l: 'resid1_t', v: L.resid1[st.t] }, { l: 'm_t', v: L.mlpOut[st.t] }, { l: 'resid2_t', v: L.resid2[st.t] }] };
+        case 'logits': return { shape: '[' + T + ', 25]', inputs: 'final norm, E', eq: 'logits_t = y_t · Eᵀ' };
+        case 'probs': return { shape: '[' + T + ', 25]', inputs: 'logits', eq: 'p_t = softmax(logits_t)' };
       }
     }
 
-    /* ---- Visual view ---- */
-    function viewVisual(D, p) {
-      let h = '';
-      D.mats.forEach(m => { h += '<h3>' + esc(m.n) + ' <small>[' + m.rows.length + ', ' + m.rows[0].length + ']</small></h3>' + heat(m.rows, p, { rowLabels: m.rl, colLabels: m.cl, causal: m.causal, sel: m.sel === undefined ? st.t : m.sel, name: m.n }); });
-      if (D.probs) {
-        const pr = tr.probs[st.t], order = pr.map((x, i) => i).sort((a, b) => pr[b] - pr[a]).slice(0, 8);
-        h += '<h3>Top next-token candidates after “' + esc(words()[st.t]) + '” (token ' + st.t + ')</h3>' + order.map((i, r) => '<div class="brow"><span>' + esc(V[i]) + '</span><span class="bar"><i style="width:' + (pr[i] * 100).toFixed(2) + '%;background:var(--c3)"></i></span><span>' + fmt(pr[i], p) + '</span></div>').join('') +
-          '<p class="src">Greedy choice: <b>' + esc(V[order[0]]) + '</b>. ' + (st.w === 'random' ? 'These weights are random, so the ranking shows mechanics, not meaning.' : 'Trained on a toy grammar, so the ranking reflects that grammar only.') + '</p>';
-      }
-      if (HEADD[STEPS[st.step].k] && STEPS[st.step].k === 'softmax') {
-        const w = tr.layers[STEPS[st.step].l].heads[st.h].weights[st.t];
-        h += '<h3>Where token ' + st.t + ' (“' + esc(words()[st.t]) + '”) looks</h3>' + w.map((x, j) => '<div class="brow"><span>' + j + ' ' + esc(words()[j]) + '</span><span class="bar"><i style="width:' + (x * 100).toFixed(2) + '%;background:var(--c4)"></i></span><span>' + fmt(x, p) + '</span></div>').join('');
-      }
-      return h;
+    /* ---- Picture view: one drawing per operation, centered on the followed token ---- */
+    function cols(vals, o) {
+      const t = st.t, mx = o.signed ? absMax([vals.filter((v, j) => isFinite(v) && (o.all || j <= t))]) : 1;
+      return '<div class="mx-scroll"><div class="mx-cols' + (o.signed ? ' signed' : '') + '" role="img" aria-label="' + esc(o.name) + '">' + vals.map((v, j) => {
+        const fut = j > t, blocked = fut && o.block;
+        let bar = '';
+        if (blocked) bar = '<b class="blk"></b>';
+        else if (o.signed) bar = '<b style="height:' + (Math.abs(v) / mx * 50).toFixed(2) + '%;' + (v >= 0 ? 'bottom:50%' : 'top:50%') + ';background:' + (v >= 0 ? 'var(--c1)' : 'var(--c2)') + '"></b>';
+        else bar = '<b style="height:' + (v * 100).toFixed(2) + '%;bottom:0;background:var(--c4)"></b>';
+        const vt = blocked ? (o.signed ? MINUS + '∞' : '0%') : o.signed ? fmt(v, 2) : pct(v);
+        return '<div class="mx-col' + (j === t ? ' me' : '') + (fut ? ' fut' : '') + '"><div class="mx-plot">' + bar + '</div><div class="mx-cv">' + vt + '</div><div class="mx-cw">' + esc(wd[j]) + '</div></div>';
+      }).join('') + '</div></div>';
+    }
+    function arcs(w) {
+      const t = st.t, T = w.length, dx = 68, base = 108, W = T * dx;
+      let s = '';
+      w.forEach((x, j) => {
+        if (j > t || x < 0.004) return;
+        const x1 = t * dx + dx / 2, x2 = j * dx + dx / 2, sw = (1 + x * 9).toFixed(2), op = (0.2 + 0.8 * Math.min(1, x * 1.6)).toFixed(2);
+        if (j === t) s += '<path d="M' + (x1 - 9) + ' ' + (base - 18) + ' C' + (x1 - 34) + ' ' + (base - 74) + ' ' + (x1 + 34) + ' ' + (base - 74) + ' ' + (x1 + 9) + ' ' + (base - 18) + '" stroke-width="' + sw + '" opacity="' + op + '"/>';
+        else { const h = Math.min(92, 26 + (t - j) * 11); s += '<path d="M' + x1 + ' ' + (base - 18) + ' C' + x1 + ' ' + (base - 18 - h) + ' ' + x2 + ' ' + (base - 18 - h) + ' ' + x2 + ' ' + (base - 18) + '" stroke-width="' + sw + '" opacity="' + op + '"/>'; }
+      });
+      const words = wd.map((x, j) => '<text x="' + (j * dx + dx / 2) + '" y="' + base + '" class="' + (j === t ? 'me' : j > t ? 'fut' : '') + '">' + esc(x) + '</text>' +
+        (j <= t ? '<text x="' + (j * dx + dx / 2) + '" y="' + (base + 18) + '" class="pc">' + pct(w[j]) + '</text>' : '')).join('');
+      return '<div class="mx-scroll"><svg class="mx-arcs" viewBox="0 0 ' + W + ' ' + (base + 26) + '" style="max-width:' + W + 'px" role="img" aria-label="' + esc('Attention from ' + wd[t] + ' to each earlier token; thicker means more weight') + '"><g class="arcs">' + s + '</g>' + words + '</svg></div>';
+    }
+    function geluPlot(hidden) {
+      const W = 300, H = 170, r = Math.max(3, Math.ceil(absMax([hidden]))), X = v => 14 + (v + r) / (2 * r) * (W - 28), Y = v => H - 22 - (v + 0.4) / (r + 0.4) * (H - 36);
+      const g = ITM.math.gelu, pts = Array.from({ length: 81 }, (_, i) => { const v = -r + 2 * r * i / 80; return X(v).toFixed(1) + ',' + Y(g(v)).toFixed(1); }).join(' ');
+      return '<svg class="mx-gelu" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="The GELU curve with this token’s 32 hidden values plotted on it">' +
+        '<line x1="14" x2="' + (W - 14) + '" y1="' + Y(0) + '" y2="' + Y(0) + '" class="ax"/><line x1="' + X(0) + '" x2="' + X(0) + '" y1="10" y2="' + (H - 18) + '" class="ax"/>' +
+        '<polyline points="' + pts + '" class="cv"/>' + hidden.map(v => '<circle cx="' + X(v).toFixed(1) + '" cy="' + Y(g(v)).toFixed(1) + '" r="4" fill="' + (v < 0 ? 'var(--c2)' : 'var(--c1)') + '"><title>' + fmt(v, 3) + ' → ' + fmt(g(v), 3) + '</title></circle>').join('') +
+        '<text x="' + (W - 14) + '" y="' + (Y(0) + 14) + '" text-anchor="end">input</text><text x="' + (X(0) + 6) + '" y="20">GELU(input)</text></svg>';
     }
 
-    /* ---- Math view: the selected token's actual numbers substituted into the equation ---- */
-    function viewMath(D, p) {
-      const S = STEPS[st.step], k = S.k, t = st.t, wd = words();
-      let h = '<p class="xp-eq">' + esc(D.eq) + '</p>';
-      if (D.scoreTable || D.softTable || k === 'mask') {
+    function picture() {
+      const S = STEPS[st.step], k = S.k, t = st.t, L = tr.layers[S.l === undefined ? 0 : S.l], H = L.heads[st.h], D = describe(st.step), me = q(wd[t]);
+      const rl = wd.map((w, i) => i + ' ' + w);
+      switch (k) {
+        case 'tokens':
+          return '<div class="mx-scroll"><div class="mx-ids">' + wd.map((w, i) => '<div class="mx-id' + (i === t ? ' me' : '') + '"><span class="w">' + esc(w) + '</span><span class="ar" aria-hidden="true">↓</span><span class="n">' + tk.ids[i] + '</span><small>position ' + i + '</small></div>').join('') + '</div></div>' +
+            '<h3>The whole vocabulary</h3><div class="mx-vtab">' + V.map((w, i) => '<span class="' + (i === tk.ids[t] ? 'me' : tk.ids.includes(i) ? 'in' : '') + '"><b>' + i + '</b>' + esc(w) + '</span>').join('') + '</div>';
+        case 'embed':
+          return '<h3>The embedding matrix E <small>25 words × 16 numbers</small></h3>' + mini(ws().W.E, { rl: V.map((w, i) => i + ' ' + w), sel: tk.ids[t], hl: tk.ids, name: 'Embedding matrix', wide: true }) +
+            '<p class="src">Highlighted rows are the words in your prompt; the outlined row is ' + me + '.</p><h3>Row ' + tk.ids[t] + ' becomes ' + me + '’s vector</h3>' + eqn([{ l: 'e', sub: me, v: tr.tokEmb[t] }]) + LEGEND;
+        case 'pos': {
+          const pe = tr.pe.map(r => r.map(x => 0.5 * x));
+          return eqn([{ l: 'e', sub: 'meaning of ' + me, v: tr.tokEmb[t] }, { op: '+', l: 'position', sub: 'wave pattern for position ' + t, v: pe[t] }, { op: '=', l: 'x⁰', sub: 'start of the stream', v: tr.x0[t] }]) + LEGEND +
+            '<h3>The position pattern for every position</h3>' + mini(pe, { rl: wd.map((w, i) => 'position ' + i), sel: t, name: 'Position pattern' }) + '<p class="src">Left columns change quickly from row to row, right columns slowly: together they give every position a unique fingerprint.</p>';
+        }
+        case 'ln1': case 'ln2': case 'lnf': {
+          const rms = D.src.map(x => ITM.math.rmsOf(x)), mx = absMax([D.src[t], D.out[t]]);
+          return eqn([{ l: 'x', sub: 'stream for ' + me, v: D.src[t] }, { op: '÷', l: fmt(D.rms, 2), sub: 'its RMS size', html: '<div class="mx-note">every number is divided by the same amount</div>' }, { op: '=', l: 'y', sub: 'normalized', v: D.out[t] }], mx) + LEGEND +
+            '<h3>Size of every token’s vector, before and after</h3>' + hbars(rms.map((r, i) => ({ l: i + ' ' + wd[i], v: r, on: i === t })), { c: 'var(--muted)' }).replace('mx-hb"', 'mx-hb rms"') + '<p class="src">After normalization every one of these is 1.00.</p>';
+        }
+        case 'qkv': {
+          const mx = absMax([H.q[t], H.k[t], H.v[t]]);
+          return eqn([{ l: 'y', sub: 'normalized ' + me, v: L.ln1[t] }]) +
+            eqn([{ op: '→', l: 'query', sub: 'what ' + me + ' looks for', v: H.q[t] }, { op: '→', l: 'key', sub: 'what ' + me + ' offers', v: H.k[t] }, { op: '→', l: 'value', sub: 'what ' + me + ' passes on', v: H.v[t] }], mx) + LEGEND +
+            '<h3>Every token’s queries, keys and values <small>head ' + st.h + '</small></h3><div class="mx-trio">' + [['Queries', H.q], ['Keys', H.k], ['Values', H.v]].map(m => '<div><b>' + m[0] + '</b>' + mini(m[1], { rl, sel: t, name: m[0] }) + '</div>').join('') + '</div>';
+        }
+        case 'scores':
+          return '<h3>' + me + '’s query against every key</h3>' + cols(H.scaled[t], { signed: true, all: true, name: 'Scores' }) +
+            (t < tr.T - 1 ? '<p class="src">Faded columns are later tokens. Their scores exist, but the next step hides them.</p>' : '') +
+            '<h3>Every token at once <small>rows look, columns are looked at</small></h3>' + mini(H.scaled, { rl, cl: wd, sel: t, name: 'Score matrix' });
+        case 'mask':
+          return '<h3>' + me + '’s scores after masking</h3>' + cols(H.masked[t], { signed: true, block: true, name: 'Masked scores' }) +
+            '<h3>Every token at once</h3>' + mini(H.masked, { rl, cl: wd, sel: t, causal: true, name: 'Masked score matrix' }) + '<p class="src">Hatched cells are blocked: the triangle above the diagonal is the future.</p>';
+        case 'softmax':
+          return '<h3>Where ' + me + ' looks</h3>' + arcs(H.weights[t]) + cols(H.weights[t], { block: true, name: 'Attention weights' }) +
+            '<h3>Every token at once</h3>' + mini(H.weights, { rl, cl: wd, sel: t, causal: true, pos: true, name: 'Attention weights' }) + '<p class="src">Each row adds up to 1. Stronger color means more attention.</p>';
+        case 'headout': {
+          const w = H.weights[t], keep = w.map((x, j) => j).filter(j => j <= t && w[j] >= 0.02).sort((a, b) => w[b] - w[a]), rest = w.reduce((s, x, j) => s + (j <= t && !keep.includes(j) ? x : 0), 0);
+          const rows = keep.map((j, n) => ({ op: n ? '+' : '', l: w[j].toFixed(2) + ' × value', sub: 'of ' + q(wd[j]) + ', position ' + j, v: H.v[j].map(a => a * w[j]) }));
+          if (rest > 0) rows.push({ op: '+', l: 'the rest', sub: 'weights under 0.02, ' + rest.toFixed(3) + ' in total', v: H.out[t].map((o, n) => o - keep.reduce((s, j) => s + w[j] * H.v[j][n], 0)) });
+          rows.push({ op: '=', l: 'output', sub: 'head ' + st.h + ' for ' + me, v: H.out[t] });
+          return '<h3>Each value, scaled by its attention weight, then summed</h3>' + arcs(w) + eqn(rows) + LEGEND;
+        }
+        case 'oproj': return eqn([{ l: 'stream', sub: me + ' before attention', v: L.xIn[t] }, { op: '+', l: 'attention', sub: 'both heads, mixed by W<sub>o</sub>', v: L.attnOut[t] }, { op: '=', l: 'stream', sub: 'after attention', v: L.resid1[t] }]) + LEGEND +
+          '<h3>What attention added to every token</h3>' + mini(L.attnOut, { rl, sel: t, name: 'Attention output' });
+        case 'mlp': {
+          const mx = absMax([L.hidden[t], L.act[t]]);
+          return eqn([{ l: 'y', sub: 'normalized ' + me + ', 16', v: L.ln2[t] }]) + eqn([{ op: '→', l: 'widen', sub: '32 hidden units', v: L.hidden[t] }, { op: '→', l: 'GELU', sub: 'negatives squashed', v: L.act[t] }], mx) +
+            eqn([{ op: '→', l: 'project back', sub: '16 numbers', v: L.mlpOut[t] }]) + LEGEND +
+            '<div class="mx-split"><div><h3>What GELU does to the 32 hidden units</h3>' + geluPlot(L.hidden[t]) + '</div><p class="src">Each dot is one hidden unit of ' + me + '. Positive inputs (blue) pass through almost unchanged; negative inputs (orange) are pulled close to zero. That bend is what lets the network compute more than a single matrix could.</p></div>';
+        }
+        case 'resid2': return eqn([{ l: 'stream', sub: 'after attention', v: L.resid1[t] }, { op: '+', l: 'MLP', sub: 'its output for ' + me, v: L.mlpOut[t] }, { op: '=', l: 'stream', sub: 'layer ' + S.l + ' output', v: L.resid2[t] }]) + LEGEND +
+          '<h3>The stream for every token, after layer ' + S.l + '</h3>' + mini(L.resid2, { rl, sel: t, name: 'Layer output' });
+        case 'logits': {
+          const lg = tr.logits[t], ord = lg.map((x, i) => i).sort((a, b) => lg[b] - lg[a]);
+          return eqn([{ l: 'y', sub: 'final vector for ' + me, v: tr.lnf[t] }]) + LEGEND + '<h3>Its dot product with every word’s embedding, highest first</h3>' + hbars(ord.map(i => ({ l: V[i], v: lg[i], on: i === ord[0] })), { signed: true, c: 'var(--c1)' });
+        }
+        case 'probs': {
+          const pr = tr.probs[t], ord = pr.map((x, i) => i).sort((a, b) => pr[b] - pr[a]), nx = t < tr.T - 1 ? tk.ids[t + 1] : -1;
+          return '<div class="mx-answer"><span>After ' + phrase(t) + ' the model predicts</span><b>' + esc(V[ord[0]]) + '</b><span>' + pct(pr[ord[0]]) + '</span></div>' +
+            '<h3>The ten most likely next words</h3>' + hbars(ord.slice(0, 10).map(i => ({ l: V[i] + (i === nx ? '  (actual next word)' : ''), v: pr[i], on: i === ord[0] || i === nx })), { pct: true, c: 'var(--c3)' }) +
+            '<p class="src">The other ' + (V.length - 10) + ' words share ' + pct(ord.slice(10).reduce((s, i) => s + pr[i], 0)) + '.</p>';
+        }
+      }
+    }
+
+    /* ---- one computed observation per step: what the numbers in front of you actually say ---- */
+    function notice() {
+      const S = STEPS[st.step], k = S.k, t = st.t, L = tr.layers[S.l === undefined ? 0 : S.l], H = L.heads[st.h], me = q(wd[t]), T = tr.T;
+      const rep = (() => { const seen = {}; for (let i = 1; i < T; i++) (seen[wd[i]] = seen[wd[i]] || []).push(i); return Object.entries(seen).find(([, v]) => v.length > 1); })();
+      const who = (j, tt) => j === tt ? ' (itself)' : j === 0 ? ' (the start token, a common resting place when nothing else is useful)' : j === tt - 1 ? ' (the previous word)' : '';
+      switch (k) {
+        case 'tokens': return 'Your prompt is ' + T + ' tokens, counting &lt;bos&gt;.' + (rep ? ' ' + q(rep[0]) + ' appears ' + rep[1].length + ' times and is ID ' + V.indexOf(rep[0]) + ' every time: the ID says which word, never where it is.' : '');
+        case 'embed': {
+          const pos = wd.map((w, i) => i).filter(i => i > 0 && wd[i] === wd[t]);
+          return (pos.length > 1 ? me + ' appears at positions ' + pos.join(' and ') + ' and gets exactly the same vector each time. Only the next step will tell them apart.' : 'Every occurrence of a word gets the same row, wherever it is in the sentence.') +
+            (st.w === 'random' ? ' With untrained weights these rows are random noise.' : ' Training shaped these rows; words used in similar ways ended up with similar vectors.');
+        }
+        case 'pos': {
+          if (!rep) return 'The pattern is different at every position, so the same word in two places ends up with two different vectors.';
+          const [a, b] = rep[1], d = norm(tr.x0[a].map((x, n) => x - tr.x0[b][n]));
+          return 'Before this step, ' + q(rep[0]) + ' at positions ' + a + ' and ' + b + ' had identical vectors. Now they are ' + d.toFixed(2) + ' apart, so the model can tell them apart.';
+        }
+        case 'ln1': case 'ln2': case 'lnf': {
+          const D = describe(st.step), r = D.src.map(x => ITM.math.rmsOf(x));
+          return me + '’s vector had an RMS size of ' + D.rms.toFixed(2) + '; afterwards it is 1.00. Across the prompt, sizes ranged from ' + Math.min(...r).toFixed(2) + ' to ' + Math.max(...r).toFixed(2) + ' before and are all 1.00 after.';
+        }
+        case 'qkv': { const j = argmax(H.scaled[t].slice(0, t + 1)); return 'Looking ahead: of the tokens ' + me + ' may read, the key that best matches its query belongs to ' + q(wd[j]) + who(j, t) + '. The next step shows the scores.'; }
+        case 'scores': {
+          const j = argmax(H.scaled[t].slice(0, t + 1)), n = T - 1 - t;
+          return 'Highest score among the tokens ' + me + ' may read: ' + q(wd[j]) + who(j, t) + ', at ' + fmt(H.scaled[t][j], 2) + '.' + (n ? ' The ' + n + ' later token' + (n > 1 ? 's are' : ' is') + ' scored too, but not for long.' : ' ' + me + ' is the last token, so nothing will be hidden from it.');
+        }
+        case 'mask': { const n = T - 1 - t; return me + ' can read ' + (t + 1) + ' token' + (t ? 's' : '') + ': itself and everything before it. ' + (n ? n + ' later token' + (n > 1 ? 's are' : ' is') + ' blocked.' : 'Nothing is blocked, because it is the last token.'); }
+        case 'softmax': {
+          const w = H.weights[t], j = argmax(w), o = L.heads[1 - st.h].weights[t], j2 = argmax(o);
+          return me + ' puts ' + pct(w[j]) + ' of its attention on ' + q(wd[j]) + who(j, t) + '. The other head in this layer mostly reads ' + q(wd[j2]) + ' (' + pct(o[j2]) + '): heads are free to look in different places.';
+        }
+        case 'headout': { const w = H.weights[t], j = argmax(w); return pct(w[j]) + ' of this output is the value vector of ' + q(wd[j]) + '. The output has 8 numbers, like each value it was blended from.'; }
+        case 'oproj': return 'Attention changed ' + me + '’s vector by ' + pct(norm(L.attnOut[t]) / norm(L.xIn[t])) + ' of its length. The original vector is still there underneath: residual connections only add.';
+        case 'mlp': { const n = L.hidden[t].filter(x => x < 0).length; return n + ' of ' + me + '’s 32 hidden units are negative and GELU squashes them toward zero; the other ' + (32 - n) + ' pass through.'; }
+        case 'resid2': return 'The MLP changed ' + me + '’s vector by ' + pct(norm(L.mlpOut[t]) / norm(L.resid1[t])) + ' of its length. ' + (S.l === 0 ? 'This vector is what layer 1 starts from.' : 'This is the last edit; next comes the prediction.');
+        case 'logits': { const lg = tr.logits[t], j = argmax(lg); return 'The highest logit is ' + q(V[j]) + ' at ' + fmt(lg[j], 2) + '. Only the gaps between logits matter: adding the same amount to all of them would change nothing.'; }
+        case 'probs': {
+          const pr = tr.probs[t], j = argmax(pr), alt = ITM.forward(ws(st.w === 'random' ? 'trained' : 'random').W, tk.ids).probs[t], ja = argmax(alt);
+          let s = t < T - 1 ? 'At this position the model is guessing what follows ' + me + '. Its top guess is ' + q(V[j]) + '; the word that actually comes next in your prompt, ' + q(wd[t + 1]) + ', got ' + pct(pr[tk.ids[t + 1]]) + ' (rank ' + (pr.filter(x => x > pr[tk.ids[t + 1]]).length + 1) + ' of 25).' : 'The model predicts ' + q(V[j]) + ' with ' + pct(pr[j]) + '.';
+          return s + ' With ' + (st.w === 'random' ? 'trained' : 'untrained') + ' weights, the same arithmetic would pick ' + q(V[ja]) + ' (' + pct(alt[ja]) + ').';
+        }
+      }
+    }
+
+    /* ---- Numbers view: the selected token's actual numbers substituted into the equation ---- */
+    function vecTable(rows, p, labels) {
+      const n = rows[0].v.length;
+      return '<div class="mx-scroll"><table class="grid mx-num"><thead><tr><th></th>' + Array.from({ length: n }, (_, i) => '<th scope="col">' + (labels ? esc(labels[i]) : i) + '</th>').join('') + '</tr></thead><tbody>' +
+        rows.map(r => '<tr><th scope="row">' + r.l + '</th>' + r.v.map(x => '<td>' + fmt(x, p) + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
+    }
+    function numbers() {
+      const S = STEPS[st.step], k = S.k, t = st.t, p = st.p, D = describe(st.step);
+      let h = '<div class="mx-numbar"><p class="mx-eq">' + esc(D.eq) + '</p><label class="mx-prec">Decimals <input type="range" data-x="prec" min="2" max="8" value="' + p + '"><output>' + p + '</output></label></div>';
+      if (k === 'scores' || k === 'mask' || k === 'softmax') {
         const H = tr.layers[S.l].heads[st.h];
         if (k === 'scores') {
-          const j0 = t, terms = H.q[t].map((a, n) => fmt(a, p) + '·' + fmt(H.k[j0][n], p));
-          h += '<p>Token ' + t + ' (“' + esc(wd[t]) + '”), layer ' + S.l + ', head ' + st.h + '. Worked example for key j = ' + j0 + ':</p><pre class="xp-pre">q·k = ' + terms.join(' + ') + '\n    = ' + fmt(H.dots[t][j0], p) + '\ns   = ' + fmt(H.dots[t][j0], p) + ' / √8 = ' + fmt(H.scaled[t][j0], p) + '</pre>';
+          const terms = H.q[t].map((a, n) => fmt(a, p) + '·' + fmt(H.k[t][n], p));
+          h += '<p>Token ' + t + ' (' + q(wd[t]) + '), layer ' + S.l + ', head ' + st.h + '. Worked example for its own key, j = ' + t + ':</p><pre class="mx-pre">q·k = ' + terms.join(' + ') + '\n    = ' + fmt(H.dots[t][t], p) + '\ns   = ' + fmt(H.dots[t][t], p) + ' / √8 = ' + fmt(H.scaled[t][t], p) + '</pre>';
           h += vecTable([{ l: 'q·k_j', v: H.dots[t].slice(0, t + 1) }, { l: 's_j', v: H.scaled[t].slice(0, t + 1) }], p, wd.slice(0, t + 1).map((w, j) => j + ' ' + w));
-          if (t < tr.T - 1) h += '<p class="src">Keys j > ' + t + ' are computed in the table but masked in the next step.</p>';
+          if (t < tr.T - 1) h += '<p class="src">Keys j > ' + t + ' are computed too, but masked in the next step.</p>';
         } else if (k === 'mask') {
           h += vecTable([{ l: 'before', v: H.scaled[t] }, { l: 'after', v: H.masked[t] }], p, wd.map((w, j) => j + ' ' + w)) + '<p class="src">Keys after token ' + t + ' become ' + MINUS + '∞, so exp(' + MINUS + '∞) = 0 in the next step.</p>';
         } else {
           const sc = H.masked[t], m = Math.max(...sc), e = sc.map(s => Math.exp(s - m)), tot = e.reduce((a, b) => a + b, 0);
-          h += '<p>Token ' + t + ', layer ' + S.l + ', head ' + st.h + '. max score = ' + fmt(m, p) + '.</p>' + vecTable([{ l: 's_j', v: sc }, { l: 'exp(s−max)', v: e }, { l: 'w_j', v: H.weights[t] }], p, wd.map((w, j) => j + ' ' + w)) +
+          h += '<p>Token ' + t + ', layer ' + S.l + ', head ' + st.h + '. The largest score is ' + fmt(m, p) + '; subtracting it first keeps exp() from overflowing.</p>' + vecTable([{ l: 's_j', v: sc }, { l: 'exp(s−max)', v: e }, { l: 'w_j', v: H.weights[t] }], p, wd.map((w, j) => j + ' ' + w)) +
             '<p>Σ exp = ' + fmt(tot, p) + ', so w_j = exp(s_j − max) / ' + fmt(tot, p) + '. Σ w_j = ' + H.weights[t].reduce((a, b) => a + b, 0).toFixed(12) + '.</p>';
         }
         return h;
       }
-      if (D.outTable) {
+      if (k === 'headout') {
         const H = tr.layers[S.l].heads[st.h], w = H.weights[t];
-        h += '<p>Token ' + t + ', layer ' + S.l + ', head ' + st.h + '. Each value vector is scaled by its weight, then summed:</p>' +
+        return h + '<p>Token ' + t + ', layer ' + S.l + ', head ' + st.h + '. Each value vector is scaled by its weight, then summed:</p>' +
           vecTable(w.map((x, j) => ({ l: 'w=' + fmt(x, p) + ' · v_' + j + ' (' + esc(wd[j]) + ')', v: H.v[j].map(a => a * x) })).filter((r, j) => w[j] !== 0).concat([{ l: 'o_' + t + ' (sum)', v: H.out[t] }]), p);
-        return h;
       }
-      if (k === 'tokens') return h + '<pre class="xp-pre">' + wd.map((w, i) => i + ': ' + w + ' → id ' + tk.ids[i]).join('\n') + '</pre>';
-      if (k === 'logits') {
-        const lg = tr.logits[t];
-        return h + '<p>Token ' + t + ': logit for each vocabulary entry = y_' + t + ' · E[entry].</p>' + vecTable([{ l: 'logit', v: lg }, { l: 'softmax', v: tr.probs[t] }], p, V);
-      }
+      if (k === 'tokens') return h + '<pre class="mx-pre">' + wd.map((w, i) => i + ': ' + esc(w) + ' → id ' + tk.ids[i]).join('\n') + '</pre>';
+      if (k === 'logits') return h + '<p>Token ' + t + ': the logit for each vocabulary entry is y_' + t + ' · E[entry].</p>' + vecTable([{ l: 'logit', v: tr.logits[t] }, { l: 'softmax', v: tr.probs[t] }], p, V);
       if (k === 'probs') { const pr = tr.probs[t]; return h + vecTable([{ l: 'p', v: pr }], p, V) + '<p>Σ p = ' + pr.reduce((a, b) => a + b, 0).toFixed(12) + '</p>'; }
-      h += '<p>Token ' + t + ' (“' + esc(wd[t]) + '”):</p>' + vecTable(D.vec, p);
+      h += '<p>Token ' + t + ' (' + q(wd[t]) + '):</p>' + vecTable(D.vec, p);
       if (D.vec2) h += vecTable(D.vec2, p);
       if (D.extra) h += '<p>' + esc(D.extra) + '</p>';
       return h;
     }
 
-    function viewCode() {
-      const k = stepKey(st.step);
-      return '<p class="src">Reference implementation, <a href="/js/itm-model.js">itm-model.js</a> (pure JavaScript, float64). The active operation is highlighted.</p><pre class="xp-code"><code>' +
+    function codeView() {
+      const k = STEPS[st.step].k;
+      return '<p class="src">The reference implementation, <a href="/js/itm-model.js">itm-model.js</a>: plain JavaScript in float64. The line for this step is highlighted.</p><pre class="mx-code"><code>' +
         Object.keys(CODE).map(n => '<span class="' + (n === k ? 'on' : '') + '"' + (n === k ? ' aria-current="true"' : '') + '>' + esc(CODE[n]) + '</span>').join('\n') + '</code></pre>' +
-        '<button class="btn" data-a="copy">Copy the active line</button> <a class="btn" href="/trace/golden.json" download>Download golden fixture</a>';
+        '<div class="mx-acts"><button type="button" class="mx-btn" data-a="copy">Copy this line</button> <a class="mx-btn" href="/trace/golden.json" download>Download the golden fixture</a></div>';
     }
 
     /* ---- render ---- */
-    function render() {
-      compute();
-      const S = STEPS[st.step], D = describe(st.step, st.p);
-      const sel = $('preset'); const pi = CFG.prompts.indexOf(st.prompt); sel.value = pi >= 0 ? String(pi) : 'custom';
-      const txt = $('text'); if (document.activeElement !== txt) txt.value = st.prompt;
-      $('note').textContent = (tk.unknown.length ? 'Not in the vocabulary: ' + tk.unknown.join(', ') + '. ' : '') + (tk.truncated ? 'Truncated to ' + CFG.maxCtx + ' tokens. ' : '');
-      $('strip').innerHTML = words().map((w, i) => '<button class="tok' + (i === st.t ? ' on' : '') + '" data-t="' + i + '" aria-pressed="' + (i === st.t) + '"><small>' + i + '</small>' + esc(w) + '<small>id ' + tk.ids[i] + '</small></button>').join('');
-      $('step').innerHTML = STEPS.map((s, i) => '<option value="' + i + '"' + (i === st.step ? ' selected' : '') + '>' + (i + 1) + '. ' + (s.l === undefined ? '' : 'Layer ' + s.l + ': ') + LABEL[s.k] + '</option>').join('');
-      $('pos').textContent = 'Step ' + (st.step + 1) + ' of ' + STEPS.length;
-      $('announce').textContent = 'Step ' + (st.step + 1) + ' of ' + STEPS.length + ': ' + (S.l === undefined ? '' : 'layer ' + S.l + ', ') + LABEL[S.k] + '. Token ' + st.t + ', ' + words()[st.t] + '.';
-      $('layers').innerHTML = [0, 1].map(l => '<button class="chipbtn" data-l="' + l + '" aria-pressed="' + (l === st.l) + '">' + l + '</button>').join('');
-      $('heads').innerHTML = [0, 1].map(h => '<button class="chipbtn" data-h="' + h + '" aria-pressed="' + (h === st.h) + '">' + h + '</button>').join('');
-      $('wts').innerHTML = [['trained', 'Trained'], ['random', 'Random']].map(w => '<button class="chipbtn" data-w="' + w[0] + '" aria-pressed="' + (w[0] === st.w) + '">' + w[1] + '</button>').join('');
-      el.querySelectorAll('[data-view]').forEach(b => { const on = b.dataset.view === st.view; b.setAttribute('aria-pressed', on); b.classList.toggle('on', on); });
-      el.querySelector('[data-a="prev"]').disabled = st.step === 0; el.querySelector('[data-a="next"]').disabled = st.step === STEPS.length - 1;
-      $('view').innerHTML = '<h2 class="xp-h">' + (S.l === undefined ? '' : 'Layer ' + S.l + ' · ') + LABEL[S.k] + '</h2><p class="xp-why">' + PURPOSE[S.k] + '</p>' + (st.view === 'visual' ? viewVisual(D, st.p) : st.view === 'math' ? viewMath(D, st.p) : viewCode());
-      $('prov').innerHTML = '<h3>Operation</h3><dl><dt>ID</dt><dd><code>' + opId(st.step) + '</code></dd><dt>Selected</dt><dd>token ' + st.t + ' “' + esc(words()[st.t]) + '”' + (S.l === undefined ? '' : ', layer ' + S.l) + (HEADD[S.k] ? ', head ' + st.h : '') + '</dd>' +
-        '<dt>Inputs</dt><dd>' + esc(D.inputs) + '</dd><dt>Output shape</dt><dd><code>' + esc(D.shape) + '</code> float64</dd><dt>Equation</dt><dd><code>' + esc(D.eq) + '</code></dd></dl>' +
-        '<h3>Reference model</h3><dl><dt>Version</dt><dd><code>' + CFG.version + '</code></dd><dt>Weights</dt><dd>' + (ws().meta.trained ? 'trained: ' + ws().meta.steps + ' Adam steps on a toy grammar; held-out loss ' + ws().meta.heldOutLoss + ' (uniform guessing ' + ws().meta.uniformLoss + ')' : 'random initialization, never trained') + '; checksum <code>' + ws().sum + '</code></dd><dt>Precision</dt><dd>values shown to ' + st.p + ' decimals; computed in float64' + (ws().meta.trained ? '; attention weights and logits checked against NumPy to 1e-9' : '; these random weights are not part of the NumPy check') + '</dd></dl>' +
-        '<button class="btn" data-a="copylink">Copy link to this state</button>';
-      $('foot').innerHTML = 'The model has 2 layers, 2 heads, d<sub>model</sub> = 16 and a 25-entry vocabulary. It is a teaching model: real LLMs are far larger, use subword tokenizers, and train on vastly more data. See <a href="/teardown/compare/">how it compares with real models</a> and the <a href="/guide/transformer-block/">transformer chapter</a>.';
-      const box = BLOCKS.findIndex(B => B.has(S));
-      $('pipe').innerHTML = BLOCKS.map((B, i) => '<button class="blk' + (i === box ? ' on' : '') + '" data-blk="' + i + '" style="--bc:' + B.c + '"' + (i === box ? ' aria-current="step"' : '') + '><b>' + B.n + '</b><small>' + B.sub + '</small></button>' + (i < BLOCKS.length - 1 ? '<span class="arr" aria-hidden="true">→</span>' : '')).join('');
-      const tb = $('tour');
-      if (tour >= 0) {
-        tb.hidden = false;
-        tb.innerHTML = '<div class="xp-tourhead">Guided tour · ' + (tour + 1) + ' of ' + TOUR.length + '</div><p>' + TOUR[tour].x + '</p><div class="xp-tourbtns"><button class="btn" data-tour="prev"' + (tour === 0 ? ' disabled' : '') + '>← Back</button>' +
-          (tour < TOUR.length - 1 ? '<button class="btn primary" data-tour="next">Next →</button>' : '<button class="btn primary" data-tour="exit">Finish and explore</button>') + '<button class="btn" data-tour="exit">Exit tour</button></div>';
-      } else { tb.hidden = true; tb.innerHTML = ''; }
-      try { const q = new URLSearchParams({ p: st.prompt, step: st.step, t: st.t, l: st.l, h: st.h, v: st.view, w: st.w }); history.replaceState(null, '', '#' + q.toString()); } catch (e) {}
+    const where = s => { const S = STEPS[s]; return S.l === undefined ? (s < 3 ? 'Input' : 'Output') : 'Layer ' + S.l + ' · ' + (ATTN.includes(S.k) ? 'Attention' : 'MLP'); };
+    function mapHTML() {
+      const cur = STEPS[st.step], item = s => '<li><button type="button" class="mx-step' + (s === st.step ? ' on' : s < st.step ? ' done' : '') + '" data-s="' + s + '" style="--gc:' + colorOf(s) + '"' + (s === st.step ? ' aria-current="step"' : '') + '><span class="mx-dot" aria-hidden="true"></span><span class="mx-sn">' + (s + 1) + '</span>' + INFO[STEPS[s].k].m + '</button></li>';
+      return '<button type="button" class="mx-maptoggle" data-a="map" aria-expanded="' + st.map + '">All 26 steps</button><ol class="mx-groups">' + GROUPS.map(G => {
+        if (G.subs) {
+          const open = cur.l === G.l;
+          if (!open) {
+            const same = cur.l !== undefined ? STEPS.findIndex(x => x.l === G.l && x.k === cur.k) : G.subs[0].s[0];
+            return '<li class="mx-g shut"><button type="button" class="mx-layer" data-s="' + same + '"' + (st.step > G.subs[1].s[2] ? ' data-done' : '') + '><b>' + G.n + '</b><small>' + (cur.l !== undefined ? 'same steps, next layer' : 'attention, then MLP · 10 steps') + '</small></button></li>';
+          }
+          return '<li class="mx-g"><span class="mx-gn">' + G.n + '</span><ol>' + G.subs.map(U => '<li class="mx-sub" style="--gc:' + U.c + '"><span class="mx-subn">' + U.n + '</span><ol>' + U.s.map(item).join('') + '</ol></li>').join('') + '</ol></li>';
+        }
+        return '<li class="mx-g" style="--gc:' + G.c + '"><span class="mx-gn">' + G.n + '</span><ol>' + G.s.map(item).join('') + '</ol></li>';
+      }).join('') + '</ol>';
     }
 
+    function render() {
+      compute();
+      const S = STEPS[st.step], I = INFO[S.k], D = describe(st.step), T = tr.T, last = tr.probs[T - 1], ord = last.map((x, i) => i).sort((a, b) => last[b] - last[a]);
+      const txt = $('text'); if (document.activeElement !== txt) txt.value = st.prompt;
+      el.querySelectorAll('[data-ex]').forEach(b => b.setAttribute('aria-pressed', String(CFG.prompts[+b.dataset.ex] === st.prompt)));
+      $('warn').textContent = (tk.unknown.length ? 'Skipped, not in the vocabulary: ' + tk.unknown.join(', ') + '. ' : '') + (tk.truncated ? 'Cut to the first ' + CFG.maxCtx + ' tokens.' : '');
+      $('toks').innerHTML = wd.map((w, i) => '<button type="button" class="mx-tok' + (i === st.t ? ' on' : '') + '" data-t="' + i + '" aria-pressed="' + (i === st.t) + '"><small>' + i + '</small>' + esc(w) + '</button>').join('') +
+        '<span class="mx-tokhint">' + (st.t === T - 1 ? 'The last word is where the next-word prediction is made.' : 'Pick the last word to follow the actual prediction.') + '</span>';
+      $('pred').innerHTML = '<div class="mx-predtxt"><span class="mx-k">Prediction</span><span>After ' + phrase(T - 1) + ' comes</span><b class="mx-top">' + esc(V[ord[0]]) + ' <small>' + pct(last[ord[0]]) + '</small></b>' +
+        (last[ord[1]] >= 0.01 ? '<span class="mx-also">then ' + ord.slice(1, 3).filter(i => last[i] >= 0.01).map(i => q(V[i]) + ' ' + pct(last[i])).join(', ') + '</span>' : '') + (st.step === 25 && st.t === T - 1 ? '' : '<button type="button" class="mx-link" data-a="how">Jump to the answer</button>') + '</div>' +
+        '<div class="mx-seg" role="group" aria-label="Weights"><span class="mx-k">Weights</span>' + [['trained', 'Trained'], ['random', 'Untrained']].map(w => '<button type="button" data-w="' + w[0] + '" aria-pressed="' + (w[0] === st.w) + '">' + w[1] + '</button>').join('') + '</div>';
+      $('map').innerHTML = mapHTML(); root.classList.toggle('mapopen', st.map);
+      const prev = st.step > 0 ? INFO[STEPS[st.step - 1].k].m : '', next = st.step < STEPS.length - 1 ? INFO[STEPS[st.step + 1].k].m : '';
+      const ws0 = ws();
+      $('stage').innerHTML = '<div class="mx-sh" style="--gc:' + colorOf(st.step) + '"><div class="mx-kick"><span>Step ' + (st.step + 1) + ' of ' + STEPS.length + '</span><span>' + where(st.step) + '</span></div>' +
+          '<div class="mx-nav"><button type="button" class="mx-btn" data-a="prev"' + (st.step ? '' : ' disabled') + ' aria-label="Previous step">←</button><button type="button" class="mx-btn primary" data-a="next"' + (next ? '' : ' disabled') + ' aria-label="Next step">→</button></div></div>' +
+        '<h2 class="mx-h">' + I.t + ' <small>' + I.tech + '</small></h2><p class="mx-why">' + I.why + '</p>' +
+        '<div class="mx-tools"><div class="mx-tabs" role="group" aria-label="View">' + [['visual', 'Picture'], ['math', 'Numbers'], ['code', 'Code']].map(v => '<button type="button" data-view="' + v[0] + '" aria-pressed="' + (v[0] === st.view) + '">' + v[1] + '</button>').join('') + '</div>' +
+          (HEADD[S.k] ? '<div class="mx-seg" role="group" aria-label="Attention head"><span class="mx-k">Head</span>' + [0, 1].map(h => '<button type="button" data-h="' + h + '" aria-pressed="' + (h === st.h) + '">' + h + '</button>').join('') + '</div>' : '') + '</div>' +
+        '<div class="mx-view">' + (st.view === 'math' ? numbers() : st.view === 'code' ? codeView() : picture()) + '</div>' +
+        '<div class="mx-notice" style="--gc:' + colorOf(st.step) + '"><b>Notice</b><p>' + notice() + '</p></div>' +
+        '<div class="mx-foot">' + (prev ? '<button type="button" class="mx-btn" data-a="prev"><small>Previous</small>' + prev + '</button>' : '<span></span>') + (next ? '<button type="button" class="mx-btn primary" data-a="next"><small>Next</small>' + next + '</button>' : '<button type="button" class="mx-btn" data-a="restart"><small>Done</small>Start again with another word</button>') + '</div>' +
+        '<details class="mx-more" data-x="more"' + (st.more ? ' open' : '') + '><summary>Shapes, sources and reproducibility</summary><dl>' +
+          '<dt>Operation</dt><dd><code>' + (S.l === undefined ? '' : 'L' + S.l + '.') + (HEADD[S.k] ? 'H' + st.h + '.' : '') + S.k + '</code></dd><dt>Inputs</dt><dd>' + esc(D.inputs) + '</dd><dt>Output shape</dt><dd><code>' + esc(D.shape) + '</code> float64</dd><dt>Equation</dt><dd><code>' + esc(D.eq) + '</code></dd>' +
+          '<dt>Model</dt><dd><code>' + CFG.version + '</code>: 2 layers, 2 heads, d<sub>model</sub> = 16, 25-entry vocabulary</dd>' +
+          '<dt>Weights</dt><dd>' + (ws0.meta.trained ? 'trained for ' + ws0.meta.steps + ' Adam steps on a toy grammar; held-out loss ' + ws0.meta.heldOutLoss + ' (uniform guessing ' + ws0.meta.uniformLoss + ')' : 'random initialization, never trained') + '; checksum <code>' + ws0.sum + '</code></dd>' +
+          '<dt>Precision</dt><dd>computed in float64' + (ws0.meta.trained ? '; attention weights and logits match an independent NumPy implementation to 1e-9' : '; these random weights are not part of the NumPy check') + '</dd></dl>' +
+          '<button type="button" class="mx-btn" data-a="copylink">Copy a link to exactly this view</button></details>';
+      $('announce').textContent = 'Step ' + (st.step + 1) + ' of ' + STEPS.length + ': ' + where(st.step) + ', ' + INFO[S.k].t + '. Following ' + wd[st.t] + '.';
+      try { history.replaceState(null, '', '#' + new URLSearchParams({ p: st.prompt, step: st.step, t: st.t, l: S.l === undefined ? 0 : S.l, h: st.h, v: st.view, w: st.w }).toString()); } catch (e) {}
+    }
+    const go = s => { st.step = s; st.map = false; render(); if (root.getBoundingClientRect().top < 0 || $('stage').getBoundingClientRect().top < 0) $('stage').scrollIntoView({ block: 'start' }); };
+
     el.addEventListener('click', e => {
-      const b = e.target.closest('button,[data-t]'); if (!b || !el.contains(b)) return;
-      if (b.dataset.tour) { if (b.dataset.tour === 'next') applyTour(tour + 1); else if (b.dataset.tour === 'prev') applyTour(tour - 1); else endTour(); render(); return; }
-      if (b.dataset.a === 'tour') { applyTour(0); render(); el.querySelector('.xp-tour').scrollIntoView({ block: 'nearest' }); return; }
-      if (b.dataset.blk !== undefined) { const B = BLOCKS[+b.dataset.blk], i = STEPS.findIndex((x, n) => B.has(x) && (x.l === undefined || x.l === st.l || B.n.indexOf('Layer ' + x.l) === 0)); if (i >= 0) { st.step = i; if (STEPS[i].l !== undefined) st.l = STEPS[i].l; } render(); return; }
-      if (b.dataset.t !== undefined) st.t = +b.dataset.t;
-      else if (b.dataset.l !== undefined) st.l = +b.dataset.l;
-      else if (b.dataset.h !== undefined) st.h = +b.dataset.h;
-      else if (b.dataset.w !== undefined) st.w = b.dataset.w;
-      else if (b.dataset.view) st.view = b.dataset.view;
-      else if (b.dataset.a === 'next') st.step++;
-      else if (b.dataset.a === 'prev') st.step--;
-      else if (b.dataset.a === 'reset') { st.step = 0; st.t = tr.T - 1; st.l = 0; st.h = 0; }
-      else if (b.dataset.a === 'copylink') { try { navigator.clipboard.writeText(location.href); b.textContent = 'Copied'; } catch (x) {} return; }
-      else if (b.dataset.a === 'copy') { try { navigator.clipboard.writeText(CODE[stepKey(st.step)]); b.textContent = 'Copied'; } catch (x) {} return; }
+      const b = e.target.closest('button'); if (!b || !el.contains(b)) return;
+      const d = b.dataset;
+      if (d.s !== undefined) return go(+d.s);
+      if (d.t !== undefined) st.t = +d.t;
+      else if (d.h !== undefined) st.h = +d.h;
+      else if (d.w !== undefined) st.w = d.w;
+      else if (d.view) st.view = d.view;
+      else if (d.ex !== undefined) { st.prompt = CFG.prompts[+d.ex]; st.t = 99; }
+      else if (d.add) { st.prompt = (st.prompt.trim() + ' ' + d.add).trim(); st.t = 99; }
+      else if (d.a === 'next') return go(st.step + 1);
+      else if (d.a === 'prev') return go(st.step - 1);
+      else if (d.a === 'restart') { st.t = 99; return go(0); }
+      else if (d.a === 'how') { st.t = 99; return go(25); }
+      else if (d.a === 'map') st.map = !st.map;
+      else if (d.a === 'copylink') { try { navigator.clipboard.writeText(location.href); b.textContent = 'Link copied'; } catch (x) {} return; }
+      else if (d.a === 'copy') { try { navigator.clipboard.writeText(CODE[STEPS[st.step].k]); b.textContent = 'Copied'; } catch (x) {} return; }
       else return;
-      if (STEPS[st.step].l !== undefined && b.dataset.l === undefined) st.l = STEPS[st.step].l;
-      if (b.dataset.l !== undefined) { const i = STEPS.findIndex((s, n) => s.l === st.l && s.k === STEPS[st.step].k); if (STEPS[st.step].l !== undefined && i >= 0) st.step = i; }
       render();
     });
-    el.addEventListener('change', e => {
+    el.addEventListener('input', e => {
       const x = e.target.dataset.x;
-      if (x === 'step') st.step = +e.target.value;
-      else if (x === 'preset' && e.target.value !== 'custom') { st.prompt = CFG.prompts[+e.target.value]; st.t = ITM.tokenize(st.prompt).ids.length - 1; }
-      else if (x === 'text') { st.prompt = e.target.value; st.t = 99; }
-      else return;
-      render();
+      if (x === 'text') { st.prompt = e.target.value; st.t = 99; render(); }
+      else if (x === 'prec') e.target.nextElementSibling.textContent = e.target.value;
     });
-    el.addEventListener('input', e => { if (e.target.dataset.x === 'prec') { st.p = +e.target.value; $('precout').textContent = st.p; render(); } });
+    /* re-render only when the slider is released, so dragging is not interrupted */
+    el.addEventListener('change', e => { if (e.target.dataset.x === 'prec') { st.p = +e.target.value; render(); const r = el.querySelector('[data-x="prec"]'); if (r) r.focus(); } });
+    el.addEventListener('toggle', e => { if (e.target.dataset && e.target.dataset.x === 'more') st.more = e.target.open; }, true);
     el.addEventListener('keydown', e => {
-      if (e.target.matches('input[type=text]')) return;
-      if (e.key === 'ArrowRight' && st.step < STEPS.length - 1) { st.step++; render(); } else if (e.key === 'ArrowLeft' && st.step > 0) { st.step--; render(); }
+      if (e.target.matches('input, textarea, select') || e.altKey || e.ctrlKey || e.metaKey) return;
+      if (e.key === 'ArrowRight' && st.step < STEPS.length - 1) { e.preventDefault(); st.step++; render(); }
+      else if (e.key === 'ArrowLeft' && st.step > 0) { e.preventDefault(); st.step--; render(); }
     });
-    if (!hadHash) { let seen = false; try { seen = !!localStorage.getItem('itm-xp-toured'); } catch (e) {} if (!seen) applyTour(0); }
+    /* in-page links such as /explorer/#step=7 change only the hash */
+    window.addEventListener('hashchange', () => { readHash(); render(); });
     render();
   };
 

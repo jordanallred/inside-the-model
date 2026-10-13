@@ -29,7 +29,7 @@ export default defineConfig({
       logo: { src: '/brand/logo-horizontal-light.svg', alt: 'Inside the Model', replacesTitle: true },
       favicon: '/favicon.svg',
       description: 'An interactive guide to the calculations, code, training, and inference behind large language models.',
-      customCss: ['katex/dist/katex.min.css', './src/styles/brand-tokens.css', './src/styles/custom.css', './src/styles/brand.css', './src/styles/widgets.css'],
+      customCss: ['katex/dist/katex.min.css', './src/styles/brand-tokens.css', './src/styles/custom.css', './src/styles/brand.css', './src/styles/widgets.css', './src/styles/explorer.css'],
       head: [
         { tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' } },
         { tag: 'link', attrs: { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400..600&family=JetBrains+Mono:wght@400..600&family=Plus+Jakarta+Sans:wght@700;800&display=swap' } },

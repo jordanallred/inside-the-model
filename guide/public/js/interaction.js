@@ -3,7 +3,7 @@
 (function () {
   const R = {
     homehero: { type: 'Model trace', mission: 'Choose a token or attention head and trace which earlier words matter.', observation: 'A token prediction is built from many small, inspectable attention choices.' },
-    explorer: { type: 'Guided exploration', mission: 'Follow one token all the way from text to its next-token probabilities.', observation: 'Each panel is a real intermediate value from the same tiny model.' },
+    explorer: { bare: true, type: 'Guided exploration', mission: 'Follow one token all the way from text to its next-token probabilities.', observation: 'Each panel is a real intermediate value from the same tiny model.' }, // carries its own guidance
     challenges: { type: 'Knowledge check', mission: 'Commit to an answer, then use the Explorer to verify the calculation.', observation: 'A wrong answer is useful when it tells you which stage to revisit.' },
     gd: { type: 'Simulation', mission: 'Drag the starting point, then make the step too large and watch gradient descent stop being descent.', observation: 'The gradient gives a direction, but the learning rate decides whether that direction is safe.', scenarios: [{ label: 'Overshoot', controls: { lr: 1.1 }, actions: ['play'] }, { label: 'Start on the other side', controls: { x0: 2.2, lr: 0.2 }, actions: ['play'] }] },
     mlp: { type: 'Training lab', mission: 'Change the model’s capacity, then ask it to fit a curve it cannot simply memorize. Drag on the chart to draw your own.', observation: 'More hidden units make more bends available; training still has to find them.', scenarios: [{ label: 'One unit', controls: { H: 1 }, actions: ['reinit', 'play'] }, { label: 'Hard target', controls: { tg: 'wiggle' }, actions: ['reinit', 'play'] }] },
@@ -53,7 +53,7 @@
     });
   }
   function decorate(widget, name) {
-    const item = R[name]; if (!item || widget.dataset.interactionReady) return;
+    const item = R[name]; if (!item || item.bare || widget.dataset.interactionReady) return;
     widget.dataset.interactionReady = 'true';
     const frame = document.createElement('aside'); frame.className = 'interaction-frame'; frame.setAttribute('aria-label', item.type + ': ' + item.mission);
     const scenarios = (item.scenarios || []).map((scenario, index) => '<button class="interaction-scenario" type="button" data-scenario="' + index + '">' + scenario.label + '</button>').join('');

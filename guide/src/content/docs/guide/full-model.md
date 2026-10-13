@@ -14,7 +14,7 @@ you can trace tensor shapes through a full decoder-only transformer, write the t
 :::
 
 :::note[Run a whole forward pass]
-Run a whole forward pass from prompt to next-token probabilities. The guided tour walks through it. [Open in the Model Explorer](/explorer/#step=0&t=3&v=visual).
+Run a whole forward pass from prompt to next-token probabilities, one step at a time. [Open in the Model Explorer](/explorer/#step=0&t=3&v=visual).
 :::
 
 ## Assembling the pieces
