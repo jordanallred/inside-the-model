@@ -26,7 +26,7 @@
       const { w, h } = K.box(svg, w => K.clamp(w * 0.4, 200, 280)), lo = dG(32768), hi = dG(64);
       X = K.log(64, 32768, 52, w - 14); const Y = K.log(Math.pow(10, Math.floor(Math.log10(lo))), Math.pow(10, Math.ceil(Math.log10(hi))), h - 34, 10);
       let s = K.axes(X, Y, { fx: v => v.toLocaleString('en-US'), fy: v => v.toLocaleString('en-US'), xl: 'GPUs (log scale)', yl: 'days' });
-      [[7, '1 week'], [30, '1 month'], [365, '1 year']].forEach(([d, n]) => { if (d > Y.d[0] && d < Y.d[1]) s += '<line class="wk-dash" style="stroke:var(--line)" x1="52" x2="' + (w - 14) + '" y1="' + Y(d) + '" y2="' + Y(d) + '"/>' + K.text(w - 16, Y(d) - 4, n, 'wk-tick', 'end'); });
+      [[7, '1 week'], [30, '1 month'], [365, '1 year']].forEach(([d, n]) => { if (d > Y.d[0] && d < Y.d[1]) s += '<line class="wk-dash" style="stroke:var(--line)" x1="52" x2="' + (w - 14) + '" y1="' + Y(d) + '" y2="' + Y(d) + '"/>' + (Math.abs(Y(d) - Y(dG(S.G)) + 12) < 16 && X(S.G) > w - 260 ? '' : K.text(w - 16, Y(d) - 4, n, 'wk-tick', 'end')); });
       s += '<path class="wk-ln" style="stroke:var(--c1)" d="' + K.path(Array.from({ length: 60 }, (_, i) => { const g = 64 * Math.pow(512, i / 59); return [X(g), Y(dG(g))]; })) + '"/>';
       s += K.handle('G', X(S.G), Y(dG(S.G)), 'number of GPUs', S.G + ' GPUs', 'is-c1') + K.text(X(S.G) + (X(S.G) > w - 140 ? -12 : 12), Y(dG(S.G)) - 12, S.G.toLocaleString('en-US') + ' GPUs → ' + days(dG(S.G)), 'wk-lab', X(S.G) > w - 140 ? 'end' : 'start');
       svg.innerHTML = s;
@@ -92,7 +92,7 @@
       X = K.log(1, 512, 52, w - 14);
       const ys = [tm(1), tc(1), tm(512), tc(512)], Y = K.log(Math.pow(10, Math.floor(Math.log10(Math.min(...ys) * 1e3))) / 1e3, Math.pow(10, Math.ceil(Math.log10(Math.max(...ys) * 1e3))) / 1e3, h - 34, 10);
       const ln = (f, c, cls) => '<path class="' + cls + '" style="stroke:' + c + '" d="' + K.path(Array.from({ length: 80 }, (_, i) => { const B = Math.pow(512, i / 79); return [X(B), Y(f(B))]; })) + '"/>';
-      let s = K.axes(X, Y, { fx: v => v, fy: v => (v * 1000 >= 1 ? +(v * 1000).toPrecision(2) : (v * 1000).toPrecision(1)) + ' ms', xl: 'batch: sequences decoded together (log)', yl: 'time per step' });
+      let s = K.axes(X, Y, { fx: v => v, fy: v => (v >= 1 ? +v.toPrecision(2) + ' s' : v * 1000 >= 1 ? +(v * 1000).toPrecision(2) + ' ms' : (v * 1000).toPrecision(1) + ' ms'), xl: 'batch: sequences decoded together (log)', yl: 'time per step' });
       s += ln(tm, 'var(--c1)', 'wk-dash') + ln(tc, 'var(--c2)', 'wk-dash') + ln(st, 'var(--fg)', 'wk-ln');
       const den = 2 * N * bw / pf - S.c * kvb, Bx = den > 0 ? wb / den : Infinity;
       if (Bx >= 1 && Bx <= 512) s += '<line class="wk-grid" style="stroke:var(--c4);stroke-dasharray:4 3" x1="' + X(Bx) + '" x2="' + X(Bx) + '" y1="10" y2="' + (h - 34) + '"/>' + K.text(X(Bx) + 4, 24, 'compute takes over ≈ ' + Math.round(Bx), 'wk-tick');
@@ -123,14 +123,19 @@
         hist.push({ b, mOld: m, mn, sc, add: blk.reduce((a, x) => a + Math.exp(x - mn), 0) });
         l = l * sc + blk.reduce((a, x) => a + Math.exp(x - mn), 0); o = o * sc + blk.reduce((a, x, j) => a + Math.exp(x - mn) * vb[j], 0); m = mn;
       }
-      const svg = pick(el, 'c'), { w } = K.box(svg, 118), cw = (w - 60) / n, Xc = i => 60 + cw * i, mx = Math.max(...s.map(Math.abs));
-      let g = K.text(52, 44, 'score', 'wk-tick', 'end') + K.text(52, 84, 'value', 'wk-tick', 'end');
+      const svg = pick(el, 'c'), w0 = K.box(svg, 10).w, cols = w0 >= 560 ? 12 : 6, rows = n / cols, rowH = 96, { w } = K.box(svg, rows * rowH + 4), cw = (w - 60) / cols, Xc = i => 60 + cw * (i % cols), Yo = i => Math.floor(i / cols) * rowH, mx = Math.max(...s.map(Math.abs));
+      let g = '';
+      for (let r = 0; r < rows; r++) g += K.text(52, r * rowH + 44, 'score', 'wk-tick', 'end') + K.text(52, r * rowH + 84, 'value', 'wk-tick', 'end');
       s.forEach((x, i) => {
-        const done = i < S.k * bs, cur = S.k > 0 && i >= (S.k - 1) * bs && i < S.k * bs;
-        g += '<rect x="' + (Xc(i) + 1.5).toFixed(1) + '" y="26" width="' + (cw - 3).toFixed(1) + '" height="28" rx="3" style="fill:' + (x >= 0 ? 'var(--c1)' : 'var(--c2)') + ';fill-opacity:' + (done ? 0.15 + 0.6 * Math.abs(x) / mx : 0.08).toFixed(2) + ';stroke:' + (cur ? 'var(--accent)' : 'var(--line)') + ';stroke-width:' + (cur ? 2.5 : 1) + '"/>' + K.text(Xc(i) + cw / 2, 44, x.toFixed(1), done ? 'wk-lab' : 'wk-tick', 'middle') + K.text(Xc(i) + cw / 2, 84, v[i].toFixed(2), 'wk-tick', 'middle');
+        const done = i < S.k * bs, cur = S.k > 0 && i >= (S.k - 1) * bs && i < S.k * bs, c = x >= 0 ? 'var(--c1)' : 'var(--c2)', op = done ? K.fit(c, 0.15 + 0.6 * Math.abs(x) / mx) : 0.08, y = Yo(i);
+        g += '<rect x="' + (Xc(i) + 1.5).toFixed(1) + '" y="' + (y + 26) + '" width="' + (cw - 3).toFixed(1) + '" height="28" rx="3" style="fill:' + c + ';fill-opacity:' + op.toFixed(2) + ';stroke:' + (cur ? 'var(--accent)' : 'var(--line)') + ';stroke-width:' + (cur ? 2.5 : 1) + '"/>' +
+          '<text x="' + (Xc(i) + cw / 2).toFixed(1) + '" y="' + (y + 44) + '" text-anchor="middle" class="' + (done ? 'wk-lab ' : '') + 'wk-in" style="fill:' + (done ? K.ink(c, op) : 'var(--fg)') + '">' + x.toFixed(1) + '</text>' + K.text(Xc(i) + cw / 2, y + 84, v[i].toFixed(2), 'wk-tick', 'middle');
+        if ((i + 1) % bs === 0 && (i + 1) % cols !== 0 && i < n - 1) g += '<line x1="' + Xc(i + 1) + '" x2="' + Xc(i + 1) + '" y1="' + (y + 22) + '" y2="' + (y + 92) + '" style="stroke:var(--muted);stroke-dasharray:2 3"/>';
       });
-      if (S.k > 0) { const a = Xc((S.k - 1) * bs), b = Xc(Math.min(n, S.k * bs)); g += '<path d="M' + (a + 2) + ' 18v-6H' + (b - 2) + 'v6" style="fill:none;stroke:var(--accent);stroke-width:2"/>' + K.text((a + b) / 2, 9, 'block ' + S.k + ' in memory', 'wk-lab', 'middle'); }
-      for (let b = 1; b < nb; b++) g += '<line x1="' + Xc(b * bs) + '" x2="' + Xc(b * bs) + '" y1="22" y2="96" style="stroke:var(--muted);stroke-dasharray:2 3"/>';
+      if (S.k > 0) {
+        const a0 = (S.k - 1) * bs, a1 = Math.min(n, S.k * bs) - 1;
+        for (let r = Math.floor(a0 / cols); r <= Math.floor(a1 / cols); r++) { const i0 = Math.max(a0, r * cols), i1 = Math.min(a1, r * cols + cols - 1), xa = Xc(i0), xb = Xc(i1) + cw, y = r * rowH; g += '<path d="M' + (xa + 2) + ' ' + (y + 18) + 'v-6H' + (xb - 2) + 'v6" style="fill:none;stroke:var(--accent);stroke-width:2"/>' + (r === Math.floor(a0 / cols) ? K.text(K.clamp((xa + xb) / 2, 110, w - 60), y + 9, 'block ' + S.k + ' in memory', 'wk-lab', 'middle') : ''); }
+      }
       svg.innerHTML = g;
       pick(el, 'tr').innerHTML = '<button type="button" class="btn primary" data-a="next"' + (S.k >= nb ? ' disabled' : '') + '>Next block</button>' + K.playBtn(PL) + K.btn('restart', 'Restart') + K.btn('re', 'New random scores') + '<span class="wk-spacer"></span><span class="wk-count">block ' + S.k + ' of ' + nb + '</span>';
       const last = hist[hist.length - 1], mxs = Math.max(...s), den = s.reduce((a, x) => a + Math.exp(x - mxs), 0), ref = s.reduce((a, x, j) => a + Math.exp(x - mxs) * v[j], 0) / den;
@@ -153,10 +158,10 @@
     K.bind(el, S, render);
     function render() {
       const kv = S.kv, svg = pick(el, 'c'), { w } = K.box(svg, 170), cw = (w - 20) / 8, gs = 8 / kv, gc = g => COL[g % 4];
-      let s = K.text(10, 14, 'query heads (each still asks its own question)', 'wk-tick') + K.text(10, 166, 'key/value heads (what is cached)', 'wk-tick');
+      let s = K.text(10, 14, w > 420 ? 'query heads (each still asks its own question)' : 'query heads', 'wk-tick') + K.text(10, 166, 'key/value heads (what is cached)', 'wk-tick');
       for (let i = 0; i < 8; i++) { const g = Math.floor(i / gs), x = 10 + cw * i + cw / 2, kx = 10 + cw * gs * g + cw * gs / 2; s += '<line x1="' + x + '" y1="52" x2="' + kx + '" y2="118" style="stroke:' + gc(g) + ';stroke-width:2;opacity:.7"/>'; }
-      for (let i = 0; i < 8; i++) { const g = Math.floor(i / gs); s += '<rect x="' + (10 + cw * i + 3) + '" y="22" width="' + (cw - 6) + '" height="30" rx="5" style="fill:' + gc(g) + '"/>' + K.text(10 + cw * i + cw / 2, 41, 'Q' + i, 'wk-lab', 'middle'); }
-      for (let g = 0; g < kv; g++) s += '<rect x="' + (10 + cw * gs * g + 3) + '" y="118" width="' + (cw * gs - 6) + '" height="30" rx="5" style="fill:' + gc(g) + ';fill-opacity:.85;stroke:var(--fg);stroke-width:1.5"/>' + K.text(10 + cw * gs * g + cw * gs / 2, 137, 'K,V ' + g, 'wk-lab', 'middle');
+      for (let i = 0; i < 8; i++) { const g = Math.floor(i / gs); s += '<rect x="' + (10 + cw * i + 3) + '" y="22" width="' + (cw - 6) + '" height="30" rx="5" style="fill:' + gc(g) + '"/>' + '<text x="' + (10 + cw * i + cw / 2) + '" y="41" text-anchor="middle" class="wk-lab wk-in" style="fill:' + K.ink(gc(g)) + '">Q' + i + '</text>'; }
+      for (let g = 0; g < kv; g++) s += '<rect x="' + (10 + cw * gs * g + 3) + '" y="118" width="' + (cw * gs - 6) + '" height="30" rx="5" style="fill:' + gc(g) + ';fill-opacity:' + K.fit(gc(g), 0.85).toFixed(2) + ';stroke:var(--fg);stroke-width:1.5"/>' + '<text x="' + (10 + cw * gs * g + cw * gs / 2) + '" y="137" text-anchor="middle" class="wk-lab wk-in" style="fill:' + K.ink(gc(g), K.fit(gc(g), 0.85)) + '">K,V ' + g + '</text>';
       svg.innerHTML = s;
       const per = 2 * kv * 128 * 2;
       pick(el, 'out').innerHTML = '<div class="kicker">KV cache per token per layer (head size 128, 16-bit)</div>' + T.bar(kv === 8 ? 'multi-head' : 'this design', kv / 8, 'var(--accent)', T.bytes(per)) + T.bar('multi-head', 1, 'var(--muted)', T.bytes(2 * 8 * 128 * 2)) +
@@ -185,7 +190,7 @@
         const ctx = C[0].map((_, j) => wts.reduce((s, x, i) => s + x * C[i][j], 0)), oAbs = mv(WUV, ctx), Vs = C.map(c => mv(WUV, c)), oEx = [0, 1, 2, 3].map(d => wts.reduce((s, x, i) => s + x * Vs[i][d], 0));
         const mx = Math.max(...ex.map((x, i) => Math.abs(x - ab[i])), ...oAbs.map((x, i) => Math.abs(x - oEx[i])));
         h = '<div class="wk-two"><div class="wk-card"><b>Expand every key</b><div class="wk-cap">build k_j = W_UK·c_j for all 5 tokens (20 numbers), then q·k_j</div></div><div class="wk-card is-on"><b>Absorb into the query</b><div class="wk-cap">compute q′ = W_UKᵀ·q once (3 numbers), then q′·c_j</div></div></div>' +
-          '<div class="gscroll"><table class="grid tr-t"><thead><tr><th>token</th><th>score, expanded</th><th>score, absorbed</th><th></th></tr></thead><tbody>' + ex.map((x, j) => '<tr><th scope="row">' + j + '</th><td>' + x.toFixed(6) + '</td><td>' + ab[j].toFixed(6) + '</td><td style="color:var(--ok)">' + (Math.abs(x - ab[j]) < 1e-9 ? 'equal' : 'differs') + '</td></tr>').join('') + '</tbody></table></div>' +
+          '<div class="gscroll"><table class="grid tr-t"><thead><tr><th>token</th><th>score, expanded</th><th>score, absorbed</th><th></th></tr></thead><tbody>' + ex.map((x, j) => '<tr><th scope="row">' + j + '</th><td>' + x.toFixed(6) + '</td><td>' + ab[j].toFixed(6) + '</td><td class="wk-ok-ink">' + (Math.abs(x - ab[j]) < 1e-9 ? 'equal' : 'differs') + '</td></tr>').join('') + '</tbody></table></div>' +
           '<div class="wk-eq">output, expanding every value     [' + oEx.map(x => x.toFixed(4)).join(', ') + ']\noutput, absorbed W_UV·(Σ w·c)     [' + oAbs.map(x => x.toFixed(4)).join(', ') + ']</div>' +
           K.say('ok', 'Identical up to rounding (largest difference ' + mx.toExponential(1) + '). Full-size keys and values never have to be built: the cache holds only the latents.') + K.say('info', 'Now switch on RoPE for the expanded keys and see what breaks.');
       } else {
@@ -245,12 +250,12 @@
       const routes = toks.map((t, i) => { const sc = Array.from({ length: E }, (_, e) => T.hash(i * 3 + t.length, e + 13) * 4 - 2), idx = sc.map((v, e) => [v, e]).sort((a, b) => b[0] - a[0]).slice(0, Kk), w = T.softmax(idx.map(x => x[0])); idx.forEach(x => { load[x[1]]++; }); return idx.map((x, j) => [x[1], w[j]]); });
       const svg = pick(el, 'c'), lw = 92, { w } = K.box(svg, () => 30 + toks.length * 24 + 70), cw = (w - lw - 4) / E, mxl = Math.max(...load, 1), top = 22;
       let s = '';
-      for (let e = 0; e < E; e++) if (cw >= 16 || e % Math.ceil(16 / cw) === 0) s += K.text(lw + cw * (e + 0.5), 14, 'E' + e, 'wk-tick', 'middle');
+      for (let e = 0; e < E; e++) if (e % Math.ceil(30 / cw) === 0) s += K.text(lw + cw * (e + 0.5), 14, 'E' + e, 'wk-tick', 'middle');
       toks.forEach((t, i) => {
         const y = top + i * 24, on = S.sel === i;
         s += '<g data-row="' + i + '" class="wk-click"><rect x="0" y="' + y + '" width="' + w + '" height="22" style="fill:' + (on ? 'color-mix(in srgb, var(--accent) 14%, transparent)' : 'transparent') + '"/>' + K.text(lw - 8, y + 15, esc(t.length > 11 ? t.slice(0, 10) + '…' : t), on ? 'wk-lab' : '', 'end');
         for (let e = 0; e < E; e++) s += '<rect x="' + (lw + cw * e + 1).toFixed(1) + '" y="' + (y + 2) + '" width="' + Math.max(1, cw - 2).toFixed(1) + '" height="18" rx="2" style="fill:var(--tint);stroke:var(--line);stroke-width:.5"/>';
-        routes[i].forEach(([e, wt]) => { s += '<rect x="' + (lw + cw * e + 1).toFixed(1) + '" y="' + (y + 2) + '" width="' + Math.max(1, cw - 2).toFixed(1) + '" height="18" rx="2" style="fill:var(--c1);fill-opacity:' + (0.35 + 0.65 * wt).toFixed(2) + '"><title>' + esc(t) + ' → E' + e + ': ' + (wt * 100).toFixed(0) + '%</title></rect>' + (cw >= 28 ? K.text(lw + cw * (e + 0.5), y + 15, (wt * 100).toFixed(0), 'wk-lab', 'middle') : ''); });
+        routes[i].forEach(([e, wt]) => { s += '<rect x="' + (lw + cw * e + 1).toFixed(1) + '" y="' + (y + 2) + '" width="' + Math.max(1, cw - 2).toFixed(1) + '" height="18" rx="2" style="fill:var(--c1);fill-opacity:' + K.fit('var(--c1)', 0.35 + 0.65 * wt).toFixed(2) + '"><title>' + esc(t) + ' → E' + e + ': ' + (wt * 100).toFixed(0) + '%</title></rect>' + (cw >= 28 ? '<text x="' + (lw + cw * (e + 0.5)).toFixed(1) + '" y="' + (y + 15) + '" text-anchor="middle" class="wk-lab wk-in" style="fill:' + K.ink('var(--c1)', K.fit('var(--c1)', 0.35 + 0.65 * wt)) + '">' + (wt * 100).toFixed(0) + '</text>' : ''); });
         s += '</g>';
       });
       const by = top + toks.length * 24 + 8;
@@ -355,12 +360,12 @@
       if (kind === 'fp32') { const u = new Uint32Array(new Float32Array([Math.abs(c.v)]).buffer)[0]; for (let d = -4; d <= 4; d++) { const uu = new Uint32Array([u + d]), f = new Float32Array(uu.buffer)[0]; if (u + d >= 0 && isFinite(f)) nb.push(f); } }
       else for (let d = -4; d <= 4; d++) { const t = c.tb[c.idx + d]; if (t) nb.push(t.v); }
       if (c.sg) nb = nb.map(v => -v);
-      const svg = pick(el, 'n'), { w } = K.box(svg, 70), lo = Math.min(...nb, x), hi = Math.max(...nb, x), X = K.lin(lo - (hi - lo) * 0.04 - 1e-30, hi + (hi - lo) * 0.04 + 1e-30, 16, w - 16);
+      const svg = pick(el, 'n'), { w } = K.box(svg, 70), span0 = Math.max(...nb) - Math.min(...nb) || 1, inX = x >= Math.min(...nb) - span0 && x <= Math.max(...nb) + span0, lo = Math.min(...nb, inX ? x : Infinity), hi = Math.max(...nb, inX ? x : -Infinity), X = K.lin(lo - (hi - lo) * 0.04 - 1e-30, hi + (hi - lo) * 0.04 + 1e-30, 16, w - 16);
       let s = '<line class="wk-axis" x1="10" x2="' + (w - 10) + '" y1="34" y2="34"/>';
       nb.forEach(v => { s += '<line x1="' + X(v).toFixed(1) + '" x2="' + X(v).toFixed(1) + '" y1="26" y2="42" style="stroke:var(--muted);stroke-width:2"/>'; });
-      nb.forEach((v, i) => { if (i % 2 === 0 || nb.length < 6) s += K.text(X(v), 58, +v.toPrecision(4), 'wk-tick', 'middle'); });
+      let lastX = -1e9; nb.forEach(v => { const t = String(+v.toPrecision(4)), px = X(v); if (px - lastX >= t.length * 7 + 10 && px > 14 + t.length * 3.5 && px < w - 14 - t.length * 3.5) { s += K.text(px, 58, t, 'wk-tick', 'middle'); lastX = px; } });
       s += '<circle cx="' + X(c.v).toFixed(1) + '" cy="34" r="6" style="fill:var(--c3)"/>';
-      if (Math.abs(X(x) - X(c.v)) < 2000) s += '<path d="M' + X(x).toFixed(1) + ' 22l-5 -9h10z" style="fill:var(--c2)"/>' + K.text(K.clamp(X(x), 40, w - 40), 10, 'your number', 'wk-tick', 'middle');
+      if (!inX) s += K.text(x > hi ? w - 10 : 10, 14, (x > hi ? 'your number is far to the right →' : '← your number is far to the left'), 'wk-tick', x > hi ? 'end' : 'start'); else s += '<path d="M' + X(x).toFixed(1) + ' 22l-5 -9h10z" style="fill:var(--c2)"/>' + K.text(K.clamp(X(x), 40, w - 40), 10, 'your number', 'wk-tick', 'middle');
       svg.innerHTML = s;
       const gap = nb.length > 1 ? Math.abs(nb[Math.min(nb.length - 1, nb.indexOf(c.v) + 1)] - c.v) || Math.abs(nb[1] - nb[0]) : 0;
       const tb = c.tb, info = kind === 'fp32' ? { max: '3.4×10³⁸', min: '1.4×10⁻⁴⁵', count: '≈ 4.3 billion' } : { max: String(c.max), min: K.sci(tb[1].v, 2), count: String(2 * tb.length - 1) };
@@ -389,9 +394,9 @@
     function render() {
       const r = T.rng(S.seed * 31), w = Array.from({ length: 64 }, () => T.randn(r)); w[5] = S.o;
       const { q, lv } = schemes[S.sch](w), { w: cw, h } = K.box(svg, w => K.clamp(w * 0.42, 220, 300));
-      const mx = Math.max(...w.map(Math.abs), 1) * 1.08, X = i => 30 + (i + 0.5) / 64 * (cw - 40); Y = K.lin(-Math.max(mx * 0.35, 3.5), mx, h - 10, 12);
-      let s = '<line class="wk-axis" x1="30" x2="' + (cw - 10) + '" y1="' + Y(0) + '" y2="' + Y(0) + '"/><line x1="' + ((X(31) + X(32)) / 2) + '" x2="' + ((X(31) + X(32)) / 2) + '" y1="8" y2="' + h + '" style="stroke:var(--muted);stroke-dasharray:3 3"/>' + K.text(X(0), 22, 'block 1', 'wk-tick') + K.text(X(32), 22, 'block 2', 'wk-tick');
-      lv.forEach(([a, b, levels]) => { const ys = levels.map(Y).filter(y => y > 8 && y < h); const dense = ys.length > 1 && Math.min(...ys.slice(1).map((y, i) => Math.abs(y - ys[i]) || 99)) < 2.5; if (!dense) levels.forEach(v => { const y = Y(v); if (y > 8 && y < h) s += '<line x1="' + (X(a) - 3).toFixed(1) + '" x2="' + (X(b - 1) + 3).toFixed(1) + '" y1="' + y.toFixed(1) + '" y2="' + y.toFixed(1) + '" style="stroke:var(--c4);stroke-opacity:.3"/>'; }); else s += K.text(X(a), 36, 'levels too dense to draw', 'wk-tick'); });
+      const mx = Math.max(...w.map(Math.abs), 1) * 1.08, X = i => 30 + (i + 0.5) / 64 * (cw - 40); Y = K.lin(-Math.max(mx * 0.35, 3.5), mx, h - 16, 12);
+      let s = '<line class="wk-axis" x1="30" x2="' + (cw - 10) + '" y1="' + Y(0) + '" y2="' + Y(0) + '"/><line x1="' + ((X(31) + X(32)) / 2) + '" x2="' + ((X(31) + X(32)) / 2) + '" y1="8" y2="' + h + '" style="stroke:var(--muted);stroke-dasharray:3 3"/>' + K.text(X(0), h - 2, 'block 1', 'wk-tick') + K.text(X(32), h - 2, 'block 2', 'wk-tick');
+      lv.forEach(([a, b, levels]) => { const ys = levels.map(Y).filter(y => y > 8 && y < h); const dense = ys.length > 1 && Math.min(...ys.slice(1).map((y, i) => Math.abs(y - ys[i]) || 99)) < 2.5; if (!dense) levels.forEach(v => { const y = Y(v); if (y > 8 && y < h) s += '<line x1="' + (X(a) - 3).toFixed(1) + '" x2="' + (X(b - 1) + 3).toFixed(1) + '" y1="' + y.toFixed(1) + '" y2="' + y.toFixed(1) + '" style="stroke:var(--c4);stroke-opacity:.3"/>'; }); else s += K.text(X(a), 22, cw > 460 ? 'levels too dense to draw' : 'levels too dense', 'wk-tick'); });
       const bw = Math.max(2, (cw - 40) / 64 * 0.55);
       w.forEach((v, i) => { s += '<rect x="' + (X(i) - bw / 2).toFixed(1) + '" width="' + bw.toFixed(1) + '" y="' + Math.min(Y(v), Y(0)).toFixed(1) + '" height="' + Math.abs(Y(v) - Y(0)).toFixed(1) + '" style="fill:var(--muted)" opacity=".6"/><line x1="' + (X(i) - bw).toFixed(1) + '" x2="' + (X(i) + bw).toFixed(1) + '" y1="' + Y(q[i]).toFixed(1) + '" y2="' + Y(q[i]).toFixed(1) + '" style="stroke:var(--c2);stroke-width:3"/>'; });
       s += K.handle('o', X(5), Y(S.o), 'outlier magnitude', S.o + ' σ', 'is-c2') + K.text(X(5) + 14, Y(S.o) + 4, 'outlier ' + S.o + 'σ', 'wk-lab');
@@ -419,14 +424,14 @@
     function render() {
       const { w, h } = K.box(svg, w => K.clamp(w * 0.6, 260, 400));
       X = K.lin(8, 12.7, 46, w - 10); Y = K.lin(9, 14, h - 36, 8);
-      const lab = v => T.fmt(Math.pow(10, v));
+      const lab = v => K.short(Math.pow(10, v));
       let s = '', gx = 28, gy = 20;
       const lo = L(Math.pow(10, 12.7), 1e14), hi = L(1e8, 1e9);
       for (let i = 0; i < gx; i++) for (let j = 0; j < gy; j++) { const n = 8 + (i + 0.5) * 4.7 / gx, d = 9 + (j + 0.5) * 5 / gy, l = L(Math.pow(10, n), Math.pow(10, d)), a = Math.pow((hi - l) / (hi - lo), 1.6); s += '<rect x="' + X(8 + i * 4.7 / gx).toFixed(1) + '" y="' + Y(9 + (j + 1) * 5 / gy).toFixed(1) + '" width="' + (X(8 + 4.7 / gx) - X(8) + 0.6).toFixed(1) + '" height="' + (Y(9) - Y(9 + 5 / gy) + 0.6).toFixed(1) + '" style="fill:var(--c3);fill-opacity:' + (0.02 + 0.3 * a).toFixed(3) + '"/>'; }
       s += K.axes(X, Y, { fx: lab, fy: lab, nx: 5, ny: 5, xl: 'parameters N', yl: 'training tokens D' });
-      for (let c = 18; c <= 28; c++) { const lc = c - Math.log10(6), x0 = Math.max(8, lc - 14), x1 = Math.min(12.7, lc - 9); if (x1 <= x0) continue; s += '<line x1="' + X(x0) + '" y1="' + Y(lc - x0) + '" x2="' + X(x1) + '" y2="' + Y(lc - x1) + '" style="stroke:var(--muted);stroke-opacity:.45"/>'; if (lc - x1 > 9.15 || x1 < 12.6) s += K.text(X(x1) - 2, Y(lc - x1) + (x1 < 12.6 ? -4 : -4), pow10(Math.pow(10, c)), 'wk-tick', 'end'); }
+      for (let c = 18; c <= 28; c++) { const lc = c - Math.log10(6), x0 = Math.max(8, lc - 14), x1 = Math.min(12.7, lc - 9); if (x1 <= x0) continue; s += '<line x1="' + X(x0) + '" y1="' + Y(lc - x0) + '" x2="' + X(x1) + '" y2="' + Y(lc - x1) + '" style="stroke:var(--muted);stroke-opacity:.45"/>'; if ((w > 460 || c % 2 === 0) && Y(lc - x1) > 20 && X(x1) > 80) s += K.text(X(x1) - 2, Y(lc - x1) - 4, pow10(Math.pow(10, c)), 'wk-tick', 'end'); }
       const l20 = Math.log10(20); s += '<line class="wk-dash" style="stroke:var(--fg)" x1="' + X(8) + '" y1="' + Y(8 + l20) + '" x2="' + X(12.7) + '" y2="' + Y(Math.min(14, 12.7 + l20)) + '"/>' + K.text(X(8.9), Y(8.9 + l20) - 8, 'D = 20 N', 'wk-lab');
-      Object.values(PUB).forEach(([n, N, D]) => { const x = X(Math.log10(N)), y = Y(Math.log10(D)), left = n === 'GPT-3'; s += '<circle cx="' + x + '" cy="' + y + '" r="5" style="fill:var(--c1);stroke:var(--bg)"/>' + K.text(x + (left || x > w - 90 ? -8 : 8), y + 4, n, 'wk-lab', left || x > w - 90 ? 'end' : 'start'); });
+      Object.values(PUB).forEach(([n, N, D]) => { const x = X(Math.log10(N)), y = Y(Math.log10(D)), below = n === 'GPT-3'; s += '<circle cx="' + x + '" cy="' + y + '" r="5" style="fill:var(--c1);stroke:var(--bg)"/>' + (below ? K.text(x, y + 18, n, 'wk-lab', 'middle') : K.text(x + (x > w - 90 ? -8 : 8), y + 4, n, 'wk-lab', x > w - 90 ? 'end' : 'start')); });
       const N = Math.pow(10, S.N), D = Math.pow(10, S.D), C = 6 * N * D, bN = Math.sqrt(C / 120), bD = 20 * bN;
       if (Math.log10(bN) >= 8 && Math.log10(bN) <= 12.7) s += '<line class="wk-dash" style="stroke:var(--c2)" x1="' + X(S.N) + '" y1="' + Y(S.D) + '" x2="' + X(Math.log10(bN)) + '" y2="' + Y(Math.log10(bD)) + '"/><circle cx="' + X(Math.log10(bN)) + '" cy="' + Y(Math.log10(bD)) + '" r="6" style="fill:none;stroke:var(--c2);stroke-width:2.5"/>';
       s += K.handle('pt', X(S.N), Y(S.D), 'your model: parameters and tokens', T.fmt(N) + ' parameters, ' + T.fmt(D) + ' tokens', 'is-c2');
@@ -489,8 +494,8 @@
       pick(el, 'a1').innerHTML = K.stats([{ l: 'mean reward', v: m.toFixed(3) }, { l: 'std', v: sd.toFixed(3) }, { l: 'advantage', v: '(r − mean) / std', s: 'shared by every token of that answer' }]) +
         (sd ? K.say('info', 'Answers that beat their siblings are pushed up, the rest down. Click a bar to use that answer’s advantage as A in the clip below.') : K.say('warn', 'Every answer got the same reward, so every advantage is 0: this question teaches nothing.'));
       const { w: cwid, h } = K.box(svg, 200), e = S.eps, Av = S.A, obj = r => Math.min(r * Av, K.clamp(r, 1 - e, 1 + e) * Av);
-      X = K.lin(0.4, 1.8, 44, cwid - 12); const lo = Math.min(0.4 * Av, 1.8 * Av, 0) - 0.1, hi = Math.max(0.4 * Av, 1.8 * Av, 0) + 0.1, Yc = K.lin(lo, hi, h - 30, 10);
-      let s = '<rect x="' + X(1 - e) + '" width="' + (X(1 + e) - X(1 - e)) + '" y="10" height="' + (h - 40) + '" style="fill:var(--c3)" class="wk-band"/>' + K.axes(X, Yc, { fx: v => v.toFixed(1), fy: v => v.toFixed(1), xl: 'ratio r = π_new / π_old', nx: 7 });
+      X = K.lin(0.4, 1.8, 44, cwid - 12); const lo = Math.min(0.4 * Av, 1.8 * Av, 0) - 0.1, hi = Math.max(0.4 * Av, 1.8 * Av, 0) + 0.1, Yc = K.lin(lo, hi, h - 36, 10);
+      let s = '<rect x="' + X(1 - e) + '" width="' + (X(1 + e) - X(1 - e)) + '" y="10" height="' + (h - 46) + '" style="fill:var(--c3)" class="wk-band"/>' + K.axes(X, Yc, { fx: v => v.toFixed(1), fy: v => v.toFixed(1), xl: 'ratio r = π_new / π_old', nx: 7 });
       s += '<path class="wk-dash" style="stroke:var(--muted)" d="' + K.path([[X(0.4), Yc(0.4 * Av)], [X(1.8), Yc(1.8 * Av)]]) + '"/>' + K.text(X(1.8) - 2, Yc(1.8 * Av) + (Av >= 0 ? 14 : -6), 'r·A (unclipped)', 'wk-tick', 'end');
       const pts = Array.from({ length: 141 }, (_, i) => 0.4 + i * 0.01);
       s += '<path class="wk-ln" style="stroke:var(--c4)" d="' + K.path(pts.map(r => [X(r), Yc(obj(r))])) + '"/>';
@@ -518,7 +523,7 @@
       const svg = pick(el, 'm'), w0 = K.box(svg, 10).w, Z = Math.min(170, (w0 - 70) / 2.3), th = Math.max(3, r / d * Z), y0 = 22;
       K.box(svg, Z + y0 + 24);
       let x = 4, s = '';
-      s += '<rect x="' + x + '" y="' + y0 + '" width="' + Z + '" height="' + Z + '" style="fill:var(--muted);fill-opacity:.25;stroke:var(--muted)"/>' + K.text(x + Z / 2, y0 + Z / 2 - 4, 'W (frozen)', 'wk-lab', 'middle') + K.text(x + Z / 2, y0 + Z / 2 + 12, '4096 × 4096', 'wk-tick', 'middle') + K.text(x + Z / 2, y0 + Z + 16, T.fmt(d * d) + ' numbers', 'wk-tick', 'middle');
+      s += '<rect x="' + x + '" y="' + y0 + '" width="' + Z + '" height="' + Z + '" style="fill:var(--muted);fill-opacity:.25;stroke:var(--muted)"/>' + K.text(x + Z / 2, y0 + Z / 2 - 4, 'W (frozen)', 'wk-lab wk-in', 'middle') + K.text(x + Z / 2, y0 + Z / 2 + 12, '4096 × 4096', 'wk-lab wk-in', 'middle') + K.text(x + Z / 2, y0 + Z + 16, T.fmt(d * d) + ' numbers', 'wk-tick', 'middle');
       x += Z + 20; s += K.text(x, y0 + Z / 2 + 5, '+', 'wk-big', 'middle'); x += 22;
       s += '<rect x="' + x + '" y="' + (y0 + th + 6) + '" width="' + th.toFixed(1) + '" height="' + (Z - th - 6) + '" style="fill:var(--c2)"/>' + K.text(x + th + 6, y0 + Z - 4, 'B: 4096 × ' + r, 'wk-lab');
       s += '<rect x="' + (x + th + 6).toFixed(1) + '" y="' + y0 + '" width="' + (Z - th - 6).toFixed(1) + '" height="' + th.toFixed(1) + '" style="fill:var(--c2)"/>' + K.text(x + th + 6, y0 + th + 16, 'A: ' + r + ' × 4096', 'wk-lab');
@@ -582,7 +587,7 @@
       const adv = eps * w.reduce((s, x) => s + Math.abs(x), 0), rr = T.rng(12), rnd = Math.abs(eps * w.reduce((s, x) => s + x * (rr() < 0.5 ? -1 : 1), 0));
       const { w: cw, h } = K.box(svg, w => K.clamp(w * 0.42, 210, 290));
       X = K.log(10, 1e5, 52, cw - 14); const Y = K.log(1e-4, 100, h - 34, 10), ex = v => eps * Math.sqrt(2 * v / Math.PI);
-      let s = K.axes(X, Y, { fx: v => T.fmt(v), fy: v => (v >= 1 ? v : v.toExponential(0)), xl: 'number of input features d (log)', yl: 'change in the score' });
+      let s = K.axes(X, Y, { fx: K.short, fy: v => (v >= 1 ? v : v.toExponential(0)), xl: 'number of input features d (log)', yl: 'change in the score' });
       s += '<line class="wk-dash" style="stroke:var(--ok)" x1="52" x2="' + (cw - 14) + '" y1="' + Y(mar) + '" y2="' + Y(mar) + '"/>' + K.text(56, Y(mar) - 5, cw > 460 ? 'margin: the prediction flips above this line' : 'margin', 'wk-tick');
       s += '<path class="wk-ln" style="stroke:var(--c2)" d="' + K.path(Array.from({ length: 50 }, (_, i) => { const v = 10 * Math.pow(1e4, i / 49); return [X(v), Y(ex(v))]; })) + '"/>' + K.text(cw - 16, Y(ex(1e5)) + 14, cw > 460 ? 'worst case: ε·‖w‖₁ ≈ 0.8·ε·√d' : 'worst case', 'wk-tick', 'end');
       s += '<path class="wk-dash" style="stroke:var(--muted)" d="M52 ' + Y(eps) + 'H' + (cw - 14) + '"/>' + K.text(cw - 16, Y(eps) + 14, cw > 460 ? 'random signs: ≈ ε, flat' : 'random', 'wk-tick', 'end');
@@ -615,18 +620,18 @@
       key: (h, d) => (h === 'p' ? ui.update('p', +K.clamp(S.p + d * 0.05, 0.1, 1).toFixed(2)) : ui.update('k', K.clamp(S.k + d, 1, 8))),
     });
     function render() {
-      const { p, ord, keep, f } = final(), { w, h } = K.box(svg, 240), x0 = 40, bw = (w - x0 - 16) / 8, Y = K.lin(0, 1, h - 40, 14); geo = { Y, x0, bw };
+      const { p, ord, keep, f } = final(), { w, h } = K.box(svg, 240), x0 = 40, bw = (w - x0 - 16) / 8, narrow = bw < 58, Y = K.lin(0, 1, h - (narrow ? 54 : 40), 14); geo = { Y, x0, bw };
       let s = [0, 0.25, 0.5, 0.75, 1].map(v => '<line class="wk-grid" x1="' + x0 + '" x2="' + (w - 16) + '" y1="' + Y(v) + '" y2="' + Y(v) + '"/>' + K.text(x0 - 6, Y(v) + 4, v, 'wk-tick', 'end')).join('');
       let cum = 0; const cp = [];
       ord.forEach(([v, i], j) => {
         const x = x0 + bw * j, kept = keep.has(i); cum += v; cp.push([x + bw / 2, Y(cum)]);
         s += '<rect x="' + (x + bw * 0.18).toFixed(1) + '" width="' + (bw * 0.64).toFixed(1) + '" y="' + Y(v).toFixed(1) + '" height="' + (Y(0) - Y(v)).toFixed(1) + '" rx="2" style="fill:' + (kept ? 'var(--accent)' : 'var(--muted)') + ';fill-opacity:' + (kept ? 1 : 0.35) + '"/>';
-        s += K.text(x + bw / 2, h - 24, toks[i], kept ? 'wk-lab' : 'wk-tick', 'middle') + K.text(x + bw / 2, h - 10, kept ? (f[i] * 100).toFixed(0) + '%' : 'cut', 'wk-tick', 'middle');
+        s += K.text(x + bw / 2, h - 24 - (narrow && j % 2 ? 14 : 0), toks[i], kept ? 'wk-lab' : 'wk-tick', 'middle') + K.text(x + bw / 2, h - 10, kept ? (f[i] * 100).toFixed(0) + '%' : 'cut', 'wk-tick', 'middle');
         const c = draws.filter(d => d === i).length; if (c) s += K.text(x + bw / 2, Y(v) - 6, '×' + c, 'wk-lab', 'middle');
       });
       s += '<path class="wk-ln" style="stroke:var(--c3);stroke-width:2" d="' + K.path(cp) + '"/>' + cp.map(q => '<circle cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="3" style="fill:var(--c3)"/>').join('');
-      s += '<line x1="' + x0 + '" x2="' + (w - 16) + '" y1="' + Y(S.p) + '" y2="' + Y(S.p) + '" style="stroke:var(--c3);stroke-dasharray:5 3;stroke-width:2"/>' + K.handle('p', x0, Y(S.p), 'top-p', S.p.toFixed(2), 'is-c3') + K.text(x0 + 14, Y(S.p) - 7, 'top-p ' + S.p.toFixed(2), 'wk-lab');
-      const kx = x0 + bw * S.k; s += '<line x1="' + kx + '" x2="' + kx + '" y1="10" y2="' + (h - 36) + '" style="stroke:var(--c2);stroke-dasharray:5 3;stroke-width:2"/>' + K.handle('k', kx, h - 36, 'top-k', String(S.k), 'is-c2') + K.text(kx - 10, 24, 'top-k ' + S.k, 'wk-lab', 'end');
+      s += '<line x1="' + x0 + '" x2="' + (w - 16) + '" y1="' + Y(S.p) + '" y2="' + Y(S.p) + '" style="stroke:var(--c3);stroke-dasharray:5 3;stroke-width:2"/>' + K.handle('p', x0, Y(S.p), 'top-p', S.p.toFixed(2), 'is-c3') + K.text(x0 + 14, Math.max(Y(S.p) - 7, 12), 'top-p ' + S.p.toFixed(2), 'wk-lab');
+      const kx = x0 + bw * S.k; s += '<line x1="' + kx + '" x2="' + kx + '" y1="10" y2="' + (Y(0) - 3) + '" style="stroke:var(--c2);stroke-dasharray:5 3;stroke-width:2"/>' + K.handle('k', kx, Y(0) - 3, 'top-k', String(S.k), 'is-c2') + K.text(kx - 10, 24, 'top-k ' + S.k, 'wk-lab', 'end');
       svg.innerHTML = s;
       pick(el, 'draws').innerHTML = draws.map(i => '<span class="wk-tok">' + toks[i] + '</span>').join('');
       const ent = -f.reduce((a, v) => a + (v ? v * Math.log2(v) : 0), 0);
@@ -656,7 +661,7 @@
       let s = [0, 0.25, 0.5, 0.75, 1].map(v => '<line class="wk-grid" x1="' + X(v) + '" x2="' + X(v) + '" y1="10" y2="80"/>' + K.text(X(v), 96, (v * 100) + '%', 'wk-tick', 'middle')).join('');
       const row = (y, a, b, c, name) => K.text(100, y + 4, name, 'wk-tick', 'end') + '<line x1="' + X(K.clamp(a, 0, 1)) + '" x2="' + X(K.clamp(b, 0, 1)) + '" y1="' + y + '" y2="' + y + '" style="stroke:' + c + ';stroke-width:10;stroke-linecap:round;stroke-opacity:.8"/>';
       s += row(30, lo, hi, 'var(--accent)', 'Wilson') + row(60, nlo, nhi, 'var(--muted)', 'normal approx.') + '<line x1="' + X(p) + '" x2="' + X(p) + '" y1="18" y2="72" style="stroke:var(--fg);stroke-width:2"/>';
-      if (nlo < 0 || nhi > 1) s += K.text(w - 16, 76, 'normal approximation leaves [0, 100%] (cut off here)', 'wk-tick', 'end');
+      if (nlo < 0 || nhi > 1) s += K.text(w - 16, 76, w > 460 ? 'normal approximation leaves [0, 100%] (cut off here)' : 'normal approx. leaves [0, 100%]', 'wk-tick', 'end');
       svg.innerHTML = s;
       pick(el, 'out').innerHTML = K.stats([{ l: 'observed rate', v: (p * 100).toFixed(1) + '%', s: x + ' of ' + n }, { l: 'Wilson interval', v: (lo * 100).toFixed(1) + '–' + (hi * 100).toFixed(1) + '%', tone: 'accent', s: '± ' + ((hi - lo) * 50).toFixed(1) + ' points' }, { l: 'trials for ± 5 points', v: Math.ceil(z * z * 0.25 / 0.0025), s: 'worst case p = 0.5; ± 2 points: ' + Math.ceil(z * z * 0.25 / 0.0004) }, x === 0 ? { l: 'zero successes: upper bound', v: '≈ ' + (300 / n).toFixed(1) + '%', s: 'rule of three (95%)' } : { l: 'chance of ≥ 1 success in 50 attempts', v: ((1 - Math.pow(1 - p, 50)) * 100).toFixed(0) + '%', s: 'if this rate is per attempt' }]);
       const f = pick(el, 'f');

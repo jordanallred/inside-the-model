@@ -24,7 +24,28 @@
   K.stats = items => '<div class="wk-stats">' + items.filter(Boolean).map(i => '<div class="wk-stat' + (i.tone ? ' is-' + i.tone : '') + '"><span>' + i.l + '</span><b>' + i.v + '</b>' + (i.s ? '<small>' + i.s + '</small>' : '') + '</div>').join('') + '</div>';
   K.say = (tone, html) => '<p class="wk-say is-' + tone + '">' + html + '</p>';
   K.details = (summary, html) => '<details class="wk-more"><summary>' + summary + '</summary>' + html + '</details>';
-  K.heat = (v, max, pos, neg) => { const a = Math.min(1, Math.abs(v) / (max || 1)); return 'background:color-mix(in srgb,' + (v >= 0 ? pos || 'var(--c1)' : neg || 'var(--c2)') + ' ' + (a * 70).toFixed(0) + '%,transparent)'; };
+  /* Resolve any CSS color (tokens, color-mix) to [r, g, b] through a hidden probe, so text ink can be chosen by contrast. */
+  let probe;
+  K.rgb = c => {
+    if (!probe) { probe = document.createElement('i'); probe.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;visibility:hidden'; document.body.appendChild(probe); }
+    probe.style.backgroundColor = ''; probe.style.backgroundColor = c;
+    const v = getComputedStyle(probe).backgroundColor;
+    let m = v.match(/color\(srgb ([^)]+)\)/); if (m) { const p = m[1].split(/[ /]+/).map(Number); return [p[0] * 255, p[1] * 255, p[2] * 255]; }
+    m = v.match(/rgba?\(([^)]+)\)/); if (m) { const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number); return [p[0], p[1], p[2]]; }
+    return [128, 128, 128];
+  };
+  const lum = c => { const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); };
+  /* Dark or light text, whichever reads better on color c laid at opacity a over the widget surface. */
+  const best = (c, a) => {
+    const top = K.rgb(c), bot = K.rgb('var(--surface)'), L = lum(top.map((v, i) => v * a + bot[i] * (1 - a))), light = 1.05 / (L + 0.05), dark = (L + 0.05) / (lum([11, 16, 32]) + 0.05);
+    return light >= dark ? ['#f8fafc', light] : ['#0b1020', dark];
+  };
+  K.ink = (c, a) => best(c, a == null ? 1 : a)[0];
+  /* Mid-tone fills can sit where neither ink reaches 4.5:1; strengthen the fill just enough to leave that band. */
+  K.fit = (c, a) => { a = a == null ? 1 : a; while (a < 1 && best(c, a)[1] < 4.8) a = Math.min(1, a + 0.04); return a; };
+  K.heat = (v, max, pos, neg) => { const c = v >= 0 ? pos || 'var(--c1)' : neg || 'var(--c2)', a = K.fit(c, Math.min(1, Math.abs(v) / (max || 1)) * 0.7); return 'background:color-mix(in srgb,' + c + ' ' + (a * 100).toFixed(0) + '%,transparent);color:' + K.ink(c, a); };
+  /* Compact numbers for tick labels: 1K, 2.5M, 100B. */
+  K.short = v => { const a = Math.abs(v), u = [[1e12, 'T'], [1e9, 'B'], [1e6, 'M'], [1e3, 'K']].find(x => a >= x[0]); return u ? +(v / u[0]).toPrecision(3) + u[1] : String(+v.toPrecision(3)); };
   K.sup = n => String(n).replace(/[-0-9]/g, c => '⁻⁰¹²³⁴⁵⁶⁷⁸⁹'['-0123456789'.indexOf(c)]);
   K.sci = (v, d) => { if (!isFinite(v)) return String(v); if (v === 0) return '0'; const e = Math.floor(Math.log10(Math.abs(v))), m = v / Math.pow(10, e); return m.toFixed(d == null ? 1 : d) + '×10' + K.sup(e); };
 
@@ -110,11 +131,14 @@
   K.axes = (X, Y, o) => {
     o = o || {}; let s = '';
     const fx = o.fx || (v => String(v)), fy = o.fy || (v => String(v)), x0 = X.r[0], x1 = X.r[1], y0 = Y.r[0], y1 = Y.r[1];
-    (o.noGridY ? [] : K.ticks(Y, o.ny || 4)).forEach(v => { const y = Y(v); s += '<line class="wk-grid" x1="' + x0 + '" x2="' + x1 + '" y1="' + y.toFixed(1) + '" y2="' + y.toFixed(1) + '"/>' + K.text(x0 - 6, y + 4, fy(v), 'wk-tick', 'end'); });
-    K.ticks(X, o.nx || 5).forEach(v => { const x = X(v); s += '<line class="wk-grid" y1="' + y0 + '" y2="' + (y0 + 4) + '" x1="' + x.toFixed(1) + '" x2="' + x.toFixed(1) + '"/>' + K.text(x, y0 + 16, fx(v), 'wk-tick', 'middle'); });
+    (o.noGridY ? [] : K.ticks(Y, o.ny || 4)).forEach(v => { const y = Y(v); s += '<line class="wk-grid" x1="' + x0 + '" x2="' + x1 + '" y1="' + y.toFixed(1) + '" y2="' + y.toFixed(1) + '"/>' + K.text(x0 - 6, Math.max(y + 4, 11), fy(v), 'wk-tick', 'end'); });
+    K.ticks(X, o.nx || 5).forEach(v => {
+      const x = X(v), t = String(fx(v)), half = t.length * 3.4, anchor = x + half > x1 + 8 ? 'end' : 'middle';
+      s += '<line class="wk-grid" y1="' + y0 + '" y2="' + (y0 + 4) + '" x1="' + x.toFixed(1) + '" x2="' + x.toFixed(1) + '"/>' + K.text(anchor === 'end' ? Math.min(x + 4, x1 + 8) : x, y0 + 16, t, 'wk-tick', anchor);
+    });
     s += '<line class="wk-axis" x1="' + x0 + '" x2="' + x1 + '" y1="' + y0 + '" y2="' + y0 + '"/>';
-    if (o.xl) s += K.text((x0 + x1) / 2, y0 + 32, o.xl, 'wk-axl', 'middle');
-    if (o.yl) s += K.text(x0, y1 - 8, o.yl, 'wk-axl', 'start');
+    if (o.xl) s += K.text((x0 + x1) / 2, y0 + 30, o.xl, 'wk-axl', 'middle');
+    if (o.yl) s += K.text(x0 + 4, Math.max(12, y1 - 6), o.yl, 'wk-axl', 'start');
     return s;
   };
   K.handle = (name, x, y, label, value, cls) => '<g class="wk-h' + (cls ? ' ' + cls : '') + '" data-h="' + name + '" tabindex="0" role="slider" aria-label="' + esc(label) + '" aria-valuetext="' + esc(value) + '" transform="translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ')"><circle class="wk-h-hit" r="16"/><circle class="wk-h-dot" r="7"/></g>';

@@ -47,9 +47,9 @@
     });
     function render() {
       const { w, h } = K.box(svg, w => K.clamp(w * 0.42, 220, 300));
-      X = K.lin(-3, 3, 40, w - 12); Y = K.lin(-2, 4, h - 26, 10);
+      X = K.lin(-3, 3, 40, w - 12); Y = K.lin(-2, 4, h - 34, 10);
       const v = last(), g = df(v), on = x => [X(x), Y(f(x))];
-      let s = '<defs><clipPath id="gdc"><rect x="40" y="0" width="' + (w - 52) + '" height="' + (h - 26) + '"/></clipPath><marker id="gda" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--c2)"/></marker></defs>';
+      let s = '<defs><clipPath id="gdc"><rect x="40" y="0" width="' + (w - 52) + '" height="' + (h - 34) + '"/></clipPath><marker id="gda" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--c2)"/></marker></defs>';
       s += K.axes(X, Y, { xl: 'x', fy: v => v, nx: 6 });
       s += '<g clip-path="url(#gdc)"><path class="wk-ln" style="stroke:var(--fg)" d="' + K.path(Array.from({ length: 241 }, (_, i) => on(-3 + i / 40))) + '"/>';
       const vis = path.filter(x => !dead(x));
@@ -380,7 +380,7 @@
       });
       svg.innerHTML = s;
       pick(el, 'row').style.cssText = 'display:grid;grid-template-columns:repeat(' + n + ',minmax(0,1fr))';
-      pick(el, 'row').innerHTML = toks.map((t, j) => '<button type="button" class="wk-tok" data-q="' + j + '" aria-pressed="' + (j === q) + '" style="' + (j !== q && reach.has(j) ? 'box-shadow:0 0 0 2px var(--c3);' : '') + (allow(q, j) || reach.has(j) ? '' : 'opacity:.45;') + 'overflow:hidden;text-overflow:ellipsis">' + esc(t) + '<br><small>' + (allow(q, j) ? (P[q][j] * 100).toFixed(0) + '%' : '–') + '</small></button>').join('');
+      pick(el, 'row').innerHTML = toks.map((t, j) => '<button type="button" class="wk-tok' + (allow(q, j) || reach.has(j) || j === q ? '' : ' is-far') + '" data-q="' + j + '" aria-pressed="' + (j === q) + '" style="' + (j !== q && reach.has(j) ? 'box-shadow:0 0 0 2px var(--c3);' : '') + 'overflow:hidden;text-overflow:ellipsis">' + esc(t) + '<br><small>' + (allow(q, j) ? (P[q][j] * 100).toFixed(0) + '%' : '–') + '</small></button>').join('');
       let blocked = 0, g = '<table class="grid"><tr><th></th>' + toks.map(t => '<th>' + esc(t) + '</th>').join('') + '</tr>';
       for (let i = 0; i < n; i++) g += '<tr' + (i === q ? ' style="outline:2px solid var(--accent)"' : '') + '><th class="wk-click" data-q="' + i + '">' + esc(toks[i]) + '</th>' + P[i].map((v, j) => { if (!allow(i, j)) { blocked++; return '<td class="m" data-q="' + i + '"></td>'; } return '<td data-q="' + i + '" title="' + esc(toks[i] + ' reads ' + toks[j] + ': ' + v.toFixed(2)) + '"><i style="opacity:' + Math.min(1, v * 1.6).toFixed(2) + '"></i></td>'; }).join('') + '</tr>';
       pick(el, 'grid').innerHTML = g + '</table>';
@@ -458,9 +458,9 @@
       const mats = [['Wq', H * hd, 'var(--c1)'], ['Wk', KV * hd, 'var(--c1)'], ['Wv', KV * hd, 'var(--c1)'], ['Wo', H * hd, 'var(--c1)']].concat((g ? [['W_gate', ff], ['W_up', ff], ['W_down', ff]] : [['W_up', ff], ['W_down', ff]]).map(m => m.concat('var(--c2)')));
       const svg = pick(el, 'm'), { w } = K.box(svg, 92), gap = 5, sum = mats.reduce((a, m) => a + m[1], 0), sc = (w - gap * (mats.length - 1)) / sum;
       let x = 0, s = '';
-      mats.forEach(([n, wd, c], i) => { const ww = Math.max(1.5, wd * sc); s += '<rect x="' + x.toFixed(1) + '" y="16" width="' + ww.toFixed(1) + '" height="46" rx="2" style="fill:' + c + '" opacity="' + (i < 4 ? 0.85 : 0.9) + '"><title>' + n + ': ' + d + ' × ' + wd + ' = ' + T.fmt(d * wd) + '</title></rect>' + (ww > 38 ? K.text(x + ww / 2, 44, n, 'wk-lab', 'middle') : ''); x += ww + gap; });
+      mats.forEach(([n, wd, c], i) => { const ww = Math.max(1.5, wd * sc); s += '<rect x="' + x.toFixed(1) + '" y="16" width="' + ww.toFixed(1) + '" height="46" rx="2" style="fill:' + c + '" opacity="' + K.fit(c, i < 4 ? 0.85 : 0.9).toFixed(2) + '"><title>' + n + ': ' + d + ' × ' + wd + ' = ' + T.fmt(d * wd) + '</title></rect>' + (ww > 38 ? '<text x="' + (x + ww / 2).toFixed(1) + '" y="44" text-anchor="middle" class="wk-lab wk-in" style="fill:' + K.ink(c, K.fit(c, i < 4 ? 0.85 : 0.9)) + '">' + n + '</text>' : ''); x += ww + gap; });
       const aw = (2 * H * hd + 2 * KV * hd) * sc + gap * 3;
-      s += K.text(0, 10, 'attention ' + T.fmt(attn), 'wk-tick') + K.text(Math.min(aw + gap, w - 100), 10, 'MLP ' + T.fmt(mlp), 'wk-tick') + K.text(0, 80, w > 460 ? 'every matrix is d = ' + d + ' tall; width = its other dimension' : 'all ' + d + ' tall', 'wk-tick');
+      s += K.text(0, 10, 'attention ' + T.fmt(attn), 'wk-tick') + K.text(w, 10, 'MLP ' + T.fmt(mlp), 'wk-tick', 'end') + K.text(0, 80, w > 460 ? 'every matrix is d = ' + d + ' tall; width = its other dimension' : 'all ' + d + ' tall', 'wk-tick');
       svg.innerHTML = s;
       const seg = (n, v, c) => '<i title="' + n + ' ' + T.fmt(v) + '" style="width:' + (v / tot * 100).toFixed(2) + '%;background:' + c + '"></i>';
       pick(el, 'tot').innerHTML = '<div class="kicker">whole model: ' + L + ' layers + embeddings</div><div class="bar" style="display:flex;height:1.4rem">' + seg('attention', L * attn, 'var(--c1)') + seg('MLP', L * mlp, 'var(--c2)') + seg('embeddings', emb, 'var(--muted)') + '</div>' +
@@ -498,7 +498,7 @@
         const d = ((aq - ak) % (2 * Math.PI) + 3 * Math.PI) % (2 * Math.PI) - Math.PI, large = Math.abs(d) > Math.PI ? 1 : 0, r2 = R * 0.45, pk = [cx + r2 * Math.cos(-ak), cy + r2 * Math.sin(-ak)], pq = [cx + r2 * Math.cos(-(ak + d)), cy + r2 * Math.sin(-(ak + d))];
         s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" style="fill:var(--bg);stroke:var(--line)"/>' + '<path d="M' + cx + ' ' + cy + 'L' + pk[0].toFixed(1) + ' ' + pk[1].toFixed(1) + 'A' + r2 + ' ' + r2 + ' 0 ' + large + ' ' + (d > 0 ? 0 : 1) + ' ' + pq[0].toFixed(1) + ' ' + pq[1].toFixed(1) + 'z" style="fill:var(--c4);fill-opacity:.35"/>';
         [[ak, 'var(--c2)'], [aq, 'var(--c1)']].forEach(([a, c]) => { const p = P(a); s += '<line x1="' + cx + '" y1="' + cy + '" x2="' + p[0].toFixed(1) + '" y2="' + p[1].toFixed(1) + '" style="stroke:' + c + ';stroke-width:3;stroke-linecap:round"/>'; });
-        s += K.text(cx, cy + R + 16, 'pair ' + i + ' · λ ≈ ' + T.fmt(2 * Math.PI / th(i)) + ' tok', 'wk-tick', 'middle');
+        s += K.text(cx, cy + R + 16, 'pair ' + i + ' · λ ' + K.short(2 * Math.PI / th(i)), 'wk-tick', 'middle');
       }
       svg.innerHTML = s;
       const tb = K.box(tr, 58); TX = K.lin(0, 300, 14, tb.w - 14);
@@ -533,13 +533,13 @@
       X = K.log(0.05, 1000, 44, w - 12); const Y = K.lin(0, 1.08, h - 40, 14);
       const mult = r => { const g = r < al ? 0 : r > be ? 1 : (r - al) / (be - al); return (1 - g) / s + g; };
       let sx = '<rect x="' + X(0.05) + '" width="' + (X(al) - X(0.05)) + '" y="14" height="' + (h - 54) + '" style="fill:var(--c1)" class="wk-band"/><rect x="' + X(be) + '" width="' + (X(1000) - X(be)) + '" y="14" height="' + (h - 54) + '" style="fill:var(--c3)" class="wk-band"/>';
-      sx += K.axes(X, Y, { ny: 4, nx: 6, fx: v => (v < 1 ? v : T.fmt(v)), fy: v => v.toFixed(2), yl: 'frequency multiplier', xl: w > 460 ? 'full turns within the original ' + L.toLocaleString('en-US') + '-token context' : 'full turns in the original context' });
+      sx += K.axes(X, Y, { ny: 4, nx: 6, fx: v => (v < 1 ? v : K.short(v)), fy: v => v.toFixed(2), yl: 'frequency multiplier', xl: w > 460 ? 'full turns within the original ' + L.toLocaleString('en-US') + '-token context' : 'full turns in the original context' });
       sx += K.text(X(0.05) + 4, 26, 'interpolate', 'wk-lab') + K.text(X(1000) - 4, 26, 'keep', 'wk-lab', 'end');
       sx += '<path class="wk-dash" style="stroke:var(--c1)" d="M' + X(0.05) + ' ' + Y(1 / s) + 'H' + X(1000) + '"/>' + K.text(w - 14, Y(1 / s) - 5, 'position interpolation: 1/s', 'wk-tick', 'end');
       sx += '<path class="wk-ln" style="stroke:var(--c2)" d="' + K.path(Array.from({ length: 200 }, (_, i) => { const r = Math.pow(10, -1.3 + 4.3 * i / 199); return [X(r), Y(mult(r))]; })) + '"/>';
       let cnt = [0, 0, 0];
       for (let i = 0; i < np; i++) { const th = Math.pow(10000, -2 * i / D), lam = 2 * Math.PI / th, r = L / lam; cnt[r < al ? 0 : r > be ? 2 : 1]++; sx += '<circle cx="' + X(K.clamp(r, 0.05, 1000)).toFixed(1) + '" cy="' + Y(mult(r)).toFixed(1) + '" r="4" style="fill:var(--c2);stroke:var(--bg)"><title>pair ' + i + ': wavelength ' + lam.toFixed(0) + ' tokens, ' + r.toFixed(2) + ' turns, multiplier ' + mult(r).toFixed(3) + '</title></circle>'; }
-      [['a', al, 'α'], ['bt', be, 'β']].forEach(([k, v, n]) => { sx += '<line x1="' + X(v) + '" x2="' + X(v) + '" y1="14" y2="' + (h - 40) + '" style="stroke:var(--fg);stroke-dasharray:3 3"/>' + K.text(X(v), h - 46, n + ' = ' + v, 'wk-lab', 'middle') + K.handle(k, X(v), 14, n + ' boundary', String(v)); });
+      [['a', al, 'α'], ['bt', be, 'β']].forEach(([k, v, n]) => { sx += '<line x1="' + X(v) + '" x2="' + X(v) + '" y1="14" y2="' + (h - 40) + '" style="stroke:var(--fg);stroke-dasharray:3 3"/>' + K.text(X(v), 40, n + ' = ' + v, 'wk-lab', 'middle') + K.handle(k, X(v), 14, n + ' boundary', String(v)); });
       svg.innerHTML = sx;
       const f = 0.1 * Math.log(s) + 1;
       pick(el, 'out').innerHTML = K.stats([{ l: 'new context', v: (s * L).toLocaleString('en-US') + ' tokens' }, { l: 'pairs interpolated', v: cnt[0], s: 'slow clocks, stretched by 1/s', tone: 'accent' }, { l: 'pairs on the ramp', v: cnt[1] }, { l: 'pairs untouched', v: cnt[2], s: 'fast clocks keep local detail', tone: 'ok' }, { l: 'attention logit scale', v: '×' + (f * f).toFixed(3), s: '(0.1·ln s + 1)²' }]);

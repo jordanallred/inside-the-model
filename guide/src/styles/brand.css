@@ -123,7 +123,7 @@ code, pre, .widget .grid, .widget .stat { font-variant-numeric: tabular-nums; }
 .ar { margin: 0; overflow-x: auto; }
 .ar figcaption { font-weight: 600; margin-bottom: 0.3rem; }
 .widget .ar .grid td { width: 1.35rem; height: 1.35rem; min-width: 0; }
-.widget .ar .grid th { font-size: 0.6rem; padding: 1px 2px; }
+.widget .ar .grid th { font-size: 0.7rem; padding: 1px 2px; }
 .widget .ar .grid thead th { writing-mode: vertical-rl; transform: rotate(180deg); text-align: left; height: 3rem; }
 .widget .ar .grid td i { background: var(--c4); }
 .ar details { font-size: var(--sl-text-xs); margin: 0.3rem 0; }

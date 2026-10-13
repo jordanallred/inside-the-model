@@ -122,3 +122,23 @@ button.wk-tok[aria-pressed=true] { background: var(--accent); color: var(--accen
 @media (prefers-reduced-motion: reduce) { .wk-toggle span, .wk-toggle span::after { transition: none; } }
 .wk-sw { display: inline-block; width: 0.7em; height: 0.7em; border-radius: 2px; margin: 0 0.3em 0 0.15em; vertical-align: baseline; }
 .widget .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Muted text inside the learning frame sits on the tinted panel, which costs contrast; lift it to at least 4.5:1. */
+.interaction-frame { --muted: color-mix(in srgb, var(--fg) 86%, var(--tint)); }
+
+/* ---- readability ---- */
+/* Text in brand colors needs a darker ink on light surfaces (the raw tokens are 2-3.5:1 on white). */
+:root { --ink-c1: var(--itm-sky); --ink-c2: var(--itm-peach); --ink-c3: var(--itm-teal); --ink-c4: var(--itm-violet); }
+:root[data-theme='light'] { --ink-c1: #1d4ed8; --ink-c2: #c2410c; --ink-c3: #0f766e; --ink-c4: #6d28d9; }
+.wk-badge { color: var(--ink-c2); font-size: 0.72rem; }
+.wk-prompt .is-sys { color: var(--ink-c3); }
+.wk-prompt .is-user { color: var(--ink-c1); }
+.wk-ok-ink { color: var(--ink-c3); }
+/* Chart labels get a halo in the figure's background color, so grid lines, curves and shading never cut through them.
+   Labels deliberately placed inside a colored shape opt out with .wk-in and pick their own ink. */
+.wk-fig text { paint-order: stroke fill; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; }
+.wk-fig text.wk-in { stroke: none; }
+/* Secondary text inside a selected pill inherits the pill's high-contrast ink. */
+button.wk-tok[aria-pressed=true] small { color: inherit; }
+.wk-tok.is-far { color: var(--muted); border-style: dashed; background: none; }
+.wk-mat th { font-size: 0.72rem; }
