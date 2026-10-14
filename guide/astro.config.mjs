@@ -34,7 +34,7 @@ export default defineConfig({
       customCss: ['katex/dist/katex.min.css', './src/styles/brand-tokens.css', './src/styles/custom.css', './src/styles/brand.css', './src/styles/widgets.css', './src/styles/explorer.css', './src/styles/home.css'],
       head: [
         { tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' } },
-        { tag: 'link', attrs: { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400..600&family=JetBrains+Mono:wght@400..600&family=Parkinsans:wght@700&family=Plus+Jakarta+Sans:wght@700;800&display=swap' } },
+        { tag: 'link', attrs: { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400..600&family=JetBrains+Mono:wght@400..600&family=Source+Serif+4:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap' } },
         { tag: 'link', attrs: { rel: 'alternate', type: 'application/rss+xml', title: "Inside the Model: What's new", href: `${siteUrl}/rss.xml` } },
         { tag: 'meta', attrs: { property: 'og:image', content: socialCardUrl } },
         { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
