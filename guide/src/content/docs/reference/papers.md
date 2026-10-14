@@ -3,7 +3,7 @@ title: All papers
 description: Every paper and book cited in the guide, with arXiv links and the chapters that use them.
 ---
 
-118 references. Each arXiv id and title was checked against the arXiv API. Sorted by year.
+119 references. Each arXiv id and title was checked against the arXiv API. Sorted by year.
 
 | Year | Reference | Cited in chapters |
 | --- | --- | --- |
@@ -66,6 +66,7 @@ description: Every paper and book cited in the guide, with arXiv links and the c
 | 2022 | Olsson et al. [In-context Learning and Induction Heads](https://arxiv.org/abs/2209.11895) (arXiv:2209.11895) | [6](/guide/attention/), [19](/guide/applications/) |
 | 2022 | Ouyang et al. [Training language models to follow instructions with human feedback](https://arxiv.org/abs/2203.02155) (arXiv:2203.02155) | [17](/guide/post-training/) |
 | 2022 | Perez et al. [Red Teaming Language Models with Language Models](https://arxiv.org/abs/2202.03286) (arXiv:2202.03286) | [21](/guide/evaluation/) |
+| 2022 | Wang et al. [Interpretability in the Wild: a Circuit for Indirect Object Identification in GPT-2 small](https://arxiv.org/abs/2211.00593) (arXiv:2211.00593) | - |
 | 2022 | Wei et al. [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903) (arXiv:2201.11903) | [19](/guide/applications/) |
 | 2022 | Yao et al. [ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629) (arXiv:2210.03629) | [19](/guide/applications/) |
 | 2023 | Ainslie et al. [GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints](https://arxiv.org/abs/2305.13245) (arXiv:2305.13245) | [11](/guide/gqa-and-mla/) |

@@ -139,4 +139,6 @@ window.PAPERS = {
   hayes2024: { a: 'Hayes et al.', y: 2024, t: 'Buffer Overflow in Mixture of Experts', x: '2402.05526' },
   song2024: { a: 'Song et al.', y: 2024, t: 'The Early Bird Catches the Leak: Unveiling Timing Side Channels in LLM Serving Systems', x: '2409.20002' },
   weiss2024: { a: 'Weiss et al.', y: 2024, t: 'What Was Your Prompt? A Remote Keylogging Attack on AI Assistants', x: '2403.09751' },
+  /* interpretability */
+  wang2022: { a: 'Wang et al.', y: 2022, t: 'Interpretability in the Wild: a Circuit for Indirect Object Identification in GPT-2 small', x: '2211.00593' },
 };
