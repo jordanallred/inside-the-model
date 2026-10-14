@@ -158,7 +158,7 @@
   W.casestory = el => {
     const { ITM } = window; if (!ITM) { el.insertAdjacentHTML('beforeend', '<p class="src">The model engine failed to load.</p>'); return; }
     el.innerHTML = '<p class="src" role="status">Loading the case-file model…</p>';
-    fetch('/trace/case-weights.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    fetch('/trace/case-weights.json', { cache: 'no-cache' }) /* revalidate, so a retrained model is never served stale */.then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(M => story(el, ITM, M))
       .catch(() => { el.innerHTML = '<p class="src">The case-file model failed to load. Reload the page to try again.</p>'; });
   };

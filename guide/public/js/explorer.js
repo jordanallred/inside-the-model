@@ -348,7 +348,7 @@
       const intro = '<p class="src">The reference implementation, <a href="' + PY_URL + '">itm_model.py</a>, in NumPy. Your browser runs a JavaScript port of it so the Explorer can recompute live; the two are checked to agree to within 1e-9.</p>';
       const dl = '<div class="mx-acts"><a class="mx-btn" href="' + PY_URL + '" download>Download itm_model.py</a><a class="mx-btn" href="/trace/model.json" download>model.json</a><a class="mx-btn" href="/trace/weights.json" download>weights.json</a></div>';
       if (!PY) {
-        if (!pyFailed) fetch(PY_URL).then(r => (r.ok ? r.text() : Promise.reject(r.status))).then(t => { PY = t.replace(/\r\n/g, '\n').split('\n'); }).catch(() => { pyFailed = true; }).then(() => { if (st.view === 'code') render(); });
+        if (!pyFailed) fetch(PY_URL, { cache: 'no-cache' }).then(r => (r.ok ? r.text() : Promise.reject(r.status))).then(t => { PY = t.replace(/\r\n/g, '\n').split('\n'); }).catch(() => { pyFailed = true; }).then(() => { if (st.view === 'code') render(); });
         return intro + (pyFailed ? '<p class="mx-warn">The code could not be loaded here. Download it below.</p>' : '<p class="src">Loading the code…</p>') + dl;
       }
       const k = STEPS[st.step].k, on = pyBlock(k), aux = HELPER[k] ? pyDef(HELPER[k]) : null;
