@@ -11,3 +11,15 @@ data/
 .env
 .env.*
 !.env.example
+
+# Internal working files, kept locally but not published
+/.claude/
+/.superpowers/
+/docs/
+/BRAND_GUIDELINES.md
+/DESIGN.md
+/PRODUCT.md
+/inside-the-model-brand-kit.zip
+/inside_the_model_design_document.docx
+/rebuild.bat
+/guide/tools/sources/
