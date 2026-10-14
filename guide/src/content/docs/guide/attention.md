@@ -45,7 +45,7 @@ O&=AV
 \end{aligned}
 $$
 
-Here $S_{ij}$ is how well token $j$ matches token $i$'s query, every row of $A$ is non-negative and sums to 1, and $O_i=\sum_j A_{ij}V_j$.
+Here $S_{ij}$ is how well token $j$ matches token $i$’s query, every row of $A$ is non-negative and sums to 1, and $O_i=\sum_j A_{ij}V_j$.
 
 Every output row is a **convex combination** of value rows. The weights $A_{i,:}$ are the "attention pattern" of token $i$. Work through it with numbers you can verify by hand:
 
