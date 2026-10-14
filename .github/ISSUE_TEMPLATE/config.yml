@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: How to contribute
+    url: https://github.com/jordanallred/inside-the-model/blob/main/CONTRIBUTING.md
+    about: What makes a useful report, and when to open a pull request.

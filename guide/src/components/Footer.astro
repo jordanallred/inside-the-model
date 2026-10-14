@@ -1,0 +1,46 @@
+---
+// Starlight's footer plus a prefilled "report a problem" link and the license line on every page.
+import Default from '@astrojs/starlight/components/Footer.astro';
+import { repoUrl } from '../site-config.mjs';
+
+const { entry } = Astro.locals.starlightRoute;
+const path = Astro.url.pathname;
+const report = new URL(`${repoUrl}/issues/new`);
+report.searchParams.set('template', 'page-problem.yml');
+report.searchParams.set('title', `[Page] ${entry.data.title}: `);
+report.searchParams.set('page', path);
+const show = entry.id !== '404';
+---
+
+<Default><slot /></Default>
+{
+  show && (
+    <div class="itm-foot not-content">
+      <p class="itm-foot-report">
+        Spotted a mistake, a confusing explanation or a broken widget?{' '}
+        <a href={report.href} rel="noopener">Report a problem with this page</a>
+      </p>
+      <p class="itm-foot-meta">
+        Free for noncommercial use. Text <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license noopener">CC BY-NC-SA 4.0</a>,
+        code <a href={`${repoUrl}/blob/main/LICENSE-CODE.md`} rel="license noopener">PolyForm Noncommercial</a>.
+        {' '}<a href={repoUrl} rel="noopener">Source on GitHub</a> · <a href={`${repoUrl}/blob/main/CONTRIBUTING.md`} rel="noopener">How to contribute</a>
+      </p>
+    </div>
+  )
+}
+
+<style>
+  .itm-foot {
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--sl-color-hairline);
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+  .itm-foot p { margin: 0 0 0.5rem; }
+  .itm-foot-report { color: var(--sl-color-gray-2); }
+  .itm-foot-report a { font-weight: 600; }
+  .itm-foot-meta { font-size: var(--sl-text-xs); }
+  .itm-foot a { color: var(--sl-color-text-accent); text-underline-offset: 0.15em; }
+  .itm-foot a:hover { color: var(--sl-color-white); }
+</style>
