@@ -7,6 +7,10 @@ New chapters, teardowns, tools and corrections, newest first. Follow along with 
 
 Found a mistake? Every page ends with a link to report it, and corrections are listed here.
 
+## 2026-10-14: Investigate a working model
+
+The site now starts with [guided investigations](/cases/): **The place detector**, **What training changes**, and **The hidden future**. Make a prediction, run an experiment on the teaching transformer, inspect the evidence, and test your explanation on a fresh example. Progress saves locally, with a next case and focused links into the Explorer, chapters, and labs. The place detector now requires an experiment and a fresh-example prediction to complete; earlier progress is recognized without skipping the new assessment.
+
 ## 2026-10-13: Report a problem from any page
 
 Every page now ends with a **Report a problem with this page** link that opens a prefilled report on GitHub, where anyone can see it and follow the fix. The guide is free for noncommercial use: the text is licensed CC BY-NC-SA 4.0 and the code PolyForm Noncommercial 1.0.0. This page and its RSS feed are new too.

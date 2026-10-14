@@ -1,10 +1,12 @@
 # Inside the Model
 
-See exactly how LLMs work.
+Understand language models by taking them apart.
 
 Found a mistake or a broken widget? Use the **Report a problem with this page** link at the bottom of any page, or see [CONTRIBUTING.md](CONTRIBUTING.md). Licensing terms are in [LICENSE](LICENSE).
 
-An interactive, public guide to how modern language models work. It is a static Astro site, and the guide and its interactive tools are delivered globally.
+Guided investigations for developers who build with LLMs and want to understand their internals. Predict an outcome, change a component or input in a working teaching transformer, inspect the evidence, and test your explanation on a fresh example. The chapters, labs, and model teardowns form the supporting reference library.
+
+It is a static Astro site. Experiments run locally in the browser, and investigation progress stays in that browser. Start with **The place detector**, then investigate **What training changes** and **The hidden future**.
 
 ## Develop locally
 
@@ -52,6 +54,7 @@ All content is Markdown in `guide/src/content/docs/`:
 | `labs/` | hands-on exercises |
 | `teardown/compare.md` | the comparison page (toy model against real models); its widget is `public/js/compare.js` |
 | `explorer.md` | the Model Explorer page; its engine is `public/js/itm-model.js` and its UI is `public/js/explorer.js` |
+| `cases/` | guided investigations; the index is generated from `public/js/case-catalog.js`, measurements and progress live in `public/js/case-engine.js`, and the shared UI is `public/js/cases.js` |
 | `reference/` | public security guidance (hand-written) and the paper index (generated) |
 
 Math is LaTeX: `$...$` inline, `$$...$$` for display. The interactive widgets live in `guide/public/js/` and are placed in a page with `<div class="widget not-content" data-w="name" data-title="Title"></div>`. They are built from the shared kit in `guide/public/js/kit.js` (state binding, segmented choices, stat cards, SVG charts with draggable and keyboard-operable handles, step/play transport; styles in `guide/src/styles/widgets.css`). Each widget registers `set`, `act` and `reset` on its box so the learning frame in `interaction.js` can drive its "Try" scenarios by state key. Every cited paper is an entry in `guide/public/js/papers.js` and is cited in a page with `<cite data-p="key" data-s></cite>`.

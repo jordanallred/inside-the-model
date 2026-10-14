@@ -1,17 +1,19 @@
 ---
 title: "Case 1: The place detector"
-description: After “the cat sat on the”, the model always expects a place, never an animal. Switch attention heads off and edit the prompt to find out which part of the model knows, and how.
+description: Predict, remove one attention head, and test which input signal makes the teaching model expect a place. Finish with a fresh-example check.
 ---
 
 The model in the [Model Explorer](/explorer/) has learned that after <code>the cat sat on the</code> comes a place: <code>mat</code> or <code>bed</code>. That is not as easy as it sounds. Most of the time in its training sentences, “the” is followed by an animal, as in <code>the dog</code> or <code>chased the cat</code>. So something inside the model must notice that this “the” is different.
 
 The model has two layers, each with two attention heads, and 4,496 trained parameters in all. Your job is to find which part of it knows a place is coming, and what that part is looking at.
 
+**About 10 minutes.** Make a prediction, run a controlled experiment, then test your explanation on a fresh example. No installation or prior maths required.
+
 <div class="widget not-content" data-w="caseplace" data-title="Case 1: The place detector"></div>
 
 ## How the tools work
 
-**Switching a head off** sets that head's output to zero before it is added back into the token's vector, and leaves everything else in the model as it was. If the model's behavior collapses when a head is off, that head is necessary for the behavior. This is called **ablation**.
+**Switching a head off** sets that head's output to zero before it is added back into the token's vector. The input and other weights stay fixed, while downstream computations respond to the intervention. A collapse in the place prediction provides evidence that this head's output is necessary under this intervention. This is called **ablation**; it does not by itself prove sufficiency or identify the entire mechanism.
 
 **What a head reads** is its attention weights from the last word: how much of each earlier word's information it takes in. The weights in each row add up to 1. The [attention chapter](/guide/attention/) explains where they come from.
 

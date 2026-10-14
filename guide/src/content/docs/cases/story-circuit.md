@@ -1,5 +1,5 @@
 ---
-title: "Case 2: Who gets the ball?"
+title: "Who gets the ball?"
 description: In “tom and ann went to the park . ann gave a ball to”, the model answers tom, every time. Find the heads that make the choice, and how the model rules out the wrong person.
 ---
 

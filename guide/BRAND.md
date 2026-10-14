@@ -1,8 +1,11 @@
 # Inside the Model
 
 The visual identity is a technical field guide: readable pages, working figures,
-and direct explanations. Preserve the name and the promise, “See exactly how LLMs
-work.” Avoid adding promotional claims without evidence in the project.
+and direct explanations. Preserve the name. The primary promise is “Understand
+language models by taking them apart.” The audience is developers who build with
+LLMs and want to understand their internals. Lead with a concrete question and a
+working investigation; chapters, labs, and teardowns support the discovery. Avoid
+adding promotional or learning-outcome claims without evidence in the project.
 
 ## Type and surfaces
 

@@ -8,8 +8,7 @@ import rehypeKatex from 'rehype-katex';
 import { CH, PARTS } from './src/chapters.mjs';
 import { siteUrl, socialCardUrl, repoUrl } from './src/site-config.mjs';
 
-/* Script URLs carry a fingerprint of their contents, so a changed script gets a new URL and no browser keeps running
-   an old copy from its cache after a release. */
+// Version browser scripts by content to prevent stale releases.
 const stamp = f => createHash('sha256').update(fs.readFileSync(new URL(`./public/js/${f}.js`, import.meta.url))).digest('hex').slice(0, 10);
 
 const num = Object.fromEntries(CH.map((c, i) => [c[0], i + 1]));
@@ -35,8 +34,8 @@ export default defineConfig({
       favicon: '/favicon.svg',
       social: [{ icon: 'github', label: 'Source and issues on GitHub', href: repoUrl }],
       components: { Footer: './src/components/Footer.astro' },
-      description: 'An interactive guide to the calculations, code, training, and inference behind large language models.',
-      customCss: ['katex/dist/katex.min.css', './src/styles/brand-tokens.css', './src/styles/custom.css', './src/styles/brand.css', './src/styles/widgets.css', './src/styles/explorer.css', './src/styles/home.css', './src/styles/theme.css'],
+      description: 'Understand language models by taking them apart. Guided experiments for developers, with live calculations and reproducible code.',
+      customCss: ['katex/dist/katex.min.css', './src/styles/brand-tokens.css', './src/styles/custom.css', './src/styles/brand.css', './src/styles/widgets.css', './src/styles/explorer.css', './src/styles/home.css', './src/styles/theme.css', './src/styles/cases.css'],
       head: [
         { tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' } },
         { tag: 'link', attrs: { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400..600&family=JetBrains+Mono:wght@400..600&display=swap' } },
@@ -44,10 +43,10 @@ export default defineConfig({
         { tag: 'meta', attrs: { property: 'og:image', content: socialCardUrl } },
         { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
         { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
-        { tag: 'meta', attrs: { property: 'og:image:alt', content: 'Inside the Model. See exactly how LLMs work. An interactive guide to the calculations, code, training, and inference behind large language models.' } },
+        { tag: 'meta', attrs: { property: 'og:image:alt', content: 'Inside the Model. See exactly how LLMs work. The Inside the Model field-guide cover.' } },
         { tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
         { tag: 'meta', attrs: { name: 'twitter:image', content: socialCardUrl } },
-        { tag: 'meta', attrs: { name: 'twitter:image:alt', content: 'Inside the Model. See exactly how LLMs work. An interactive guide to the calculations, code, training, and inference behind large language models.' } },
+        { tag: 'meta', attrs: { name: 'twitter:image:alt', content: 'Inside the Model. See exactly how LLMs work. The Inside the Model field-guide cover.' } },
         {
           tag: 'script',
           attrs: { type: 'application/ld+json' },
@@ -58,25 +57,26 @@ export default defineConfig({
                 '@type': 'WebSite',
                 name: 'Inside the Model',
                 url: siteUrl,
-                description: 'An interactive guide to the calculations, code, training, and inference behind large language models.',
+                description: 'Understand language models by taking them apart. Guided experiments for developers, with live calculations and reproducible code.',
                 inLanguage: 'en',
               },
               {
                 '@type': 'LearningResource',
                 name: 'Inside the Model',
                 url: siteUrl,
-                description: 'An interactive guide to the calculations, code, training, and inference behind large language models.',
-                learningResourceType: 'Interactive guide',
+                description: 'Understand language models by taking them apart. Guided experiments for developers, with live calculations and reproducible code.',
+                learningResourceType: 'Guided investigations and interactive reference',
                 educationalLevel: 'Beginner to intermediate',
                 inLanguage: 'en',
               },
             ],
           }),
         },
-      ].concat(['papers', 'glossary', 'itm-weights', 'itm-model', 'itm-train', 'explorer', 'trainer', 'home', 'compare', 'kit', 'widgets', 'widgets2', 'cases', 'interaction', 'site'].map(f => ({ tag: 'script', attrs: { src: `/js/${f}.js?v=${stamp(f)}`, defer: true } }))),
+      ].concat(['papers', 'glossary', 'itm-weights', 'itm-model', 'itm-train', 'case-catalog', 'case-engine', 'explorer', 'trainer', 'home', 'compare', 'kit', 'widgets', 'widgets2', 'cases', 'cases-story', 'interaction', 'site'].map(f => ({ tag: 'script', attrs: { src: `/js/${f}.js?v=${stamp(f)}`, defer: true } }))),
       sidebar: [
-        { label: 'Start here', items: [{ slug: 'index', label: 'Overview' }, { slug: 'explorer', label: 'Model Explorer' }, { slug: 'changelog', label: "What's new" }] },
-        { label: 'Case files', items: [{ slug: 'cases', label: 'About the cases' }, { slug: 'cases/place-or-animal', label: '1. The place detector' }, { slug: 'cases/story-circuit', label: '2. Who gets the ball?' }] },
+        { label: 'Start here', items: [{ slug: 'index', label: 'Overview' }, { slug: 'changelog', label: "What's new" }] },
+        { label: 'Investigations', items: [{ slug: 'cases', label: 'Choose an investigation' }, { slug: 'cases/place-or-animal', label: '1. The place detector' }, { slug: 'cases/what-training-changes', label: '2. What training changes' }, { slug: 'cases/hidden-future', label: '3. The hidden future' }, { slug: 'cases/story-circuit', label: 'Further: Who gets the ball?' }] },
+        { label: 'Model workbench', items: [{ slug: 'explorer', label: 'Model Explorer' }] },
         ...guideGroups,
         {
           label: 'Hands-on labs',

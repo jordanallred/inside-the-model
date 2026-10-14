@@ -6,7 +6,8 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { CH, PARTS } from '../src/chapters.mjs';
-import { renderHome } from './home-template.mjs';
+import { renderHome, renderCases } from './home-template.mjs';
+import '../public/js/case-catalog.js';
 
 const DOCS = 'src/content/docs';
 const num = Object.fromEntries(CH.map((c, i) => [c[0], i + 1]));
@@ -53,6 +54,8 @@ ${rows.map(r => `| ${r.p.y} | ${r.p.a.replace(/\.$/, '')}. [${r.p.t.replace(/\|/
 /* home page; the parameter count is read from the trained weights so it cannot drift */
 const countNumbers = v => typeof v === 'number' ? 1 : Object.values(v).reduce((n, x) => n + countNumbers(x), 0);
 const params = countNumbers(JSON.parse(fs.readFileSync('public/trace/weights.json', 'utf8')).weights);
-const home = renderHome({ CH, PARTS, labs, rows, params });
-fs.writeFileSync(`${DOCS}/index.md`, home);
+const cases = globalThis.ITMCaseCatalog;
+const home = renderHome({ CH, PARTS, labs, rows, params, cases });
+fs.writeFileSync(`${DOCS}/index.md`, home.replace(/\r\n/g, '\n'));
+fs.writeFileSync(`${DOCS}/cases/index.md`, renderCases(cases).replace(/\r\n/g, '\n'));
 console.log(`generated: ${CH.length} chapters, ${labs.length} labs, ${rows.length} papers`);
