@@ -73,7 +73,7 @@ export default defineConfig({
             ],
           }),
         },
-      ].concat(['papers', 'glossary', 'itm-weights', 'itm-model', 'itm-train', 'explorer', 'trainer', 'home', 'compare', 'kit', 'widgets', 'widgets2', 'chapters', 'cases', 'interaction', 'site'].map(f => ({ tag: 'script', attrs: { src: `/js/${f}.js?v=${stamp(f)}`, defer: true } }))),
+      ].concat(['papers', 'glossary', 'itm-weights', 'itm-model', 'itm-train', 'explorer', 'trainer', 'home', 'compare', 'kit', 'widgets', 'widgets2', 'cases', 'interaction', 'site'].map(f => ({ tag: 'script', attrs: { src: `/js/${f}.js?v=${stamp(f)}`, defer: true } }))),
       sidebar: [
         { label: 'Start here', items: [{ slug: 'index', label: 'Overview' }, { slug: 'explorer', label: 'Model Explorer' }, { slug: 'changelog', label: "What's new" }] },
         { label: 'Case files', items: [{ slug: 'cases', label: 'About the cases' }, { slug: 'cases/place-or-animal', label: '1. The place detector' }, { slug: 'cases/story-circuit', label: '2. Who gets the ball?' }] },

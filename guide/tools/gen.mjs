@@ -1,5 +1,4 @@
 // Generates the pieces of the site that are derived from other content. Run with: npm run gen
-//   public/js/chapters.js        chapter metadata for the browser (sidebar progress marks)
 //   src/content/docs/index.md     home page (from src/chapters.mjs)
 //   src/content/docs/labs/index.md  list of labs (from each lab's front matter)
 //   src/content/docs/reference/papers.md  every cited paper, with the chapters that cite it
@@ -11,9 +10,6 @@ import { renderHome } from './home-template.mjs';
 
 const DOCS = 'src/content/docs';
 const num = Object.fromEntries(CH.map((c, i) => [c[0], i + 1]));
-
-/* chapter metadata for the browser */
-fs.writeFileSync('public/js/chapters.js', 'window.CHAPTERS = ' + JSON.stringify(CH.map(c => ({ id: c[0], slug: c[1], part: c[2], title: c[3], min: c[4] }))) + ';\n');
 
 /* labs index, from the labs themselves */
 const labs = fs.readdirSync(`${DOCS}/labs`).filter(f => f.endsWith('.md') && f !== 'index.md').map(f => {

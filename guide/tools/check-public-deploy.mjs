@@ -24,11 +24,6 @@ for (const file of walk(dist)) {
   }
 }
 
-const siteScript = fs.readFileSync(path.join(root, 'public', 'js', 'site.js'), 'utf8');
-if (!/localStorage\.getItem\('book-progress'\)/.test(siteScript)) {
-  failures.push('the browser-local reading-progress store is missing');
-}
-
 function read(relative) {
   const file = path.join(dist, relative);
   if (!fs.existsSync(file)) {

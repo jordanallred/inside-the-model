@@ -1,8 +1,7 @@
-/* Client behavior for the guide: citations, interactive widgets, inline definitions, progress, focus view. */
+/* Client behavior for the guide: citations, interactive widgets, inline definitions, focus view. */
 (function () {
   const ready = f => (document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', f) : f());
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const CHS = window.CHAPTERS || [];
 
   function cite(el) {
     const k = el.dataset.p, p = (window.PAPERS || {})[k];
@@ -50,24 +49,10 @@
     if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('term') && e.target.tagName === 'SPAN') { e.preventDefault(); showPop(e.target); }
   });
 
-  /* ---- progress (private to this browser) ---- */
-  let S = { done: {}, skip: {} };
-  try { Object.assign(S, JSON.parse(localStorage.getItem('book-progress') || '{}')); } catch (e) {}
-  const chapterByPath = () => { const m = location.pathname.match(/\/guide\/([^/]+)\/?$/); return m ? CHS.find(c => c.slug === m[1]) : null; };
-  function markSidebar() {
-    document.querySelectorAll('#starlight__sidebar a[href]').forEach(a => {
-      const m = a.getAttribute('href').match(/\/guide\/([^/]+)\/?$/); if (!m) return;
-      const c = CHS.find(x => x.slug === m[1]); if (!c) return;
-      a.classList.toggle('ch-done', !!S.done[c.id]); a.classList.toggle('ch-skipped', !!S.skip[c.id]);
-    });
-  }
-  function save() {
-    try { localStorage.setItem('book-progress', JSON.stringify(S)); } catch (e) {}
-    markSidebar();
-  }
+  /* earlier versions kept self-reported chapter progress here; drop it */
+  try { localStorage.removeItem('book-progress'); } catch (e) {}
 
   ready(() => {
-    markSidebar();
     const root = document.querySelector('.sl-markdown-content');
     if (root) {
       root.querySelectorAll('cite[data-p]').forEach(cite);
@@ -79,15 +64,6 @@
         try { f(box); window.ITMInteractions?.decorate(w, w.dataset.w); } catch (e) { box.innerHTML = '<p class="src">Widget error: ' + esc(e.message) + '</p>'; console.error(e); }
       });
       if (/^\/(guide\/[^/]+|labs\/[^/]+)\/?$/.test(location.pathname)) wrapTerms(root);
-      const c = chapterByPath();
-      if (c) {
-        const p = document.createElement('div');
-        p.innerHTML = '<hr><p><label><input type="checkbox" id="dn"' + (S.done[c.id] ? ' checked' : '') + '> I understand this chapter</label><br><label><input type="checkbox" id="sk"' + (S.skip[c.id] ? ' checked' : '') + '> I already knew this and skipped it</label></p>';
-        root.appendChild(p);
-        const dn = p.querySelector('#dn'), sk = p.querySelector('#sk');
-        dn.onchange = () => { if (dn.checked) { S.done[c.id] = true; delete S.skip[c.id]; sk.checked = false; } else delete S.done[c.id]; save(); };
-        sk.onchange = () => { if (sk.checked) { S.skip[c.id] = true; delete S.done[c.id]; dn.checked = false; } else delete S.skip[c.id]; save(); };
-      }
     }
   });
 })();

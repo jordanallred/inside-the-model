@@ -4,7 +4,7 @@ See exactly how LLMs work.
 
 Found a mistake or a broken widget? Use the **Report a problem with this page** link at the bottom of any page, or see [CONTRIBUTING.md](CONTRIBUTING.md). Licensing terms are in [LICENSE](LICENSE).
 
-An interactive, public guide to how modern language models work. It is a static Astro site: the guide and its interactive tools are delivered globally, while reading progress stays private to each visitor's browser.
+An interactive, public guide to how modern language models work. It is a static Astro site, and the guide and its interactive tools are delivered globally.
 
 ## Develop locally
 

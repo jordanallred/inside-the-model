@@ -33,10 +33,6 @@
 }
 #pop b { display: block; color: var(--sl-color-white); }
 
-/* Reading progress marks in the sidebar. */
-#starlight__sidebar a.ch-done::after { content: " ✓"; color: var(--ok); }
-#starlight__sidebar a.ch-skipped { opacity: 0.6; }
-
 /* ---- interactive widgets ---- */
 .widget { background: var(--surface); border: 1px solid var(--line); border-radius: var(--itm-radius-md); padding: 0.9rem 1rem; margin: 1.25rem 0; overflow: hidden; font-size: var(--sl-text-sm); line-height: 1.55; }
 .widget .wt { font-weight: 600; margin-bottom: 0.5rem; color: var(--sl-color-white); }
