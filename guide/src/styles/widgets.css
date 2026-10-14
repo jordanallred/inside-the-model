@@ -142,3 +142,30 @@ button.wk-tok[aria-pressed=true] { background: var(--accent); color: var(--accen
 button.wk-tok[aria-pressed=true] small { color: inherit; }
 .wk-tok.is-far { color: var(--muted); border-style: dashed; background: none; }
 .wk-mat th { font-size: 0.72rem; }
+
+/* ---- case files (cases.js) ---- */
+.cs-step { padding: 0.25rem 0 1rem; }
+.cs-step + .cs-step { border-top: 1px solid var(--line); margin-top: 0.75rem; padding-top: 1rem; }
+.cs-step h3 { margin: 0.25rem 0 0.5rem; font-size: var(--sl-text-lg); }
+.cs-step p { margin: 0.4rem 0; }
+.cs { container-type: inline-size; }
+.cs-heads { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; margin: 0.75rem 0; }
+.cs-head { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.45rem 0.7rem; border: 1px solid var(--line); border-radius: var(--itm-radius-sm); background: var(--bg); color: var(--fg); font: inherit; font-size: var(--sl-text-sm); cursor: pointer; text-align: left; }
+.cs-head b { display: flex; flex-wrap: wrap; column-gap: 0.3em; font-weight: 600; }
+.cs-head b span { white-space: nowrap; }
+@container (min-width: 46rem) { .cs-heads { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.cs-kind { color: var(--muted); font-size: 0.7em; font-weight: 400; }
+.cs-head .cs-state { flex: none; font: 600 var(--sl-text-xs) var(--mono); padding: 0.1rem 0.4rem; border-radius: 0.3rem; background: color-mix(in srgb, var(--ok) 18%, transparent); }
+.cs-head[aria-pressed="true"] { border-style: dashed; border-color: var(--warn); color: var(--muted); }
+.cs-head[aria-pressed="true"] b { text-decoration: line-through; }
+.cs-head[aria-pressed="true"] .cs-state { background: color-mix(in srgb, var(--warn) 22%, transparent); color: var(--fg); }
+.cs-head:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cs-pred { margin: 0.5rem 0; }
+.cs-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; }
+.cs-prompt { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 0.5rem 0; font-size: var(--sl-text-sm); }
+.cs-prompt input, .cs-share input { flex: 1 1 14rem; min-width: 0; min-height: 2.75rem; padding: 0.4rem 0.6rem; border: 1px solid var(--line); border-radius: var(--itm-radius-sm); background: var(--bg); color: var(--fg); font: var(--sl-text-sm) var(--mono); }
+.cs-tests { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; margin: 0.4rem 0; font-size: var(--sl-text-xs); color: var(--muted); }
+.cs-tests .wk-tok { cursor: pointer; min-height: 2.25rem; }
+.cs-closed { border-left: 3px solid var(--ok); padding-left: 0.9rem; }
+.cs-share { display: flex; flex-wrap: wrap; align-items: end; gap: 0.5rem; margin: 0.75rem 0; }
+.cs-share label { display: flex; flex-direction: column; gap: 0.25rem; flex: 1 1 16rem; font-size: var(--sl-text-sm); }
