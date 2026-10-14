@@ -169,3 +169,8 @@ button.wk-tok[aria-pressed=true] small { color: inherit; }
 .cs-closed { border-left: 3px solid var(--ok); padding-left: 0.9rem; }
 .cs-share { display: flex; flex-wrap: wrap; align-items: end; gap: 0.5rem; margin: 0.75rem 0; }
 .cs-share label { display: flex; flex-direction: column; gap: 0.25rem; flex: 1 1 16rem; font-size: var(--sl-text-sm); }
+.cs-found { font-size: var(--sl-text-sm); }
+.cs-build { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; margin: 0.5rem 0; font-size: var(--sl-text-sm); }
+.cs-build label { display: flex; flex-direction: column; gap: 0.2rem; }
+.cs-build select { min-height: 2.75rem; padding: 0.3rem 0.5rem; border: 1px solid var(--line); border-radius: var(--itm-radius-sm); background: var(--bg); color: var(--fg); font: inherit; }
+.cs-story code { white-space: normal; }

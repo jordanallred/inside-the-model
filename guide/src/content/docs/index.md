@@ -81,7 +81,7 @@ head:
     <a href="/teardown/"><b>Model teardowns</b><span>gpt-oss-120b and DeepSeek-V3, layer by layer</span></a>
     <a href="/labs/"><b>Hands-on labs</b><span>10 reproducible exercises</span></a>
     <a href="/reference/security-guidance/"><b>Public security guidance</b><span>NSA, CISA, and allied agencies</span></a>
-    <a href="/reference/papers/"><b>All papers</b><span>118 linked references with chapter citations</span></a>
+    <a href="/reference/papers/"><b>All papers</b><span>119 linked references with chapter citations</span></a>
   </nav>
   <p class="home-sourcing">Every paper is linked (all but three textbooks to arXiv), and each arXiv id and title was checked against the arXiv API. Statements about specific models come from technical reports or model cards; anything that could not be confirmed is marked.</p>
 </section>
