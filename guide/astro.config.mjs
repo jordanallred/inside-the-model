@@ -35,6 +35,7 @@ export default defineConfig({
       head: [
         { tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' } },
         { tag: 'link', attrs: { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400..600&family=JetBrains+Mono:wght@400..600&family=Parkinsans:wght@700&family=Plus+Jakarta+Sans:wght@700;800&display=swap' } },
+        { tag: 'link', attrs: { rel: 'alternate', type: 'application/rss+xml', title: "Inside the Model: What's new", href: `${siteUrl}/rss.xml` } },
         { tag: 'meta', attrs: { property: 'og:image', content: socialCardUrl } },
         { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
         { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
@@ -69,7 +70,7 @@ export default defineConfig({
         },
       ].concat(['papers', 'glossary', 'itm-weights', 'itm-model', 'itm-train', 'explorer', 'trainer', 'home', 'compare', 'kit', 'widgets', 'widgets2', 'chapters', 'interaction', 'site'].map(f => ({ tag: 'script', attrs: { src: `/js/${f}.js`, defer: true } }))),
       sidebar: [
-        { label: 'Start here', items: [{ slug: 'index', label: 'Overview' }, { slug: 'explorer', label: 'Model Explorer' }] },
+        { label: 'Start here', items: [{ slug: 'index', label: 'Overview' }, { slug: 'explorer', label: 'Model Explorer' }, { slug: 'changelog', label: "What's new" }] },
         ...guideGroups,
         {
           label: 'Hands-on labs',

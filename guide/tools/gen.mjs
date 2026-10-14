@@ -54,7 +54,9 @@ ${rows.length} references. Each arXiv id and title was checked against the arXiv
 ${rows.map(r => `| ${r.p.y} | ${r.p.a.replace(/\.$/, '')}. [${r.p.t.replace(/\|/g, '/')}](${link(r.p)})${r.p.x ? ` (arXiv:${r.p.x})` : ''} | ${r.ch.length ? r.ch.map(n => `[${n}](/guide/${CH[n - 1][1]}/)`).join(', ') : '-'} |`).join('\n')}
 `);
 
-/* home page */
-const home = renderHome({ CH, PARTS, labs, rows });
+/* home page; the parameter count is read from the trained weights so it cannot drift */
+const countNumbers = v => typeof v === 'number' ? 1 : Object.values(v).reduce((n, x) => n + countNumbers(x), 0);
+const params = countNumbers(JSON.parse(fs.readFileSync('public/trace/weights.json', 'utf8')).weights);
+const home = renderHome({ CH, PARTS, labs, rows, params });
 fs.writeFileSync(`${DOCS}/index.md`, home);
 console.log(`generated: ${CH.length} chapters, ${labs.length} labs, ${rows.length} papers`);
