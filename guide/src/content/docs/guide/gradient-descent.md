@@ -7,7 +7,7 @@ sidebar:
 
 _Models, loss, and the gradient that trains them_
 
-Chapter 1 of 21 · I. Foundations · about 30 minutes. Needs only calculus and linear algebra.
+Chapter 1 of 24 · I. Foundations · about 30 minutes. Needs only calculus and linear algebra.
 
 :::tip[Skip this chapter if]
 you can explain why gradient descent on $f(x) = \tfrac12 \cdot a\cdot x^{2}$ converges only when the learning rate is below $2 / a$, and what "minibatch" means. Otherwise read on: every later chapter uses these ideas.

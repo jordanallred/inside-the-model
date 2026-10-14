@@ -7,7 +7,7 @@ sidebar:
 
 _Why decoding is memory-bound and what the cache costs_
 
-Chapter 10 of 21 · III. Fast attention and inference · about 35 minutes. Builds on: [9. The full model and its training loop](/guide/full-model/).
+Chapter 10 of 24 · III. Fast attention and inference · about 35 minutes. Builds on: [9. The full model and its training loop](/guide/full-model/).
 
 :::tip[Skip this chapter if]
 you can explain the KV cache and compute its size from a model's configuration, why decoding is memory-bandwidth-bound, how continuous batching and paged memory help, and why speculative decoding preserves the output distribution.

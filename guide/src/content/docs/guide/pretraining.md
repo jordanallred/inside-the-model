@@ -7,7 +7,7 @@ sidebar:
 
 _Data, scaling laws and training across thousands of GPUs_
 
-Chapter 16 of 21 · V. Training · about 40 minutes. Builds on: [9. The full model and its training loop](/guide/full-model/), [14. Mixture of experts](/guide/mixture-of-experts/), [15. Floating point and quantization](/guide/low-precision/).
+Chapter 16 of 24 · V. Training · about 40 minutes. Builds on: [9. The full model and its training loop](/guide/full-model/), [14. Mixture of experts](/guide/mixture-of-experts/), [15. Floating point and quantization](/guide/low-precision/).
 
 :::tip[Skip this chapter if]
 you can describe a pretraining data pipeline, state what the scaling laws say and their caveats, and explain data, tensor, pipeline, expert parallelism and optimizer-state sharding (ZeRO).

@@ -7,7 +7,7 @@ sidebar:
 
 _Cutting the cache without cutting quality_
 
-Chapter 11 of 21 · III. Fast attention and inference · about 35 minutes. Builds on: [8. Position and rotary embeddings](/guide/rope/), [10. Generating text: the KV cache and inference cost](/guide/kv-cache/).
+Chapter 11 of 24 · III. Fast attention and inference · about 35 minutes. Builds on: [8. Position and rotary embeddings](/guide/rope/), [10. Generating text: the KV cache and inference cost](/guide/kv-cache/).
 
 :::tip[Skip this chapter if]
 you can state the KV-cache sizes of multi-head, multi-query, grouped-query and latent attention, explain the "absorption" trick that lets latent attention avoid rebuilding keys, and say why latent attention needs a separate rotary key.

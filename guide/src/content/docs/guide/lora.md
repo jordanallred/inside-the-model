@@ -7,7 +7,7 @@ sidebar:
 
 _Training a few million parameters instead of billions_
 
-Chapter 18 of 21 · V. Training · about 25 minutes. Builds on: [7. The transformer block](/guide/transformer-block/), [15. Floating point and quantization](/guide/low-precision/).
+Chapter 18 of 24 · V. Training · about 25 minutes. Builds on: [7. The transformer block](/guide/transformer-block/), [15. Floating point and quantization](/guide/low-precision/).
 
 :::tip[Skip this chapter if]
 you can write the LoRA update, state why it saves memory, describe QLoRA's ingredients, and explain distillation.

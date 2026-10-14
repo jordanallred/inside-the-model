@@ -7,7 +7,7 @@ sidebar:
 
 _Turning scores into probabilities, and probabilities into text_
 
-Chapter 4 of 21 · I. Foundations · about 30 minutes. Builds on: [1. Functions, parameters and gradient descent](/guide/gradient-descent/).
+Chapter 4 of 24 · I. Foundations · about 30 minutes. Builds on: [1. Functions, parameters and gradient descent](/guide/gradient-descent/).
 
 :::tip[Skip this chapter if]
 you can derive that the gradient of softmax cross-entropy with respect to the logits is $p - y$, define perplexity, and explain temperature and top-p sampling. These are the objects every later chapter uses to talk about a language model's output.

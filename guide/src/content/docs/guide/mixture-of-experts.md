@@ -7,7 +7,7 @@ sidebar:
 
 _More parameters, same compute per token_
 
-Chapter 14 of 21 · IV. Scaling the network · about 40 minutes. Builds on: [7. The transformer block](/guide/transformer-block/), [9. The full model and its training loop](/guide/full-model/).
+Chapter 14 of 24 · IV. Scaling the network · about 40 minutes. Builds on: [7. The transformer block](/guide/transformer-block/), [9. The full model and its training loop](/guide/full-model/).
 
 :::tip[Skip this chapter if]
 you can explain top-k routing with a load-balancing loss, the difference between total and active parameters, what fine-grained and shared experts are, and how DeepSeek-V3 balances load without an auxiliary loss.

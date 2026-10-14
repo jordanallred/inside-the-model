@@ -7,7 +7,7 @@ sidebar:
 
 _A lifecycle map of attacks, with the papers behind each_
 
-Chapter 20 of 21 · VII. Security and evaluation · about 60 minutes. Builds on: [11. Grouped-query and latent attention](/guide/gqa-and-mla/), [19. Prompting, retrieval, tools, agents and MCP](/guide/applications/).
+Chapter 20 of 24 · VII. Security and evaluation · about 60 minutes. Builds on: [11. Grouped-query and latent attention](/guide/gqa-and-mla/), [19. Prompting, retrieval, tools, agents and MCP](/guide/applications/).
 
 :::tip[Skip this chapter if]
 you can derive FGSM, explain how PGD and GCG extend it, distinguish jailbreaks from prompt injection and describe a privilege-separated defense, and name the main training-time, privacy and serving-time attacks with a paper for each.

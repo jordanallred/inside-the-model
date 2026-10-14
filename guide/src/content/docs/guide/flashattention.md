@@ -7,7 +7,7 @@ sidebar:
 
 _Exact attention without the $n\times n$ matrix_
 
-Chapter 12 of 21 · III. Fast attention and inference · about 30 minutes. Builds on: [6. Attention](/guide/attention/), [10. Generating text: the KV cache and inference cost](/guide/kv-cache/).
+Chapter 12 of 24 · III. Fast attention and inference · about 30 minutes. Builds on: [6. Attention](/guide/attention/), [10. Generating text: the KV cache and inference cost](/guide/kv-cache/).
 
 :::tip[Skip this chapter if]
 you can explain why attention is limited by memory traffic rather than arithmetic, derive the online-softmax update, and describe how FlashAttention avoids storing the $n\times n$ matrix.

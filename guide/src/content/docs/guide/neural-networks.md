@@ -7,7 +7,7 @@ sidebar:
 
 _Layers, activations and what a hidden unit does_
 
-Chapter 2 of 21 · I. Foundations · about 35 minutes. Builds on: [1. Functions, parameters and gradient descent](/guide/gradient-descent/).
+Chapter 2 of 24 · I. Foundations · about 35 minutes. Builds on: [1. Functions, parameters and gradient descent](/guide/gradient-descent/).
 
 :::tip[Skip this chapter if]
 you can say what a layer $h = \varphi (Wx + b)$ computes, why a stack of purely linear layers is no more powerful than one, and what a one-hidden-layer ReLU network looks like as a function of one input. The MLP is the "feed-forward" half of every transformer layer, so a quick refresher is worth the time.

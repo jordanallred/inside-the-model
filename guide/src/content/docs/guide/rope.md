@@ -7,7 +7,7 @@ sidebar:
 
 _Rotating vectors so attention knows who is near whom_
 
-Chapter 8 of 21 · II. The transformer · about 40 minutes. Builds on: [6. Attention](/guide/attention/).
+Chapter 8 of 24 · II. The transformer · about 40 minutes. Builds on: [6. Attention](/guide/attention/).
 
 :::tip[Skip this chapter if]
 you can derive why rotating queries and keys by position-dependent angles makes attention scores depend only on relative position, state RoPE's frequency formula, and explain how position interpolation and YaRN extend the context window.

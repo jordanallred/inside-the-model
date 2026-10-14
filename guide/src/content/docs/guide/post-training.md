@@ -7,7 +7,7 @@ sidebar:
 
 _From text continuer to assistant and reasoner_
 
-Chapter 17 of 21 · V. Training · about 50 minutes. Builds on: [4. Probability, softmax and next-token prediction](/guide/softmax-and-loss/), [16. Pretraining at scale](/guide/pretraining/).
+Chapter 17 of 24 · V. Training · about 50 minutes. Builds on: [4. Probability, softmax and next-token prediction](/guide/softmax-and-loss/), [16. Pretraining at scale](/guide/pretraining/).
 
 :::tip[Skip this chapter if]
 you can describe SFT, the RLHF pipeline (reward model with Bradley–Terry loss, PPO with a KL penalty), derive the DPO loss, explain GRPO's group-relative advantage, and say how reasoning models are trained and why test-time compute helps.

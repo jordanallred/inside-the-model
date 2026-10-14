@@ -7,7 +7,7 @@ sidebar:
 
 _The chain rule at scale, and how weights get updated_
 
-Chapter 3 of 21 · I. Foundations · about 40 minutes. Builds on: [2. Neural networks and the multilayer perceptron](/guide/neural-networks/).
+Chapter 3 of 24 · I. Foundations · about 40 minutes. Builds on: [2. Neural networks and the multilayer perceptron](/guide/neural-networks/).
 
 :::tip[Skip this chapter if]
 you can derive the gradient of a two-layer network by the chain rule, explain why residual connections help gradients flow, and write the Adam update including its bias correction. If you only know "autograd computes gradients", read the first section.

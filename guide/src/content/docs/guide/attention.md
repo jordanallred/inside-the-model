@@ -7,7 +7,7 @@ sidebar:
 
 _Queries, keys and values: a soft lookup across positions_
 
-Chapter 6 of 21 · II. The transformer · about 45 minutes. Builds on: [2. Neural networks and the multilayer perceptron](/guide/neural-networks/), [4. Probability, softmax and next-token prediction](/guide/softmax-and-loss/), [5. Tokens and embeddings](/guide/tokens-and-embeddings/).
+Chapter 6 of 24 · II. The transformer · about 45 minutes. Builds on: [2. Neural networks and the multilayer perceptron](/guide/neural-networks/), [4. Probability, softmax and next-token prediction](/guide/softmax-and-loss/), [5. Tokens and embeddings](/guide/tokens-and-embeddings/).
 
 :::tip[Skip this chapter if]
 you can write the formula $\operatorname{softmax}(QK^{\top} / \sqrt{d})V$ from memory, explain why the $\sqrt{d}$ is there, what a causal mask does, and what multiple heads buy you. Otherwise this is the most important chapter in the guide.

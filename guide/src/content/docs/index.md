@@ -17,7 +17,7 @@ head:
         <a class="home-action-primary" href="/explorer/">Open the Model Explorer <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
         <a class="home-action-secondary" href="/guide/gradient-descent/">Start the guide <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
       </div>
-      <p class="home-reading-note">21 chapters, with worked examples and a model you can take apart.</p>
+      <p class="home-reading-note">24 chapters, with worked examples and a model you can take apart.</p>
     </div>
     <figure class="home-specimen">
       <div class="widget hv not-content" data-w="homehero"></div>
@@ -60,7 +60,7 @@ head:
 <section class="home-section home-curriculum" aria-labelledby="home-curriculum-title">
   <div class="home-curriculum-intro">
     <h2 id="home-curriculum-title">The chapters</h2>
-    <p>21 chapters · about 13.5 hours</p>
+    <p>24 chapters · about 15.8 hours</p>
     <p>The guide starts with functions and gradients, then builds a transformer piece by piece. Later chapters cover training, inference, security, and evaluation.</p>
     <a href="/guide/gradient-descent/">Begin with chapter one <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
   </div>
@@ -72,6 +72,7 @@ head:
 <section class="home-curriculum-part"><header><span>05</span><div><h3>Training</h3><p>Pretraining at scale, post-training and adaptation.</p></div><small>115 min</small></header><ol><li><span>16</span><a href="/guide/pretraining/">Pretraining at scale</a><small>40 min</small></li><li><span>17</span><a href="/guide/post-training/">Post-training: instruction tuning, preferences and reinforcement learning</a><small>50 min</small></li><li><span>18</span><a href="/guide/lora/">Adapting models: LoRA, QLoRA and distillation</a><small>25 min</small></li></ol></section>
 <section class="home-curriculum-part"><header><span>06</span><div><h3>Systems</h3><p>Prompting, retrieval, tools and agents.</p></div><small>40 min</small></header><ol><li><span>19</span><a href="/guide/applications/">Prompting, retrieval, tools, agents and MCP</a><small>40 min</small></li></ol></section>
 <section class="home-curriculum-part"><header><span>07</span><div><h3>Security and evaluation</h3><p>The attacks and defenses, tied back to the papers, and how to measure any of it honestly.</p></div><small>105 min</small></header><ol><li><span>20</span><a href="/guide/security/">Attacks on language models and their defenses</a><small>60 min</small></li><li><span>21</span><a href="/guide/evaluation/">Evaluating models and systems</a><small>45 min</small></li></ol></section>
+<section class="home-curriculum-part"><header><span>08</span><div><h3>Looking inside</h3><p>Reading what a trained model computes, finding the parts that do it, and changing them on purpose.</p></div><small>140 min</small></header><ol><li><span>22</span><a href="/guide/reading-the-residual-stream/">Reading the residual stream: lenses, probes and attribution</a><small>40 min</small></li><li><span>23</span><a href="/guide/features-and-circuits/">Features, superposition and circuits</a><small>50 min</small></li><li><span>24</span><a href="/guide/intervening/">Intervening: patching, steering, ablation and editing</a><small>50 min</small></li></ol></section>
   </div>
 </section>
 
@@ -81,7 +82,7 @@ head:
     <a href="/teardown/"><b>Model teardowns</b><span>gpt-oss-120b and DeepSeek-V3, layer by layer</span></a>
     <a href="/labs/"><b>Hands-on labs</b><span>10 reproducible exercises</span></a>
     <a href="/reference/security-guidance/"><b>Public security guidance</b><span>NSA, CISA, and allied agencies</span></a>
-    <a href="/reference/papers/"><b>All papers</b><span>119 linked references with chapter citations</span></a>
+    <a href="/reference/papers/"><b>All papers</b><span>151 linked references with chapter citations</span></a>
   </nav>
   <p class="home-sourcing">Every paper is linked (all but three textbooks to arXiv), and each arXiv id and title was checked against the arXiv API. Statements about specific models come from technical reports or model cards; anything that could not be confirmed is marked.</p>
 </section>

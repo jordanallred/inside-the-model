@@ -7,7 +7,7 @@ sidebar:
 
 _Bits, scales and what low precision does to a model_
 
-Chapter 15 of 21 · IV. Scaling the network · about 40 minutes. Builds on: [9. The full model and its training loop](/guide/full-model/).
+Chapter 15 of 24 · IV. Scaling the network · about 40 minutes. Builds on: [9. The full model and its training loop](/guide/full-model/).
 
 :::tip[Skip this chapter if]
 you can decode a floating-point number from its bits, compare FP16, BF16, FP8 and FP4 formats, explain block-scaled quantization (MXFP4), and say why outliers make low-bit quantization hard.

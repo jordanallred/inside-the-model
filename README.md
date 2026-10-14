@@ -47,7 +47,7 @@ All content is Markdown in `guide/src/content/docs/`:
 
 | Folder | What it holds |
 | --- | --- |
-| `guide/` | the 21 chapters; the home page is generated from them by `npm run gen` (order and metadata in `guide/src/chapters.mjs`) |
+| `guide/` | the 24 chapters; the home page is generated from them by `npm run gen` (order and metadata in `guide/src/chapters.mjs`) |
 | `teardown/` | gpt-oss-120b and DeepSeek-V3 walked through layer by layer |
 | `labs/` | hands-on exercises |
 | `teardown/compare.md` | the comparison page (toy model against real models); its widget is `public/js/compare.js` |

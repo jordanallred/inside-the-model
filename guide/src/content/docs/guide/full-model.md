@@ -7,7 +7,7 @@ sidebar:
 
 _Shapes, loss and the cost of one training step_
 
-Chapter 9 of 21 · II. The transformer · about 35 minutes. Builds on: [3. Backpropagation and optimizers](/guide/backpropagation/), [7. The transformer block](/guide/transformer-block/), [8. Position and rotary embeddings](/guide/rope/).
+Chapter 9 of 24 · II. The transformer · about 35 minutes. Builds on: [3. Backpropagation and optimizers](/guide/backpropagation/), [7. The transformer block](/guide/transformer-block/), [8. Position and rotary embeddings](/guide/rope/).
 
 :::tip[Skip this chapter if]
 you can trace tensor shapes through a full decoder-only transformer, write the training loop, and explain the $6\cdot N\cdot D$ compute rule and the memory cost of training (about 16 or more bytes per parameter).

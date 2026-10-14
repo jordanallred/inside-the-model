@@ -7,7 +7,7 @@ sidebar:
 
 _Residual stream, normalization and the gated MLP_
 
-Chapter 7 of 21 · II. The transformer · about 40 minutes. Builds on: [2. Neural networks and the multilayer perceptron](/guide/neural-networks/), [6. Attention](/guide/attention/).
+Chapter 7 of 24 · II. The transformer · about 40 minutes. Builds on: [2. Neural networks and the multilayer perceptron](/guide/neural-networks/), [6. Attention](/guide/attention/).
 
 :::tip[Skip this chapter if]
 you can write the pre-norm transformer block from memory, give the formula for RMSNorm and for a SwiGLU MLP, and estimate the parameter count of a dense model from its width, depth and vocabulary.

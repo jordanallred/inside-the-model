@@ -7,6 +7,7 @@ export const PARTS = {
   'V. Training': 'Pretraining at scale, post-training and adaptation.',
   'VI. Systems': 'Prompting, retrieval, tools and agents.',
   'VII. Security and evaluation': 'The attacks and defenses, tied back to the papers, and how to measure any of it honestly.',
+  'VIII. Looking inside': 'Reading what a trained model computes, finding the parts that do it, and changing them on purpose.',
 };
 export const CH = [
   ['c01', 'gradient-descent', 'I. Foundations', 'Functions, parameters and gradient descent', 30, [], 'Models, loss, and the gradient that trains them', ['gradient', 'learning rate', 'minibatch', 'overfitting']],
@@ -30,4 +31,7 @@ export const CH = [
   ['c19', 'applications', 'VI. Systems', 'Prompting, retrieval, tools, agents and MCP', 40, ['c17'], 'How models become applications, and where trust breaks', ['RAG', 'agent', 'MCP', 'prompt injection']],
   ['c20', 'security', 'VII. Security and evaluation', 'Attacks on language models and their defenses', 60, ['c11', 'c19'], 'A lifecycle map of attacks, with the papers behind each', ['FGSM', 'PGD', 'backdoor', 'membership inference', 'differential privacy', 'jailbreak']],
   ['c21', 'evaluation', 'VII. Security and evaluation', 'Evaluating models and systems', 45, ['c04', 'c20'], 'Questions, test sets, statistics and the ways evaluations lie', ['confidence interval', 'benchmark contamination']],
+  ['c22', 'reading-the-residual-stream', 'VIII. Looking inside', 'Reading the residual stream: lenses, probes and attribution', 40, ['c07', 'c09'], 'What the model has worked out at each layer, and how to tell', ['logit lens', 'linear probe', 'direct logit attribution']],
+  ['c23', 'features-and-circuits', 'VIII. Looking inside', 'Features, superposition and circuits', 50, ['c06', 'c22'], 'More concepts than dimensions, and the subgraphs that use them', ['superposition', 'sparse autoencoder', 'transcoder', 'circuit']],
+  ['c24', 'intervening', 'VIII. Looking inside', 'Intervening: patching, steering, ablation and editing', 50, ['c17', 'c18', 'c20', 'c23'], 'Changing what the model computes, and what that proves', ['activation patching', 'steering vector', 'directional ablation', 'model editing']],
 ];

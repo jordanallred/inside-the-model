@@ -7,7 +7,7 @@ sidebar:
 
 _From strings to integers to vectors_
 
-Chapter 5 of 21 · I. Foundations · about 30 minutes. Builds on: [4. Probability, softmax and next-token prediction](/guide/softmax-and-loss/).
+Chapter 5 of 24 · I. Foundations · about 30 minutes. Builds on: [4. Probability, softmax and next-token prediction](/guide/softmax-and-loss/).
 
 :::tip[Skip this chapter if]
 you can describe how byte-pair encoding builds a vocabulary, say why the embedding table is equivalent to a one-hot matrix product, and explain why a tokenizer is a security-relevant component.

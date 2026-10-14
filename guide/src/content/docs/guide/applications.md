@@ -7,7 +7,7 @@ sidebar:
 
 _How models become applications, and where trust breaks_
 
-Chapter 19 of 21 · VI. Systems · about 40 minutes. Builds on: [17. Post-training: instruction tuning, preferences and reinforcement learning](/guide/post-training/).
+Chapter 19 of 24 · VI. Systems · about 40 minutes. Builds on: [17. Post-training: instruction tuning, preferences and reinforcement learning](/guide/post-training/).
 
 :::tip[Skip this chapter if]
 you can explain in-context learning and chain of thought, how retrieval-augmented generation works end to end, how tool calling and agent loops are built, what MCP is, and where untrusted text enters each of these.
