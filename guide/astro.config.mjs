@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
@@ -6,6 +7,10 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { CH, PARTS } from './src/chapters.mjs';
 import { siteUrl, socialCardUrl, repoUrl } from './src/site-config.mjs';
+
+/* Script URLs carry a fingerprint of their contents, so a changed script gets a new URL and no browser keeps running
+   an old copy from its cache after a release. */
+const stamp = f => createHash('sha256').update(fs.readFileSync(new URL(`./public/js/${f}.js`, import.meta.url))).digest('hex').slice(0, 10);
 
 const num = Object.fromEntries(CH.map((c, i) => [c[0], i + 1]));
 const guideGroups = Object.keys(PARTS).map(part => ({
@@ -68,7 +73,7 @@ export default defineConfig({
             ],
           }),
         },
-      ].concat(['papers', 'glossary', 'itm-weights', 'itm-model', 'itm-train', 'explorer', 'trainer', 'home', 'compare', 'kit', 'widgets', 'widgets2', 'chapters', 'cases', 'interaction', 'site'].map(f => ({ tag: 'script', attrs: { src: `/js/${f}.js`, defer: true } }))),
+      ].concat(['papers', 'glossary', 'itm-weights', 'itm-model', 'itm-train', 'explorer', 'trainer', 'home', 'compare', 'kit', 'widgets', 'widgets2', 'chapters', 'cases', 'interaction', 'site'].map(f => ({ tag: 'script', attrs: { src: `/js/${f}.js?v=${stamp(f)}`, defer: true } }))),
       sidebar: [
         { label: 'Start here', items: [{ slug: 'index', label: 'Overview' }, { slug: 'explorer', label: 'Model Explorer' }, { slug: 'changelog', label: "What's new" }] },
         { label: 'Case files', items: [{ slug: 'cases', label: 'About the cases' }, { slug: 'cases/place-or-animal', label: '1. The place detector' }, { slug: 'cases/story-circuit', label: '2. Who gets the ball?' }] },
