@@ -1,0 +1,50 @@
+name: Problem with a page
+description: A wrong number, equation, claim or citation, a typo, an unclear explanation, or a broken widget.
+title: "[Page] "
+labels: ["page problem"]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: The address of the page, or its path such as /guide/attention/.
+      placeholder: /guide/attention/
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of problem is it?
+      options:
+        - A number, equation or claim is wrong
+        - A citation or link is wrong or broken
+        - An explanation is unclear or confusing
+        - A widget is broken or misleading
+        - Typo or wording
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: where
+    attributes:
+      label: Where on the page?
+      description: The section heading, widget title, or a short quote of the text.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Source or calculation
+      description: For a factual or mathematical correction, a paper, model card, technical report or calculation anyone can repeat.
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      description: Only needed for a broken widget or layout.
+      placeholder: Firefox on Windows, Safari on iPhone

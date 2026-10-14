@@ -179,7 +179,7 @@ The agency documents above lean on these, and each was checked against its publi
 
 ## Sources
 
-Primary documents (the NSA PDFs are served as downloads and block scripted access; the PDFs for MCP, distillation, cyber hygiene, agentic AI and Content Credentials are archived in the repository under `guide/tools/sources/`):
+Primary documents (the NSA PDFs are served as downloads and may not open in some browsers or automated tools):
 
 - [NSA: Best Practices Guide for Cyber Hygiene](https://media.defense.gov/2026/Sep/03/2003991426/-1/-1/0/CSI_CYBER_HYGIENE.PDF) · [NSA press release, Sept. 3, 2026](https://www.nsa.gov/Press-Room/Press-Releases-Statements/Press-Release-View/Article/4590054/nsa-highlights-cyber-hygiene-best-practices-effective-against-ai-enhanced-targe/)
 - [Careful Adoption of Agentic AI Services (NSA copy)](https://media.defense.gov/2026/Apr/30/2003922823/-1/-1/0/CAREFUL%20ADOPTION%20OF%20AGENTIC%20AI%20SERVICES_FINAL.PDF)

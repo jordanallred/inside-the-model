@@ -1,0 +1,23 @@
+name: Suggestion
+description: A topic, lab, widget or improvement you would like to see.
+title: "[Suggestion] "
+labels: ["suggestion"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like to see?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why would it help?
+      description: What were you trying to learn or do when you wanted this?
+    validations:
+      required: true
+  - type: input
+    id: page
+    attributes:
+      label: Related page
+      description: Optional. The page this belongs on, if any.

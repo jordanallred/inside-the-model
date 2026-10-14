@@ -1,0 +1,62 @@
+Copyright (c) 2026 Inside the Model (https://insidethemodel.app)
+
+Inside the Model is free to read, study, share and adapt for any
+noncommercial purpose. Selling it, or using it in a product or service
+offered for money, requires written permission.
+
+This repository is covered by two licenses, plus a reservation for the
+brand. Each file falls under exactly one of the three parts below.
+
+
+1. Code: PolyForm Noncommercial License 1.0.0
+   Full text: LICENSE-CODE.md
+   https://polyformproject.org/licenses/noncommercial/1.0.0
+
+   Applies to:
+     guide/public/js/          browser engine, widgets and site scripts
+     guide/public/code/        the NumPy reference implementation
+     guide/public/trace/       trained weights and verification fixtures
+     guide/tools/              build, check, training and verification tools
+     guide/src/**/*.mjs, guide/src/**/*.ts, guide/src/**/*.astro
+     guide/src/styles/         stylesheets
+     guide/astro.config.mjs, guide/package.json
+
+   You may use, copy, modify and share this code for any noncommercial
+   purpose, including personal study, teaching, research, and use by
+   schools, charities and public institutions. Commercial use is not
+   permitted.
+
+
+2. Written and visual content: Creative Commons
+   Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
+   Full text: LICENSE-CONTENT.txt
+   https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+   Applies to everything not listed in parts 1 or 3, including:
+     guide/src/content/        chapters, labs, teardowns and reference pages,
+                               including the code examples inside them
+     README.md, CONTRIBUTING.md
+
+   You may share and adapt this material if you:
+     - give credit to "Inside the Model" with a link to
+       https://insidethemodel.app,
+     - do not use it for commercial purposes, and
+     - release any adaptation under these same terms.
+
+
+3. Brand: all rights reserved
+   The name "Inside the Model", its logo and symbol, and the files below
+   are not licensed under either license above:
+     guide/public/brand/, guide/public/favicon.svg,
+     guide/public/social-card.png, guide/src/assets/
+
+   You may use the name to give the credit required in part 2. Do not use
+   the name or logo for your own copy, fork, product or service, or in any
+   way that suggests endorsement.
+
+
+Commercial licensing
+   To ask about any use not permitted above, including commercial
+   training, courses, books or products built on this material, open an
+   issue at https://github.com/jordanallred/inside-the-model/issues and
+   choose "Licensing question".

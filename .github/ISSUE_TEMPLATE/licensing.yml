@@ -1,0 +1,16 @@
+name: Licensing question
+description: Ask about a use the license does not already allow, such as commercial use.
+title: "[Licensing] "
+labels: ["licensing"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The project is free for noncommercial use under the terms in [LICENSE](https://github.com/jordanallred/inside-the-model/blob/main/LICENSE). Use this form to ask about anything else. Issues are public, so do not include private or confidential details.
+  - type: textarea
+    id: use
+    attributes:
+      label: What would you like to do?
+      description: Which material, and how you plan to use it.
+    validations:
+      required: true

@@ -1,6 +1,8 @@
 # Inside the Model
 
-See exactly how LLMs work. Brand rules: [BRAND_GUIDELINES.md](BRAND_GUIDELINES.md).
+See exactly how LLMs work.
+
+Found a mistake or a broken widget? Use the **Report a problem with this page** link at the bottom of any page, or see [CONTRIBUTING.md](CONTRIBUTING.md). Licensing terms are in [LICENSE](LICENSE).
 
 An interactive, public guide to how modern language models work. It is a static Astro site: the guide and its interactive tools are delivered globally, while reading progress stays private to each visitor's browser.
 
@@ -71,6 +73,7 @@ Inside `guide/`:
 ## Layout
 
 ```
-rebuild.bat              convenience build script for Windows
 guide/                   the Astro + Starlight project and deployable static output
+.github/                 issue forms for reporting problems and suggestions
+LICENSE                  which license covers which files
 ```

@@ -1,4 +1,4 @@
-/* Inside the Model brand layer (see BRAND_GUIDELINES.md). Loaded after custom.css so it wins. */
+/* Inside the Model brand layer. Loaded after custom.css so it wins. */
 :root {
   --sl-font: Inter, system-ui, sans-serif;
   --sl-font-mono: "JetBrains Mono", ui-monospace, monospace;

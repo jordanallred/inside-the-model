@@ -5,7 +5,7 @@ import starlight from '@astrojs/starlight';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { CH, PARTS } from './src/chapters.mjs';
-import { siteUrl, socialCardUrl } from './src/site-config.mjs';
+import { siteUrl, socialCardUrl, repoUrl } from './src/site-config.mjs';
 
 const num = Object.fromEntries(CH.map((c, i) => [c[0], i + 1]));
 const guideGroups = Object.keys(PARTS).map(part => ({
@@ -28,6 +28,8 @@ export default defineConfig({
       title: 'Inside the Model',
       logo: { src: '/brand/logo-horizontal-light.svg', alt: 'Inside the Model', replacesTitle: true },
       favicon: '/favicon.svg',
+      social: [{ icon: 'github', label: 'Source and issues on GitHub', href: repoUrl }],
+      components: { Footer: './src/components/Footer.astro' },
       description: 'An interactive guide to the calculations, code, training, and inference behind large language models.',
       customCss: ['katex/dist/katex.min.css', './src/styles/brand-tokens.css', './src/styles/custom.css', './src/styles/brand.css', './src/styles/widgets.css', './src/styles/explorer.css', './src/styles/home.css'],
       head: [
