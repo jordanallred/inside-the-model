@@ -178,6 +178,8 @@ body:has(.home-landing) .content-panel:has(> .sl-container > h1#_top) { display:
 .home-inspection-intro { align-self: start; position: sticky; top: 6rem; }
 .home-inspection-intro > p { max-width: 36rem; margin-top: 1.4rem !important; color: var(--home-muted); line-height: 1.7; }
 .home-verification { padding-top: 1.2rem; border-top: 1px solid var(--home-line); font-size: 0.82rem; }
+.home-why-small { font-size: 0.88rem; }
+.home-why-small b { color: var(--home-ink); }
 .home-inspection-list { border-bottom: 1px solid var(--home-line); }
 .home-inspection-row { --row: var(--itm-indigo); display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 0.45rem 1rem; padding: 1.5rem 0; border-top: 1px solid var(--home-line); color: var(--home-ink) !important; text-decoration: none; }
 .home-inspection-row > span { grid-row: 1 / 3; color: var(--row); font: 600 0.75rem/1.4 var(--itm-font-code); }

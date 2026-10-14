@@ -51,6 +51,7 @@ head:
     <h2 id="home-inspection-title">Every number has a way back</h2>
     <p>The Explorer does not animate a story over a black box. It exposes the values the model actually computed, then lets you inspect the same operation as a diagram, an equation, or code.</p>
     <p class="home-verification">The browser engine is checked against the NumPy reference implementation to within 1e-9. Hand-written backpropagation is checked against finite differences.</p>
+    <p class="home-why-small"><b>Why so small?</b> The model has 4,496 trained parameters. That is small enough to show every value and check each one against an independent implementation, and it is built from the same operations as production transformers. Larger models can be watched; this one can be checked.</p>
   </div>
   <div class="home-inspection-list">
     <a class="home-inspection-row home-inspection-trace" href="/explorer/"><span>Trace</span><b>Follow a token through 26 operations</b><small>Pick the token, layer, and head. Share the exact state as a link.</small></a>
