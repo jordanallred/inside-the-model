@@ -413,6 +413,8 @@
       $('announce').textContent = 'Step ' + (st.step + 1) + ' of ' + STEPS.length + ': ' + where(st.step) + ', ' + INFO[S.k].t + '. Following ' + wd[st.t] + '.';
       try { history.replaceState(null, '', '#' + new URLSearchParams({ p: st.prompt, step: st.step, t: st.t, l: S.l === undefined ? 0 : S.l, h: st.h, v: st.view, w: st.w }).toString()); } catch (e) {}
     }
+    /* writeText is asynchronous and can be refused (permissions, insecure origin), so report what actually happened */
+    const copy = (b, text, ok, no) => { const say = m => { b.textContent = m; }; try { navigator.clipboard.writeText(text).then(() => say(ok), () => say(no)); } catch (x) { say(no); } };
     const go = s => { st.step = s; st.map = false; render(); if (root.getBoundingClientRect().top < 0 || $('stage').getBoundingClientRect().top < 0) $('stage').scrollIntoView({ block: 'start' }); };
 
     el.addEventListener('click', e => {
@@ -430,11 +432,11 @@
       else if (d.a === 'restart') { st.t = 99; return go(0); }
       else if (d.a === 'how') { st.t = 99; return go(25); }
       else if (d.a === 'map') st.map = !st.map;
-      else if (d.a === 'copylink') { try { navigator.clipboard.writeText(location.href); b.textContent = 'Link copied'; } catch (x) {} return; }
+      else if (d.a === 'copylink') return copy(b, location.href, 'Link copied', 'Copy blocked: use the address bar');
       else if (d.a === 'copy') {
         const r = PY && pyBlock(STEPS[st.step].k); if (!r) return;
         const ls = PY.slice(r[0] + 1, r[1]), cut = Math.min(...ls.map(indent));
-        try { navigator.clipboard.writeText(ls.map(l => l.slice(cut)).join('\n')); b.textContent = 'Copied'; } catch (x) {} return;
+        return copy(b, ls.map(l => l.slice(cut)).join('\n'), 'Copied', 'Copy blocked by the browser');
       }
       else return;
       render();
@@ -494,7 +496,7 @@
       Q.push({ id: 'mask', q: 'In “' + P0 + '”, token 3 (“sat”) can read only itself and earlier tokens. Counting <bos> as token 0 and the last token as token ' + (tk.ids.length - 1) + ', how many positions get exactly zero attention weight from “sat”?', opts: [n - 3, n, n + 3, 0].map(String), ans: String(n),
         why: 'Tokens ' + (t + 1) + ' to ' + (tk.ids.length - 1) + ' come after “sat”, so their scores are set to −∞ and softmax turns them into exactly 0: ' + n + ' positions.', go: link(P0, 6, t, 0, 0) }); }
     Q.push({ id: 'sum', q: 'Softmax is applied to each row of masked scores. What does each row of attention weights add up to?', opts: ['0', '1', 'The number of tokens', 'It depends on the head'], ans: '1',
-      why: 'Softmax outputs are non-negative and normalized, so every row sums to 1 (up to rounding). The Math view of the softmax step prints the sum to 12 decimals.', go: link(P0, 7, 3, 0, 0) });
+      why: 'Softmax outputs are non-negative and normalized, so every row sums to 1 (up to rounding). The Numbers view of the softmax step prints the sum to 12 decimals.', go: link(P0, 7, 3, 0, 0) });
     { const { tr, words } = run(P0), w = tr.layers[0].heads[0].weights[3], j = w.indexOf(Math.max(...w)), cands = [0, 1, 2, 3];
       Q.push({ id: 'argmax', q: 'In layer 0, head 0, which word does “sat” (token 3) give the most attention weight to?', opts: cands.map(i => i + ' ' + words[i]), ans: j + ' ' + words[j],
         why: 'The weights are ' + cands.map(i => words[i] + ' ' + f(w[i])).join(', ') + '. Heads do not have to look at other words; a head may mostly read the current token.', go: link(P0, 7, 3, 0, 0) }); }

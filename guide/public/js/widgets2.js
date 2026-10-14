@@ -287,9 +287,11 @@
     const S = { m: p0, K: MOE[p0].K, bp: 2, roll: 1 };
     el.innerHTML = K.seg('m', 'model', Object.entries(MOE).map(([k, v]) => [k, v.n])) + K.slider('K', 'experts used per token (top-k)', 1, 16, 1) + K.seg('bp', 'weight precision', [['2', '16-bit'], ['1', '8-bit'], ['0.53', '4-bit + scales']]) +
       '<div class="wk-bar">' + K.btn('roll', 'Route another token') + '<span class="wk-cap">One layer\'s experts; lit = used by this token.</span></div>' + fig('g', 'Experts of one layer, with the ones this token uses lit') + '<div data-x="out" aria-live="polite"></div>';
-    K.bind(el, S, render, { change: k => { if (k === 'm') S.K = MOE[S.m].K; }, act: a => { if (a === 'roll') S.roll++; } });
+    K.bind(el, S, render, { change: k => { if (k === 'm') S.K = MOE[S.m].K; S.K = Math.min(S.K, MOE[S.m].E); }, act: a => { if (a === 'roll') S.roll++; } });
     function render() {
       const base = MOE[S.m], m = Object.assign({}, base); m.K = Math.min(S.K, m.E); const P = window.moeParams(m), bp = S.bp;
+      /* top-k cannot exceed the expert count (Mixtral has 8), so the slider stops there */
+      const kr = el.querySelector('input[data-k="K"]'); kr.max = Math.min(16, m.E); kr.value = m.K; el.querySelector('output[data-o="K"]').textContent = m.K;
       const r = T.rng(S.roll * 31 + m.E), lit = new Set(); while (lit.size < m.K) lit.add(Math.floor(r() * m.E));
       const svg = pick(el, 'g'), cols = m.E <= 8 ? 8 + m.sh : 32, cs = Math.min(26, K.box(svg, 10).w / cols);
       K.box(svg, 4 + Math.ceil((m.E + m.sh) / cols) * cs);
@@ -341,7 +343,7 @@
     const ui = K.bind(el, S, render, {
       act: (a, b) => {
         if (a.startsWith('x:')) { S.x = a.slice(2); note = ''; return; }
-        if (!a.startsWith('bit:')) return;
+        if (!a.startsWith('bit:') || isNaN(parseFloat(S.x))) return;
         const [e, m, kind] = FMT[S.f], c = enc(parseFloat(S.x)), i = +a.slice(4);
         let v;
         if (kind === 'fp32') { const u = new Uint32Array(new Float32Array([c.v]).buffer); u[0] ^= 1 << (31 - i) >>> 0; v = new Float32Array(u.buffer)[0]; }
@@ -350,10 +352,11 @@
         S.x = String(v); note = 'Flipped bit ' + i + ': the bits now spell ' + v + '.';
       },
       change: () => { note = ''; },
+      reset: () => { note = ''; },
     });
     function render() {
       const [e, m, kind, name] = FMT[S.f], x = parseFloat(S.x), out = pick(el, 'out');
-      if (isNaN(x)) { out.innerHTML = K.say('warn', 'Enter a number.'); return; }
+      if (isNaN(x)) { pick(el, 'bits').innerHTML = ''; K.box(pick(el, 'n'), 1); pick(el, 'n').innerHTML = ''; out.innerHTML = K.say('warn', 'Enter a number, such as 0.1 or -2.5.'); return; }
       const c = enc(x), bits = (c.sg + c.ex.toString(2).padStart(e, '0') + c.mn.toString(2).padStart(m, '0')).split(''), big = bits.length > 16;
       pick(el, 'bits').innerHTML = '<div class="wk-toks" style="gap:2px">' + bits.map((b, i) => { const part = i === 0 ? ['sign', 'var(--c2)'] : i <= e ? ['exponent', 'var(--c1)'] : ['mantissa', 'var(--c3)']; return '<button type="button" class="wk-tok" data-a="bit:' + i + '" title="' + part[0] + ' bit" aria-label="' + part[0] + ' bit ' + i + ', currently ' + b + '" style="min-width:' + (big ? '1.25rem' : '1.9rem') + ';padding:.25rem ' + (big ? '.1rem' : '.3rem') + ';border-bottom:3px solid ' + part[1] + ';background:' + (b === '1' ? 'color-mix(in srgb,' + part[1] + ' 30%, var(--bg))' : 'var(--bg)') + '">' + b + '</button>'; }).join('') + '</div><div class="wk-cap"><i class="wk-sw" style="background:var(--c2)"></i>sign · <i class="wk-sw" style="background:var(--c1)"></i>exponent (' + e + ' bits: range) · <i class="wk-sw" style="background:var(--c3)"></i>mantissa (' + m + ' bits: precision)</div>';
       let nb = [];
@@ -405,7 +408,7 @@
       const L = v => (Math.log10(K.clamp(v, 1e-6, 10)) + 6) / 7;
       const zeroed = res.find(x => x[0] === S.sch)[2];
       pick(el, 'out').innerHTML = '<div class="kicker">mean squared error of each scheme on these weights (log scale; shorter is better)</div>' + res.map(([k, mse]) => '<div class="brow"><span>' + NAMES[k][0] + '</span><div class="bar"><i style="width:' + (L(mse) * 100).toFixed(1) + '%;background:' + (k === S.sch ? 'var(--c2)' : 'var(--muted)') + '"></i></div><span>' + mse.toExponential(1) + ' · ' + NAMES[k][1] + 'b</span></div>').join('') +
-        K.say(zeroed > 8 ? 'warn' : 'info', (zeroed ? zeroed + ' ordinary weights were rounded all the way to 0. ' : '') + (S.sch === 'i8' || S.sch === 'i4' ? 'One scale for the whole tensor must stretch to cover the outlier, so the levels are far apart everywhere.' : 'Each block has its own scale, so the outlier only coarsens block 1. Block 2 keeps fine levels.'));
+        K.say(zeroed > 8 ? 'warn' : 'info', (zeroed ? zeroed + (zeroed === 1 ? ' ordinary weight was' : ' ordinary weights were') + ' rounded all the way to 0. ' : '') + (S.sch === 'i8' || S.sch === 'i4' ? 'One scale for the whole tensor must stretch to cover the outlier, so the levels are far apart everywhere.' : 'Each block has its own scale, so the outlier only coarsens block 1. Block 2 keeps fine levels.'));
     }
     render();
   };
@@ -642,14 +645,16 @@
 
   /* ---- confidence interval for a success rate, and what "95%" means ---- */
   W.ci = el => {
-    const S = { n: 20, nl: Math.log10(20), x: 3, z: 1.96 };
+    /* nl is the slider position 0..1 on a log scale from 5 to 2000 trials, so both ends are exactly reachable */
+    const NL = n => Math.log(n / 5) / Math.log(400), NOF = v => Math.round(5 * Math.pow(400, v));
+    const S = { n: 20, nl: NL(20), x: 3, z: 1.96 };
     let sim = null, seed = 1;
-    el.innerHTML = K.slider('nl', 'trials n', Math.log10(5), Math.log10(2000), 0.01) + K.slider('x', 'successes x', 0, 20, 1) + K.seg('z', 'confidence', [['1.645', '90%'], ['1.96', '95%'], ['2.576', '99%']]) +
+    el.innerHTML = K.slider('nl', 'trials n', 0, 1, 0.004) + K.slider('x', 'successes x', 0, 20, 1) + K.seg('z', 'confidence', [['1.645', '90%'], ['1.96', '95%'], ['2.576', '99%']]) +
       fig('c', 'Observed rate with its Wilson interval') + '<div data-x="out" aria-live="polite"></div>' +
       '<div class="kicker" style="margin-top:1rem">What does the confidence level mean? Pretend the true rate is the observed one, and repeat the whole experiment 40 times.</div><div class="wk-bar">' + K.btn('sim', 'Repeat the experiment 40 times', true) + '</div>' + fig('f', 'Forty repeated experiments and their intervals') + '<div data-x="so" aria-live="polite"></div>';
     const ui = K.bind(el, S, render, {
       fmt: { nl: () => String(S.n) },
-      change: k => { if (k === 'nl') S.n = Math.round(Math.pow(10, S.nl)); if (k === 'n') S.nl = Math.log10(S.n); S.x = Math.min(S.x, S.n); sim = null; },
+      change: k => { if (k === 'nl') S.n = NOF(S.nl); if (k === 'n') S.nl = NL(S.n); S.x = Math.min(S.x, S.n); sim = null; },
       act: a => { if (a === 'sim') { sim = seed++; } },
       reset: () => { sim = null; },
     });
