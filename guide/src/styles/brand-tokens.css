@@ -7,10 +7,24 @@
  --itm-peach: #FB923C;
  --itm-sand: #F8FAFC;
  --itm-slate: #334155;
- --itm-font-heading: "Plus Jakarta Sans", Inter, sans-serif;
+ /* Chart colors above retain their computational roles. The UI uses these neutrals. */
+ --itm-paper: #F6F5F0;
+ --itm-paper-raised: #FCFBF8;
+ --itm-ink: #222724;
+ --itm-muted: #575F59;
+ --itm-rule: #D4D8CF;
+ --itm-link: #3F4C9C;
+ --itm-night: #10151B;
+ --itm-night-raised: #141A21;
+ --itm-night-ink: #EEEEF0;
+ --itm-night-muted: #AFB7C0;
+ --itm-night-rule: #35404A;
+ --itm-night-link: #B5BEF5;
+ --itm-font-display: "Source Serif 4", Georgia, serif;
+ --itm-font-heading: Inter, system-ui, sans-serif;
  --itm-font-body: Inter, sans-serif;
  --itm-font-code: "JetBrains Mono", monospace;
- --itm-radius-sm: 8px;
- --itm-radius-md: 12px;
- --itm-radius-lg: 20px;
+ --itm-radius-sm: 4px;
+ --itm-radius-md: 8px;
+ --itm-radius-lg: 12px;
 }

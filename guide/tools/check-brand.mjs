@@ -26,14 +26,14 @@ for (const [name, value] of Object.entries({
 if (!config.includes("logo: { src: '/brand/logo-horizontal-light.svg'")) {
   fail('desktop header must use the approved horizontal light lockup');
 }
-if (!brand.includes('--sl-color-accent: var(--itm-indigo)')) {
-  fail('primary accent must use the approved Indigo token');
+if (!brand.includes('--sl-color-accent: var(--itm-link)')) {
+  fail('the interface accent must use the shared link token');
 }
-if (!brand.includes('--sl-color-bg: var(--itm-sand)')) {
-  fail('light reading surfaces must use the approved Sand token');
+if (!brand.includes('--sl-color-bg: var(--itm-paper)')) {
+  fail('light reading surfaces must use the shared paper token');
 }
-if (!brand.includes('--sl-color-bg: var(--itm-deep-space)')) {
-  fail('dark surfaces must use the approved Deep Space token');
+if (!brand.includes('--sl-color-bg: var(--itm-night)')) {
+  fail('dark reading surfaces must use the shared night token');
 }
 if (brand.includes("background: url('/brand/symbol.svg')")) {
   fail('the home hero must not use the brand mark as unexplained decorative imagery');

@@ -1,0 +1,93 @@
+/* Shared field-guide chrome and reading surfaces. Charts keep their semantic palette. */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/source-serif-4-medium.ttf') format('truetype');
+}
+:root:not([data-theme='light']) {
+  --sl-color-bg-nav: var(--itm-night);
+  --sl-color-bg-sidebar: var(--itm-night);
+  --sl-color-bg-inline-code: var(--itm-night-raised);
+  --sl-color-hairline: var(--itm-night-rule);
+  --sl-color-hairline-light: var(--itm-night-rule);
+  --sl-color-gray-2: var(--itm-night-muted);
+  --sl-color-gray-3: var(--itm-night-muted);
+  --sl-color-gray-5: var(--itm-night-rule);
+  --sl-color-gray-6: var(--itm-night-raised);
+  --sl-color-text-accent: var(--itm-night-link);
+  --sl-color-text-invert: var(--itm-night);
+  --itm-ui-surface: var(--itm-night-raised);
+  --itm-ui-muted: var(--itm-night-muted);
+}
+:root[data-theme='light'] {
+  --sl-color-bg-nav: var(--itm-paper);
+  --sl-color-bg-sidebar: var(--itm-paper);
+  --sl-color-bg-inline-code: #EBECE5;
+  --sl-color-hairline: var(--itm-rule);
+  --sl-color-hairline-light: var(--itm-rule);
+  --sl-color-gray-2: var(--itm-muted);
+  --sl-color-gray-3: var(--itm-muted);
+  --sl-color-gray-5: var(--itm-rule);
+  --sl-color-gray-6: var(--itm-paper-raised);
+  --sl-color-text-accent: var(--itm-link);
+  --sl-color-text-invert: var(--itm-paper-raised);
+  --itm-ui-surface: var(--itm-paper-raised);
+  --itm-ui-muted: var(--itm-muted);
+}
+::selection { background: #CBD3EC; color: var(--itm-ink); }
+:focus-visible { outline: 2px solid var(--sl-color-text-accent); outline-offset: 3px; }
+input, textarea { caret-color: var(--sl-color-text-accent); }
+/* Editorial titles; functional labels and controls stay in sans-serif. */
+h1#_top {
+  font-family: var(--itm-font-display);
+  font-weight: 500;
+  font-size: clamp(2.35rem, 4vw, 3.4rem);
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.sl-markdown-content:not(:has(.home-landing)) h2:not(:where(.not-content *)) {
+  font-family: var(--itm-font-display);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+.sl-markdown-content:not(:has(.home-landing)) {
+  line-height: 1.75;
+}
+.sl-markdown-content a:not(:where(.not-content *)) { text-underline-offset: 0.2em; }
+.site-title { gap: 0; }
+.site-title img { width: 13rem; height: auto; max-width: 100%; }
+:root:not([data-theme='light']) .site-title img { content: url('/brand/logo-horizontal-dark.svg'); }
+/* Location is a rule and a weight change, rather than a promotional pill. */
+#starlight__sidebar a[aria-current='page'] {
+  background: var(--itm-ui-surface);
+  color: var(--sl-color-text-accent);
+  border-radius: 0;
+  box-shadow: inset 1px 0 var(--sl-color-text-accent);
+}
+#starlight__sidebar .group-label { font-weight: 600; }
+/* Notes are marginal explanations. Cautions retain their semantic warning color. */
+.starlight-aside:is(.starlight-aside--note, .starlight-aside--tip) {
+  --sl-color-asides-text-accent: var(--sl-color-white);
+  background: var(--itm-ui-surface);
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 4px;
+  padding: 1rem 1.1rem;
+}
+.starlight-aside:is(.starlight-aside--note, .starlight-aside--tip) .starlight-aside__icon { display: none; }
+.starlight-aside:is(.starlight-aside--note, .starlight-aside--tip) a { color: var(--sl-color-text-accent); }
+.starlight-aside__title { font-size: 1rem; }
+/* Keep text inside the instrument compact and controls visibly pressable. */
+.widget { background: var(--itm-ui-surface); }
+.widget .wt { font-weight: 600; }
+.widget :is(.chipbtn, .btn) { border-radius: var(--itm-radius-sm); }
+.widget .btn.primary { background: var(--sl-color-text-accent); border-color: var(--sl-color-text-accent); color: var(--sl-color-text-invert); }
+.mx-pred { background: var(--surface); border-color: var(--line); }
+@media (max-width: 44rem) {
+  .site-title img { content: url('/brand/logo-stacked-light.svg'); width: 8.5rem; height: auto; }
+  :root:not([data-theme='light']) .site-title img { content: url('/brand/logo-stacked-dark.svg'); }
+  .starlight-aside:is(.starlight-aside--note, .starlight-aside--tip) { padding: 0.9rem; }
+}

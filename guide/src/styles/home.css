@@ -1,20 +1,20 @@
 /* The public entry point reads as a field guide; color inside the figure encodes data. */
 :root {
-  --home-page: #f6f5f0;
-  --home-paper: #fcfbf8;
-  --home-ink: #222724;
-  --home-muted: #575f59;
-  --home-line: #d4d8cf;
-  --home-link: #3f4c9c;
-  --home-display: 'Source Serif 4', Georgia, serif;
+  --home-page: var(--itm-paper);
+  --home-paper: var(--itm-paper-raised);
+  --home-ink: var(--itm-ink);
+  --home-muted: var(--itm-muted);
+  --home-line: var(--itm-rule);
+  --home-link: var(--itm-link);
+  --home-display: var(--itm-font-display);
 }
 :root:not([data-theme='light']) {
-  --home-page: #10151b;
-  --home-paper: #141a21;
-  --home-ink: #eeeef0;
-  --home-muted: #afb7c0;
-  --home-line: #35404a;
-  --home-link: #b5bef5;
+  --home-page: var(--itm-night);
+  --home-paper: var(--itm-night-raised);
+  --home-ink: var(--itm-night-ink);
+  --home-muted: var(--itm-night-muted);
+  --home-line: var(--itm-night-rule);
+  --home-link: var(--itm-night-link);
 }
 .sl-markdown-content:has(> .home-landing) { max-width: none; }
 .content-panel:has(.home-landing) { padding-block: 0; }
