@@ -48,12 +48,15 @@ Both suffix changes preserve the selected earlier distribution within **${result
 
 Download the [Jupyter notebook](/code/gpt2-causality.ipynb), [standalone Python script](/code/replicate_gpt2_causality.py), [pinned requirements](/code/replication-requirements.txt), and [execution record](/trace/gpt2-causal-check.json). The notebook includes the full experiment and follow-up questions. Its output cells are intentionally empty so you can generate your own results; the separate execution record contains the run reported here.
 
-In a Python virtual environment, install the requirements, then run:
+We recommend [Astral’s Python tooling](/python-tools/). With [uv installed](https://docs.astral.sh/uv/getting-started/installation/), download the script and requirements into one folder and run:
 
 \`\`\`text
-python -m pip install -r replication-requirements.txt
-python replicate_gpt2_causality.py --output my-gpt2-check.json
+uv venv --python 3.12
+uv pip install -r replication-requirements.txt
+uv run --no-project python replicate_gpt2_causality.py --output my-gpt2-check.json
 \`\`\`
+
+No environment activation is needed. Existing pip-based environments also work with the same requirements.
 
 The first run downloads roughly 0.5 GB of weights. Allow several GB of available RAM. No account, GPU or remote inference is required. The website displays saved measurements; loading this page does not download or run GPT-2.
 
@@ -72,6 +75,6 @@ The [GPT-2 model card](https://huggingface.co/openai-community/gpt2) describes t
 
 This is an executed replication of a causal-mask property, not a new interpretability discovery or an independent explanation of GPT-2's decisions. Two examples do not validate all inputs, architectures or numerical environments. Floating-point differences can depend on implementation and hardware; compare with the stated tolerance and retain positive controls.
 
-Try a new token-controlled example before inspecting its result. Record the prediction, observation and limitations in your [evidence notebook](/notebook/?case=future). See [methods and review status](/methods/) for how this result is checked and corrected.
+Try a new token-controlled example before inspecting its result. Record the prediction, observation and limitations in your [notes](/notebook/?case=future). See [methods and review status](/methods/) for how this result is checked and corrected.
 `);
 console.log('Generated teaching evidence, executed GPT-2 report, requirements and runnable notebook.');

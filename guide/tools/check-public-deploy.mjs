@@ -33,6 +33,8 @@ function read(relative) {
   return fs.readFileSync(file, 'utf8');
 }
 
+const headers = read('_headers');
+if(!/\/code\/\*[\s\S]*Content-Disposition: attachment/.test(headers))failures.push('code files must download as attachments');
 const home = read('index.html');
 const notFound = read('404.html');
 const robots = read('robots.txt');

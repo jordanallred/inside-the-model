@@ -65,6 +65,12 @@ Math is LaTeX: `$...$` inline, `$$...$$` for display. The interactive widgets li
 
 After editing, run `npm run build` and refresh the local preview.
 
+## Python development
+
+We recommend [Astral’s tooling](https://docs.astral.sh/): uv for Python and isolated environments, Ruff for linting/formatting, and ty for type checking. The website’s [Python setup guide](https://insidethemodel.app/python-tools/) has standalone and project workflows; browser investigations require no Python setup.
+
+For numerical verification from `guide/`, create an environment with `uv venv --python 3.12`, install NumPy with `uv pip install numpy`, then run `uv run --no-project npm run verify`. This makes the environment’s Python available to the existing verification command.
+
 ## Checks
 
 Inside `guide/`:

@@ -2,7 +2,7 @@
    concrete experiment. Widget math stays in its own module. */
 (function () {
   const R = {
-    notebook:{bare:true,type:'Evidence notebook',mission:'Record an intervention, observation and bounded conclusion.',observation:'Notes stay local and can be exported deliberately.'},
+    notebook:{bare:true,type:'Notes',mission:'Record an intervention, observation and bounded conclusion.',observation:'Notes stay local and can be exported deliberately.'},
     casecontrols:{bare:true,type:'Investigation',mission:'Choose a comparison that separates competing explanations.',observation:'Changing two candidate causes at once can confound the result.'},
     casesufficiency:{bare:true,type:'Investigation',mission:'Compare removing a candidate with retaining it among attention heads.',observation:'Sufficiency must be stated relative to a context and intervention.'},
     caseconfidence:{bare:true,type:'Investigation',mission:'Change temperature without updating any weights.',observation:'Confidence, ranking, sampling and learning are distinct.'},

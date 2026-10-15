@@ -1,10 +1,13 @@
 ---
-title: Your evidence notebook
-description: Record your predictions, interventions, measurements and conclusions. Keep a portable copy of your investigations without an account.
+title: Notes
+tableOfContents: false
+prev: false
+next: false
+description: A private scratchpad for results, questions and ideas worth coming back to. Save locally or export a copy.
 ---
 
-A useful explanation has a trail of evidence. Record the question, the controlled change, the measurement, and the limits of your conclusion. Notes stay on this device; export them when you want a backup or choose to share a beta-session record.
+Keep anything you want to come back to: a surprising result, a question, a useful explanation. Notes are optional and private to this browser.
 
-<div class="widget not-content" data-w="notebook" data-title="Evidence notebook"></div>
+<div class="widget not-content" data-w="notebook"></div>
 
-<noscript>The notebook needs JavaScript. You can also record the six fields in a text file: question, prediction, intervention, observation, conclusion, limitations.</noscript>
+<noscript>Notes need JavaScript to save in your browser. You can still keep your own notes in any text editor.</noscript>

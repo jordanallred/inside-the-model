@@ -33,7 +33,7 @@ head:
 <section class="home-section home-routes" aria-labelledby="home-routes-title">
   <div class="home-section-heading">
     <h2 id="home-routes-title">Six questions.<br>Learn to investigate.</h2>
-    <p>Start with the place detector. Build through learning and information flow, then design controls and challenge causal claims. Each guided case includes one of three rotating transfer examples.</p>
+    <p>Start with the place detector. Build through learning and information flow, then design controls and challenge causal claims. Make a prediction, inspect what changes, and follow the questions that interest you.</p>
   </div>
   <nav class="home-route-list" aria-label="Investigations in learning order">
     <a class="home-route home-case" href="/cases/place-or-animal/"><span class="home-case-number">01</span><span><b>The place detector</b><span class="home-case-question">Which part knows a place comes next?</span><small>Find a component by removing it · about 10 min</small><span class="home-case-status" data-case-status="place">Start investigation</span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
@@ -57,7 +57,7 @@ head:
 <section class="home-section home-inspection" aria-labelledby="home-inspection-title">
   <div class="home-inspection-intro">
     <h2 id="home-inspection-title">Small by design.<br>Open to inspection.</h2>
-    <p>Our 4,496-parameter transformer makes its calculations visible. Every case uses the same model, weights, and engine as the Model Explorer.</p>
+    <p>Our 4,496-parameter transformer makes its calculations visible. The six guided investigations use the same model, weights, and engine as the Model Explorer.</p>
     <p class="home-verification">The browser engine is checked against an independent NumPy implementation to within 1e-9. Hand-written backpropagation is checked against finite differences.</p>
     <p class="home-why-small">This model learns a tiny synthetic grammar. It does not have the capabilities of a production LLM. Each investigation explains what its evidence supports; architecture comparisons show where larger models differ.</p>
   </div>
@@ -76,7 +76,8 @@ head:
     <a href="/teardown/"><b>Model teardowns</b><span>Published architectures, layer by layer</span></a>
     <a href="/reference/papers/"><b>Papers &amp; sources</b><span>151 linked references</span></a>
     <a href="/reference/security-guidance/"><b>Security guidance</b><span>Public guidance from security agencies</span></a>
-    <a href="/notebook/"><b>Evidence notebook</b><span>Write up, save and export your findings</span></a>
+    <a href="/notebook/"><b>Notes</b><span>A private scratchpad for anything worth keeping</span></a>
+    <a href="/python-tools/"><b>Python tools</b><span>Develop with uv, Ruff and ty from Astral</span></a>
     <a href="/teach/"><b>Teach a workshop</b><span>Session plan, discussion rubric and instructor notes</span></a>
     <a href="/methods/"><b>Methods &amp; evidence</b><span>Verification, provenance and review status</span></a>
     <a href="/replications/gpt2-causality/"><b>Reproduce a GPT-2 experiment</b><span>Pinned weights, measured controls and a runnable notebook</span></a>

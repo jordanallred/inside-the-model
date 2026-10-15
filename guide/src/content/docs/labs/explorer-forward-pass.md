@@ -11,7 +11,7 @@ Lab 10 of 10 · about 40 minutes · runs on a laptop. **Related chapters:** [6. 
 
 The [Model Explorer](/explorer/) shows a forward pass step by step. Here you write that forward pass yourself, from nothing but the published weights, and check it against the Explorer's own recorded numbers. If your code matches to rounding error, you have reproduced every operation the Explorer displays.
 
-Download two files into one folder: the trained [weights](/trace/weights.json) and the [golden fixture](/trace/golden.json) (the Explorer's canonical traces: token IDs, final logits and every attention weight). You need only NumPy.
+Download two files into one folder: the trained [weights](/trace/weights.json) and the [golden fixture](/trace/golden.json) (the Explorer's canonical traces: token IDs, final logits and every attention weight). You need only NumPy. We recommend [uv, Ruff and ty from Astral](/python-tools/) for Python development; the setup guide includes a runnable NumPy reference and isolated environment commands.
 
 ~~~python
 import json, math

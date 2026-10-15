@@ -9,7 +9,7 @@ Your task is to choose an experiment that separates them. A dramatic change in a
 
 **About 12 minutes.** Useful after [The place detector](/cases/place-or-animal/), or as a standalone lesson in experimental design.
 
-<div class="widget not-content" data-w="casecontrols" data-title="Design a discriminating control"></div>
+<div class="widget not-content" data-w="casecontrols" data-title="Design a discriminating control"><p data-widget-fallback>The interactive experiment uses JavaScript. If it does not appear, enable JavaScript or reload. You can also <a href="/guide/attention/">read how attention works</a>.</p></div>
 
 ## Evidence has a scope
 

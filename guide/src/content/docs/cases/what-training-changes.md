@@ -9,7 +9,7 @@ In this investigation you will compare two sets of weights in the same two-layer
 
 **About 8 minutes.** No installation, GPU, or prior maths required. Loss is explained beside the measurement.
 
-<div class="widget not-content" data-w="casetraining" data-title="Investigate what training changes"></div>
+<div class="widget not-content" data-w="casetraining" data-title="Investigate what training changes"><p data-widget-fallback>The interactive experiment uses JavaScript. If it does not appear, enable JavaScript or reload. You can also <a href="/guide/attention/">read how attention works</a>.</p></div>
 
 ## What this experiment can tell you
 

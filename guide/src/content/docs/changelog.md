@@ -7,6 +7,14 @@ New chapters, teardowns, tools and corrections, newest first. Follow along with 
 
 Found a mistake? Every page ends with a link to report it, and corrections are listed here.
 
+## 2026-10-15: Explore freely, keep simple notes, and develop with Astral
+
+Investigations now offer a direct route into the experiment without recording a prediction. Feedback focuses on measured results rather than scores. [Notes](/notebook/) is an optional, autosaved scratchpad; older structured notes and JSON backups still open. Backup and restore controls stay out of the writing area.
+
+Fixed a stale-tab bug that could erase completed progress and exposure history. Invalid prompts now stay editable and clearly identify the last valid result. Glossary definitions have native keyboard-operable buttons, and long reference navigation stays collapsed until needed.
+
+The new [Python tools guide](/python-tools/) recommends Astral’s uv, Ruff and ty, with isolated NumPy setup and project commands. The [GPT-2 replication](/replications/gpt2-causality/) now gives uv setup commands. Code files download as attachments.
+
 ## 2026-10-14: Design experiments, keep evidence, and reproduce GPT-2
 
 Three new guided cases teach [experimental controls](/cases/choose-the-control/), [conditional sufficiency](/cases/necessary-and-sufficient/), and [temperature without learning](/cases/confidence-without-learning/). The first case now requires choosing a discriminating experiment. Three verified transfer variants rotate before reuse; repeated examples are marked as practice.

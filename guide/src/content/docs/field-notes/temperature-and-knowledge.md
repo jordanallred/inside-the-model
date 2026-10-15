@@ -17,4 +17,4 @@ A higher probability assigned to a token is not evidence that the token is factu
 
 [What training changes](/cases/what-training-changes/) compares two actual weight sets under the same architecture and target. That can change logits and their ordering. Even then, a lower loss for one specified target does not establish better performance across every task.
 
-Try both cases and write down what changed in each: weights, logits, normalized probabilities, or sampled output. Use [softmax and loss](/guide/softmax-and-loss/) for the calculation and your [evidence notebook](/notebook/?case=confidence) to record a conclusion that distinguishes confidence from correctness.
+Try both cases and write down what changed in each: weights, logits, normalized probabilities, or sampled output. Use [softmax and loss](/guide/softmax-and-loss/) for the calculation and your [notes](/notebook/?case=confidence) to record a conclusion that distinguishes confidence from correctness.

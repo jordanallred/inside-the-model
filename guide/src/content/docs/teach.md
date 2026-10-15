@@ -53,6 +53,6 @@ Use this formative rubric to guide discussion. It has not been validated as a me
 
 ## Materials and practical preparation
 
-Open the cases before the session and check the live controls on the devices learners will use. Provide the [methods and limitations](/methods/), [evidence notebook](/notebook/), and [downloadable GPT-2 notebook](/code/gpt2-causality.ipynb) for follow-up. The GPT-2 notebook needs a Python environment, network access for its first model download and substantially more memory than the browser model; it is not required for the workshop.
+Open the cases before the session and check the live controls on the devices learners will use. Provide the [methods and limitations](/methods/), [notes](/notebook/), and [downloadable GPT-2 notebook](/code/gpt2-causality.ipynb) for follow-up. The GPT-2 notebook needs a Python environment, network access for its first model download and substantially more memory than the browser model; it is not required for the workshop.
 
 Learners can download Markdown notes or JSON backups. Sharing is optional and manual. Ask them to review free-text notes before sending them to you. A print or PDF of this page can serve as the instructor handout; the experiment links remain the working materials.

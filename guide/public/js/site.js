@@ -23,17 +23,20 @@
         if (n.parentElement.closest(SKIP)) continue;
         const m = re.exec(n.nodeValue); if (!m) continue;
         const after = n.splitText(m.index); after.splitText(m[0].length);
-        const sp = document.createElement('span');
-        sp.className = 'term'; sp.tabIndex = 0; sp.dataset.t = k; sp.textContent = after.nodeValue; after.replaceWith(sp);
+        const sp = document.createElement('button');
+        sp.type='button';sp.setAttribute('aria-expanded','false');sp.setAttribute('aria-label','Define '+after.nodeValue);
+        sp.className = 'term'; sp.dataset.t = k; sp.textContent = after.nodeValue; after.replaceWith(sp);
         break;
       }
     });
   }
 
-  let pop;
+  let pop, activeTerm;
+  function hidePop(){if(pop)pop.hidden=true;if(activeTerm){activeTerm.setAttribute('aria-expanded','false');activeTerm.removeAttribute('aria-describedby');}activeTerm=null;}
   function showPop(el) {
     const g = (window.GL || {})[el.dataset.t]; if (!g) return;
-    if (!pop) { pop = document.createElement('div'); pop.id = 'pop'; document.body.appendChild(pop); }
+    if (!pop) { pop = document.createElement('div'); pop.id = 'pop'; pop.setAttribute('role','tooltip'); document.body.appendChild(pop); }
+    hidePop();activeTerm=el;el.setAttribute('aria-expanded','true');el.setAttribute('aria-describedby','pop');
     pop.hidden = false; pop.innerHTML = '<b>' + esc(el.dataset.t) + '</b>' + esc(g.d);
     const r = el.getBoundingClientRect(), w = pop.offsetWidth;
     pop.style.left = Math.max(8, Math.min(window.scrollX + r.left, window.scrollX + document.documentElement.clientWidth - w - 8)) + 'px';
@@ -41,12 +44,11 @@
   }
   document.addEventListener('click', e => {
     const t = e.target.closest('.term');
-    if (t) { if (pop && !pop.hidden && pop.dataset.for === t.dataset.t) pop.hidden = true; else showPop(t); return; }
-    if (pop && !e.target.closest('#pop')) pop.hidden = true;
+    if (t) { if (pop && !pop.hidden && activeTerm === t) hidePop(); else showPop(t); return; }
+    if (pop && !e.target.closest('#pop')) hidePop();
   });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && pop) pop.hidden = true;
-    if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('term') && e.target.tagName === 'SPAN') { e.preventDefault(); showPop(e.target); }
+    if (e.key === 'Escape' && pop) hidePop();
   });
 
   /* earlier versions kept self-reported chapter progress here; drop it */
@@ -61,7 +63,7 @@
         if (!f) { w.insertAdjacentHTML('beforeend', '<p class="src">Missing widget: ' + esc(w.dataset.w) + '</p>'); return; }
         if (w.dataset.title) w.insertAdjacentHTML('afterbegin', '<div class="wt">' + esc(w.dataset.title) + '</div>');
         const box = document.createElement('div'); w.appendChild(box);
-        try { f(box); window.ITMInteractions?.decorate(w, w.dataset.w); } catch (e) { box.innerHTML = '<p class="src">Widget error: ' + esc(e.message) + '</p>'; console.error(e); }
+        try { f(box); w.querySelector('[data-widget-fallback]')?.remove(); window.ITMInteractions?.decorate(w, w.dataset.w); } catch (e) { box.innerHTML = '<p class="src">Widget error: ' + esc(e.message) + '</p>'; console.error(e); }
       });
       if (/^\/(guide\/[^/]+|labs\/[^/]+)\/?$/.test(location.pathname)) wrapTerms(root);
     }

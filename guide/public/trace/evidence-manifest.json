@@ -63,7 +63,7 @@
   "source_hashes": {
     "public/js/itm-model.js": "767bc7b4f83c3d9aa04c9b43ae2cc04b65ad2de5cfbaf12f9f2d48830578418c",
     "public/js/itm-weights.js": "c38919050b6507e4a65c6ec0d271ec97d7e4868db32aed8e8612e32536f5f56e",
-    "public/js/case-engine.js": "92cc76f5a4d499f9d0a448fe8c32e2d0972d51880dcf86d4abf41ad60cbcc156",
+    "public/js/case-engine.js": "ef0db03e87c76a711a153763b33e8c54f6c0f0e414e2683139b3fd0234f42fa4",
     "public/code/itm_model.py": "2076c7c73b59e8ffa61d1030934c8c4ad8427c954c686296e921acddb52eed97",
     "public/trace/weights.json": "00ec8b56c700ee720b94b3884d6ee8aae9da314ebb93ff28aa6f2498ec9521f6",
     "public/code/replicate_gpt2_causality.py": "ef93f35bacaa1f3bbf1e9fd8d4523c86742e5f9cabf39cb6d47a0c5419485298"

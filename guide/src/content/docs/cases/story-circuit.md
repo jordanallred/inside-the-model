@@ -11,7 +11,7 @@ The next word has to be <code>tom</code>. Ann is giving the ball, so it goes to 
 
 Answering needs more than recognizing names. The model has to keep track of who is in the story, notice who is giving, and pick the other one. Your job is to find the parts of the model that make that choice, and work out how they make it.
 
-<div class="widget not-content" data-w="casestory" data-title="Further investigation: Who gets the ball?"></div>
+<div class="widget not-content" data-w="casestory" data-title="Further investigation: Who gets the ball?"><p data-widget-fallback>The interactive experiment uses JavaScript. If it does not appear, enable JavaScript or reload. You can also <a href="/guide/attention/">read how attention works</a>.</p></div>
 
 ## New tools in this case
 

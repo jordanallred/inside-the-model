@@ -59,6 +59,7 @@
     return {original,adjusted,originalTop:top(original),adjustedTop:top(adjusted),temperature,checksum:ITM.weights().sum};
   }
   const predictionOptions = { place:['changes','same'],training:['trained','random','same'],future:['changes','same'],controls:['verb','preposition','uncertain'],sufficiency:['retains','loses'],confidence:['changes','same'] };
+  Object.values(predictionOptions).forEach(options=>{if(!options.includes('uncertain'))options.push('uncertain');});
   const explanationOptions = {place:['verb','preposition','the'],training:['weights','architecture','sampling'],future:['mask','ignored','training'],controls:['isolated','any-change','proved'],sufficiency:['conditional','entire','universal'],confidence:['temperature','learning','architecture']};
   const plans=['diagnostic','confounded','repeat'];
   function transferSpec(id, variant=0) {

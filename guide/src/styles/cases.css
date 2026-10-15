@@ -3,7 +3,7 @@
 .iv p { max-width: 70ch; line-height: 1.7; }
 .iv-progress ol { display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; padding: 0; list-style: none; font-size: .8rem; color: var(--muted); }
 .iv-progress li[aria-current] { color: var(--fg); font-weight: 600; text-decoration: underline; text-underline-offset: .4rem; }
-.iv-done { color: var(--ok); }
+.iv-done { color: var(--muted); }
 .iv-save, .iv-note { color: var(--muted); font-size: .84rem; }
 .iv-stage { padding-block: 1.5rem; border-top: 1px solid var(--line); }
 .iv-stage h3, .iv-conclusion h3 { font-family: var(--itm-font-display); font-size: clamp(1.4rem, 3vw, 1.8rem); font-weight: 500; margin: 0 0 1rem; }
@@ -74,3 +74,9 @@
 .nb-include { display: flex; gap: .5rem; align-items: baseline; margin-block: 1rem; font-size: .85rem; }
 .nb input[type=file] { display: block; max-width: 100%; padding-block: .6rem; font: inherit; font-size: .85rem; }
 .nb textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.iv-explore { margin-left: .8rem; padding: .55rem .7rem; border: 0; background: transparent; color: var(--accent); font: inherit; text-decoration: underline; text-underline-offset: .2em; }
+@media (max-width: 30rem) { .iv-explore { display: block; margin: .5rem 0 0; text-align: left; } }
+
+.widget:has(.nb) { border: 0; background: transparent; padding: 0; }
+.nb textarea { min-height: 16rem; }

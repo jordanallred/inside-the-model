@@ -9,7 +9,7 @@ Test both directions on **the cat sat on the**. Remove the candidate head, then 
 
 **About 12 minutes.** This investigation follows [The place detector](/cases/place-or-animal/) and makes the limits of a causal claim explicit.
 
-<div class="widget not-content" data-w="casesufficiency" data-title="Test necessity and conditional sufficiency"></div>
+<div class="widget not-content" data-w="casesufficiency" data-title="Test necessity and conditional sufficiency"><p data-widget-fallback>The interactive experiment uses JavaScript. If it does not appear, enable JavaScript or reload. You can also <a href="/guide/attention/">read how attention works</a>.</p></div>
 
 ## State the intervention, context and threshold
 

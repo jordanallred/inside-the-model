@@ -9,7 +9,7 @@ You will keep the input, model weights and logits fixed. The only change is the 
 
 **About 10 minutes.** Connects model internals to a setting developers use in generation APIs.
 
-<div class="widget not-content" data-w="caseconfidence" data-title="Change confidence without training"></div>
+<div class="widget not-content" data-w="caseconfidence" data-title="Change confidence without training"><p data-widget-fallback>The interactive experiment uses JavaScript. If it does not appear, enable JavaScript or reload. You can also <a href="/guide/attention/">read how attention works</a>.</p></div>
 
 ## Probabilities, ranking and samples are different observations
 

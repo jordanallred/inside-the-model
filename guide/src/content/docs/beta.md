@@ -9,7 +9,7 @@ The question for beta testing is simple: can a developer use the investigations 
 
 Start with [The place detector](/cases/place-or-animal/). Say what you think is happening as you work. There is no need to get the first prediction right. If you get stuck, explain what you expected the interface or model to do.
 
-After the case, open your [evidence notebook](/notebook/?case=place) and record an explanation, a new test you would run, and a limitation. Your notes, case progress and a bounded learning-activity record stay in this browser. No session recording or analytics is sent to the site.
+After the case, open your [notes](/notebook/?case=place) if you want to keep a result or a question for later. Your notes, case progress and a bounded learning-activity record stay in this browser. No session recording or analytics is sent to the site.
 
 If your session organizer asks for a record, you can download a JSON backup and choose whether it includes the local activity timeline. Review the notes before sharing: free text can identify you. You can keep your notes private and give verbal feedback instead.
 

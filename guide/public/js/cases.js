@@ -9,7 +9,7 @@
     const p = C.loadProgress(storage());
     document.querySelectorAll('[data-case-status]').forEach(el => {
       const s = p.cases[el.dataset.caseStatus];
-      el.textContent = s?.completed ? 'Completed' : s?.prediction ? 'In progress' : 'Start investigation';
+      el.textContent = s?.completed ? 'Explored' : s?.prediction ? 'In progress' : 'Start investigation';
     });
     const next = catalog.find(c => !p.cases[c.id].completed);
     document.querySelectorAll('[data-case-start]').forEach(el => {
@@ -62,6 +62,7 @@
     const openedAt=performance.now(),N=window.ITMNotebook;
     N?.record(storage(),id,'case-open');
     customPrompt = progress.cases[id].prompt || customPrompt;
+    let promptDraft=customPrompt,promptError=false;
     try { sessionOnly = !storage(); } catch (_) { sessionOnly = true; }
     const baseline = id === 'place' ? C.runPlace(meta.prompt) : null;
     const choices = (name, entries, selected) => entries.map(([value, label]) => '<label class="iv-option"><input type="radio" name="' + name + '" value="' + value + '"' + (value === selected ? ' checked' : '') + '> <span>' + esc(label) + '</span></label>').join('');
@@ -108,7 +109,7 @@
     function inspection() {
       if (id !== 'place') return '';
       const r = C.runPlace(customPrompt), tk = ITM.tokenize(customPrompt), att = r.tr.layers[0].heads[1].weights.at(-1);
-      return '<div class="iv-input-study"><h4>Test the input signal</h4><p>All four heads are restored for these input comparisons. The attention row below is layer 0, head 1, read from the final word.</p><div class="iv-tests" role="group" aria-label="Controlled input comparisons">' + ['the cat saw on the', 'the cat sat the', 'the cat slept on the'].map(t => '<button type="button" data-prompt="' + t + '" aria-pressed="' + (t === customPrompt) + '">' + t + '</button>').join('') + '</div><form data-form="prompt"><label for="iv-prompt">Try a supported prompt</label><div class="iv-input-row"><input id="iv-prompt" name="prompt" maxlength="250" value="' + esc(customPrompt) + '" autocomplete="off" spellcheck="false"><button type="submit" class="btn">Run prompt</button></div></form><p role="status">' + esc(customResult) + '</p>' + placeResult(r) + '<div class="iv-attention" role="list" aria-label="Measured attention by token">' + tk.ids.map((token, i) => '<span role="listitem"><code>' + esc(ITM.CFG.vocab[token]) + '</code><b>' + att[i].toFixed(3) + '</b></span>').join('') + '</div><details><summary>Words this model knows</summary><p>' + esc(ITM.CFG.vocab.slice(1).join(', ')) + '</p></details></div>';
+      return '<div class="iv-input-study"><h4>Test the input signal</h4><p>All four heads are restored for these input comparisons. The attention row below is layer 0, head 1, read from the final word.</p><div class="iv-tests" role="group" aria-label="Controlled input comparisons">' + ['the cat saw on the', 'the cat sat the', 'the cat slept on the'].map(t => '<button type="button" data-prompt="' + t + '" aria-pressed="' + (t === customPrompt) + '">' + t + '</button>').join('') + '</div><form data-form="prompt"><label for="iv-prompt">Try a supported prompt</label><div class="iv-input-row"><input id="iv-prompt" name="prompt" maxlength="250" value="' + esc(promptDraft) + '" aria-describedby="iv-prompt-status" aria-invalid="'+promptError+'" autocomplete="off" spellcheck="false"><button type="submit" class="btn">Run prompt</button></div></form><p id="iv-prompt-status" role="status">' + esc(customResult) + '</p><p>Results for <code>'+esc(customPrompt)+'</code>, all heads on.</p>' + placeResult(r) + '<div class="iv-attention" role="list" aria-label="Measured attention by token">' + tk.ids.map((token, i) => '<span role="listitem"><code>' + esc(ITM.CFG.vocab[token]) + '</code><b>' + att[i].toFixed(3) + '</b></span>').join('') + '</div><details><summary>Words this model knows</summary><p>' + esc(ITM.CFG.vocab.slice(1).join(', ')) + '</p></details></div>';
     }
     function transferResult() {
       const t=C.transferSpec(id,progress.cases[id].variant);
@@ -124,16 +125,16 @@
       const transfer=C.transferSpec(id,s.variant),canExplain=id!=='place'||s.design==='diagnostic';
       const stage = s.completed ? 4 : correctExplanation ? 3 : hasEvidence ? 2 : s.prediction ? 1 : 0;
       const next = catalog[catalog.findIndex(c => c.id === id) + 1];
-      el.innerHTML = '<div class="iv"><nav class="iv-progress" aria-label="Investigation progress"><ol>' + ['Predict', 'Experiment', 'Explain', 'Test your understanding'].map((t, i) => '<li' + (i === Math.min(stage, 3) ? ' aria-current="step"' : '') + '>' + (i + 1) + '. ' + t + (i < stage ? '<span class="iv-done"> · done</span>' : '') + '</li>').join('') + '</ol></nav>' +
+      el.innerHTML = '<div class="iv"><nav class="iv-progress" aria-label="Investigation progress"><ol>' + ['Predict', 'Experiment', 'Explain', 'Explore further'].map((t, i) => '<li' + (i === Math.min(stage, 3) ? ' aria-current="step"' : '') + '>' + (i + 1) + '. ' + t + (i < stage ? '<span class="iv-done"> · done</span>' : '') + '</li>').join('') + '</ol></nav>' +
         (s.legacy ? '<p class="iv-note">Welcome back. Your earlier work is recognized; this version adds a fresh-example check.</p>' : '') +
         '<p class="iv-save">' + (sessionOnly ? 'Browser storage is unavailable. Progress lasts until you leave this page.' : 'Progress saves in this browser. No account needed.') + '</p>' +
-        '<section class="iv-stage" aria-labelledby="iv-predict"><h3 id="iv-predict" tabindex="-1">1. Make a prediction</h3>' + (s.prediction ? '<p>Your prediction: <b>' + esc(def.choices.find(c => c[0] === s.prediction)[1]) + '</b>. A prediction is a starting point; the experiment tests it.</p>' : form('prediction', def.prediction, def.choices, '', 'Record my prediction')) + '</section>' +
-        (s.prediction ? '<section class="iv-stage" aria-labelledby="iv-experiment"><h3 id="iv-experiment" tabindex="-1">2. Collect evidence</h3><p>' + def.mission + '</p>' + evidencePanel(s) + '</section>' : '<p class="iv-locked">Record a prediction to open the experiment. It does not need to be right.</p>') +
+        '<section class="iv-stage" aria-labelledby="iv-predict"><h3 id="iv-predict" tabindex="-1">1. Make a prediction</h3>' + (s.prediction ? '<p>Starting point: <b>' + esc((s.prediction==='uncertain'?'Explore first; no prediction recorded':def.choices.find(c => c[0] === s.prediction)[1])) + '</b>. Compare it with the measured result.</p>' : form('prediction', def.prediction, def.choices, '', 'Record my prediction')+'<button type="button" class="iv-explore" data-action="explore">Go straight to the experiment</button>') + '</section>' +
+        (s.prediction ? '<section class="iv-stage" aria-labelledby="iv-experiment"><h3 id="iv-experiment" tabindex="-1">2. Collect evidence</h3><p>' + def.mission + '</p>' + evidencePanel(s) + '</section>' : '<p class="iv-locked">A prediction gives you something to compare with the result. You can also explore first.</p>') +
         (hasEvidence ? '<section class="iv-stage" aria-labelledby="iv-explain"><h3 id="iv-explain" tabindex="-1">3. Explain the result</h3>'+(id==='place'?designPanel(s):'')+(canExplain?inspection()+(correctExplanation?'<p><b>Explanation supported.</b> '+esc(def.explanations.find(c=>c[0]===s.explanation)[1])+'.</p>':form('explanation',def.explanation,def.explanations,s.explanation,'Check against the evidence')+(s.explanation?'<p class="iv-feedback" role="status">'+def.wrong+'</p>':'')):'')+'<p class="iv-note">'+def.limit+'</p></section>':'') +
-        (correctExplanation ? '<section class="iv-stage" aria-labelledby="iv-transfer"><h3 id="iv-transfer" tabindex="-1">4. Test your understanding</h3>' + (s.priorExposure ? '<p class="iv-note">You have seen this example’s result before. This is a practice check, rather than a new blind assessment.</p>' : '') + (s.completed ? '<p><b>Prediction checked.</b> ' + (s.priorExposure ? 'Your practice prediction matched the measurement.' : s.attempts > 1 ? 'You revised your answer after seeing the evidence.' : 'Your first prediction matched the fresh-example measurement.') + '</p>' : form('transfer', transfer.question, transfer.choices, s.transfer, s.transfer ? 'Check my revised prediction' : 'Commit prediction and run test')) + (s.transfer ? transferResult() + (!s.completed ? '<p class="iv-feedback" role="status">The measurement does not support that prediction. Compare the values, revise your answer, and explain the difference to yourself.</p>' : '') : '<p class="iv-note">The measurement stays hidden until you commit a prediction.</p>') + '</section>' : '') +
-        (s.completed ? '<section class="iv-conclusion" aria-labelledby="iv-closed"><h3 id="iv-closed" tabindex="-1">Investigation complete</h3><p>' + def.conclusion + '</p><div class="iv-next">' + (next ? '<a class="btn" href="/cases/' + next.slug + '/">Next: ' + next.title + '</a>' : '<a class="btn" href="/explorer/">Continue in the Model Explorer</a>') + '<a href="/cases/">All investigations</a></div></section>' : '') +
+        (correctExplanation ? '<section class="iv-stage" aria-labelledby="iv-transfer"><h3 id="iv-transfer" tabindex="-1">4. Try another input</h3>' + (s.priorExposure ? '<p class="iv-note">You have seen this example’s result before. This is a practice check, rather than a new blind assessment.</p>' : '') + (s.completed ? '<p><b>Comparison complete.</b> ' + (s.priorExposure ? 'Your prediction matches the measurement on this previously explored input.' : s.attempts > 1 ? 'The measurements helped you refine your prediction.' : 'Your prediction matches the measurement on this new input.') + '</p>' : form('transfer', transfer.question, transfer.choices, s.transfer, s.transfer ? 'Run the revised prediction' : 'Run this prediction')) + (s.transfer ? transferResult() + (!s.completed ? '<p class="iv-feedback" role="status">The result differs from your prediction. Compare the values above: what would explain the difference? You can revise the prediction and run it again.</p>' : '') : '<p class="iv-note">The measurement stays hidden until you commit a prediction.</p>') + '</section>' : '') +
+        (s.completed ? '<section class="iv-conclusion" aria-labelledby="iv-closed"><h3 id="iv-closed" tabindex="-1">What the experiment shows</h3><p>' + def.conclusion + '</p><div class="iv-next">' + (next ? '<a class="btn" href="/cases/' + next.slug + '/">Next: ' + next.title + '</a>' : '<a class="btn" href="/explorer/">Continue in the Model Explorer</a>') + '<a href="/cases/">All investigations</a><a href="/notebook/?case='+id+'">Save a note</a></div></section>' : '') +
         '<p class="iv-notice" role="status">' + esc(notice) + '</p><div class="iv-tools"><button type="button" data-action="hint"' + (s.hint >= 2 ? ' disabled' : '') + '>Show a hint' + (s.hint ? ' (' + s.hint + '/2)' : '') + '</button><button type="button" data-action="reset">Restart this investigation</button></div>' + (s.hint ? '<aside class="iv-hint" tabindex="-1"><p>' + def.hints[s.hint - 1] + '</p></aside>' : '') +
-        '<section class="iv-resources"><h3>Keep an evidence notebook</h3><p>Record what you changed, what you observed, and what your conclusion does not establish.</p><a class="btn" href="/notebook/?case='+id+'">Write up this investigation</a><h3>Follow the mechanism</h3><p>Inspect the calculation, read the explanation, or reproduce it in code.</p><ul><li><a href="' + explorerLink(id, meta.prompt) + '">Inspect this case in the Model Explorer</a></li>' + meta.resources.map(([label, href]) => '<li><a href="' + href + '">' + label + '</a></li>').join('') + '<li><a href="/methods/">Methods, verification and limitations</a></li></ul></section></div>';
+        '<section class="iv-resources"><h3>Follow the mechanism</h3><p>Inspect the calculation, read the explanation, or reproduce it in code.</p><ul><li><a href="' + explorerLink(id, meta.prompt) + '">Inspect this case in the Model Explorer</a></li>' + meta.resources.map(([label, href]) => '<li><a href="' + href + '">' + label + '</a></li>').join('') + '<li><a href="/methods/">Methods, verification and limitations</a></li></ul></section></div>';
       if (focus) {
         const target = el.querySelector(focus);
         target?.focus({ preventScroll: true });
@@ -141,7 +142,8 @@
       }
     }
     function update(action, value, focus) {
-      const pending = C.transition(progress, id, action, value), backing = storage();
+      const backing = storage(), base = backing && !sessionOnly ? C.loadProgress(backing) : progress;
+      const pending = C.transition(base, id, action, value);
       const merged = backing ? C.mergeCaseProgress(C.loadProgress(backing), pending, id) : pending;
       sessionOnly = !C.saveProgress(backing, merged);
       progress = sessionOnly ? pending : merged;
@@ -155,6 +157,7 @@
       event.preventDefault(); const action = event.target.dataset.form;
       if (action === 'prompt') {
         const text = event.target.elements.prompt.value.trim(), valid = C.validatePrompt(text);
+        promptDraft=text;promptError=!valid.ok;
         customResult = valid.ok ? 'Computed with all heads on.' : valid.message;
         if (valid.ok) { customPrompt = text; update('prompt', text, '#iv-prompt'); } else render('#iv-prompt');
         return;
@@ -170,11 +173,12 @@
       if(plan){update(id==='place'?'design':'experiment',plan.dataset.plan,'.iv-design h4');return;}
       if (head) { notice = ''; update('experiment', +head.dataset.head, '[data-head="' + head.dataset.head + '"]'); return; }
       const prompt = event.target.closest('[data-prompt]');
-      if (prompt) { customPrompt = prompt.dataset.prompt; customResult = 'Computed with all heads on.'; update('prompt', customPrompt, '[data-prompt="' + customPrompt + '"]'); return; }
+      if (prompt) { customPrompt = prompt.dataset.prompt; promptDraft=customPrompt;promptError=false; customResult = 'Computed with all heads on.'; update('prompt', customPrompt, '[data-prompt="' + customPrompt + '"]'); return; }
       const action = event.target.closest('[data-action]')?.dataset.action;
       if (!action) return;
       notice = '';
-      if (action === 'reset') { customPrompt = 'the cat saw on the'; customResult = ''; }
+      if(action==='explore'){update('prediction','uncertain','#iv-experiment');return;}
+      if (action === 'reset') { customPrompt = 'the cat saw on the'; promptDraft=customPrompt;promptError=false; customResult = ''; }
       update(action, action === 'experiment' ? true : undefined, action === 'reset' ? '#iv-predict' : action === 'hint' ? '.iv-hint' : '#iv-explain');
     });
     render();

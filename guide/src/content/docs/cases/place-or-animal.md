@@ -9,7 +9,7 @@ The model has two layers, each with two attention heads, and 4,496 trained param
 
 **About 10 minutes.** Make a prediction, run a controlled experiment, then test your explanation on a fresh example. No installation or prior maths required.
 
-<div class="widget not-content" data-w="caseplace" data-title="Case 1: The place detector"></div>
+<div class="widget not-content" data-w="caseplace" data-title="Case 1: The place detector"><p data-widget-fallback>The interactive experiment uses JavaScript. If it does not appear, enable JavaScript or reload. You can also <a href="/guide/attention/">read how attention works</a>.</p></div>
 
 ## How the tools work
 

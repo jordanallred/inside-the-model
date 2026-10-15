@@ -47,6 +47,6 @@ Published results remain tied to their source/model versions. A new model revisi
 
 ## Local data and sharing
 
-The six guided cases store progress and the evidence notebook stores notes plus the latest 200 learning-activity events in local browser storage. Events identify the case and action, time, elapsed page time, and assessment attempt/outcome; they do not copy prompts or note text into the timeline. Notes contain whatever you write in the fields. The notebook's export includes activity only when selected.
+The six guided cases store progress and the optional notes stores free-form notes plus the latest 200 learning-activity events in local browser storage. Events identify the case and action, time, elapsed page time, and assessment attempt/outcome; they do not copy prompts or note text into the timeline. Notes contain whatever you write in the fields. The notebook's export includes activity only when selected.
 
 There is no account, remote inference dependency or learning-analytics submission for these tools. Hosting providers may retain ordinary request logs; the website does not control their policies. External links and the optional model-download notebook contact their respective providers. Clearing browser data removes local records. Use notebook backups for portability, and review free text before sharing it manually.

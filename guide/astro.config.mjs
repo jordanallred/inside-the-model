@@ -14,7 +14,7 @@ const stamp = f => createHash('sha256').update(fs.readFileSync(new URL(`./public
 
 const num = Object.fromEntries(CH.map((c, i) => [c[0], i + 1]));
 const guideGroups = Object.keys(PARTS).map(part => ({
-  label: part,
+  label: part, collapsed: true,
   items: CH.filter(c => c[2] === part).map(c => ({ slug: `guide/${c[1]}`, label: `${num[c[0]]}. ${c[3]}` })),
 }));
 
@@ -78,7 +78,7 @@ export default defineConfig({
         { label: 'Start here', items: [{ slug: 'index', label: 'Overview' }, { slug: 'changelog', label: "What's new" }] },
         {label:'Investigations',items:[{slug:'cases',label:'Choose an investigation'},...globalThis.ITMCaseCatalog.map((c,i)=>({slug:'cases/'+c.slug,label:(i+1)+'. '+c.title})),{slug:'cases/story-circuit',label:'Further: Who gets the ball?'}]},
         { label: 'Model workbench', items: [{ slug: 'explorer', label: 'Model Explorer' }] },
-        {label:'Practice, reproduce & teach',items:[{slug:'notebook',label:'Your evidence notebook'},{slug:'replications/gpt2-causality',label:'Replicate a GPT-2 experiment'},{slug:'field-notes',label:'Field notes'},{slug:'teach',label:'Teach a workshop'},{slug:'beta',label:'Beta-session guide'},{slug:'methods',label:'Methods & evidence'}]},
+        {label:'Resources',collapsed:true,items:[{slug:'notebook',label:'Notes'},{slug:'python-tools',label:'Python tools: uv, Ruff & ty'},{slug:'replications/gpt2-causality',label:'Replicate a GPT-2 experiment'},{slug:'field-notes',label:'Field notes'},{slug:'teach',label:'Teach a workshop'},{slug:'methods',label:'Methods & evidence'}]},
         ...guideGroups,
         {
           label: 'Hands-on labs',
@@ -86,7 +86,7 @@ export default defineConfig({
           items: [{ slug: 'labs', label: 'All labs' }, ...labItems],
         },
         {
-          label: 'Model teardowns',
+          label: 'Model teardowns', collapsed: true,
           items: [
             { slug: 'teardown', label: 'Overview' },
             { slug: 'teardown/gpt-oss-120b', label: 'gpt-oss-120b' },

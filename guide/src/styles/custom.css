@@ -24,7 +24,7 @@
 .katex-display { overflow-x: auto; overflow-y: hidden; }
 
 /* Glossary: the first use of a term in a chapter opens its definition. */
-.term { border-bottom: 1px dotted var(--sl-color-text-accent); cursor: help; }
+.term { display: inline; padding: 0; background: none; color: inherit; font: inherit; line-height: inherit; border: 0; border-radius: 0; text-align: inherit; border-bottom: 1px dotted var(--sl-color-text-accent); cursor: help; }
 #pop {
   position: absolute; z-index: 80; max-width: min(22rem, calc(100vw - 24px));
   background: var(--sl-color-bg-nav); color: var(--sl-color-text); border: 1px solid var(--sl-color-hairline);

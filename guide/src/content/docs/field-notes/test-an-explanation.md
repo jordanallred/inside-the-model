@@ -23,4 +23,4 @@ Zeroing a head's output and seeing the behavior collapse supports necessity unde
 
 A useful conclusion might say: “For these inputs and head-output interventions, this component's output is necessary for the measured place preference.” A useful next question asks where that statement fails.
 
-Record the observation, alternative explanation and failure test in your [evidence notebook](/notebook/?case=controls). The [interventions chapter](/guide/intervening/) discusses the broader methods; [methods and evidence](/methods/) records the limits of this site's experiments. The aim is to produce an explanation another person can reproduce and contest.
+Record the observation, alternative explanation and failure test in your [notes](/notebook/?case=controls). The [interventions chapter](/guide/intervening/) discusses the broader methods; [methods and evidence](/methods/) records the limits of this site's experiments. The aim is to produce an explanation another person can reproduce and contest.

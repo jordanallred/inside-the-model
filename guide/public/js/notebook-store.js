@@ -7,7 +7,7 @@
   function normalize(value){
     const v=value&&typeof value==='object'&&value.version===1?value:{};
     const notes={};
-    for(const id of IDS){const note=v.notes?.[id];if(note&&typeof note==='object')notes[id]=Object.fromEntries(FIELDS.map(k=>[k,text(note[k])]));}
+    for(const id of IDS){const note=v.notes?.[id];if(note&&typeof note==='object')notes[id]={...Object.fromEntries(FIELDS.map(k=>[k,text(note[k])])),...(typeof note.text==='string'?{text:note.text.slice(0,16000)}:{})};}
     const events=Array.isArray(v.events)?v.events.filter(e=>e&&IDS.includes(e.caseId)&&TYPES.includes(e.type)&&typeof e.at==='string'&&Number.isFinite(Date.parse(e.at))).slice(-200).map(e=>({caseId:e.caseId,type:e.type,at:e.at.slice(0,30),correct:typeof e.correct==='boolean'?e.correct:null,attempt:Number.isInteger(e.attempt)?Math.min(100,Math.max(0,e.attempt)):0,practice:e.practice===true,seconds:Number.isFinite(e.seconds)?Math.max(0,Math.min(86400,Math.round(e.seconds))):0})):[];
     return {version:1,notes,events};
   }
@@ -17,10 +17,11 @@
     if(!IDS.includes(caseId)||!TYPES.includes(type))return false;
     const data=load(storage);data.events.push({...extra,caseId,type,at:new Date().toISOString()});return save(storage,data);
   }
+  function noteText(note={}){return typeof note.text==='string'?note.text:FIELDS.filter(f=>note[f]).map(f=>f[0].toUpperCase()+f.slice(1)+'\n'+note[f]).join('\n\n');}
   function markdown(value){
-    const data=normalize(value),lines=['# My model investigations','', 'Notes exported from Inside the Model. These are learner observations, not a reviewed research result.',''];
-    for(const [id,note]of Object.entries(data.notes)){lines.push('## '+id,'');for(const field of FIELDS)lines.push('### '+field[0].toUpperCase()+field.slice(1),'',note[field]||'(not recorded)','');}
+    const data=normalize(value),lines=['# My model investigations','', 'Notes from Inside the Model.',''];
+    for(const [id,note]of Object.entries(data.notes)){const body=noteText(note);if(body)lines.push('## '+id,'',body,'');}
     return lines.join('\n');
   }
-  root.ITMNotebook={KEY,IDS,FIELDS,normalize,load,save,record,markdown};
+  root.ITMNotebook={KEY,IDS,FIELDS,normalize,load,save,record,markdown,noteText};
 })(typeof window!=='undefined'?window:globalThis);
