@@ -1,6 +1,6 @@
 ---
 title: Beta-session guide
-description: A practical protocol for observing learning, collecting useful feedback and sharing an optional local session record.
+description: A practical protocol for observing learning, collecting useful feedback and collecting voluntary feedback.
 ---
 
 The question for beta testing is simple: can a developer use the investigations to reason about an example they have not seen before? Finding a confusing step is a useful result.
@@ -9,9 +9,7 @@ The question for beta testing is simple: can a developer use the investigations 
 
 Start with [The place detector](/cases/place-or-animal/). Say what you think is happening as you work. There is no need to get the first prediction right. If you get stuck, explain what you expected the interface or model to do.
 
-After the case, open your [notes](/notebook/?case=place) if you want to keep a result or a question for later. Your notes, case progress and a bounded learning-activity record stay in this browser. No session recording or analytics is sent to the site.
-
-If your session organizer asks for a record, you can download a JSON backup and choose whether it includes the local activity timeline. Review the notes before sharing: free text can identify you. You can keep your notes private and give verbal feedback instead.
+After the case, explain what changed, what you learned and what remains unclear. The site keeps experiment settings in this browser, but does not record a session timeline or collect feedback automatically. Share feedback verbally or through the page’s problem-report link.
 
 ## For the session facilitator
 
@@ -26,13 +24,13 @@ Use 25–35 minutes per participant. Recruit developers with experience using LL
 
 | Outcome | Definition | How to collect it |
 | --- | --- | --- |
-| Useful first comparison | A reader runs a comparison and explains what changed | Direct observation; experiment activity is supporting context only |
-| Independent transfer | The first prediction on an unfamiliar example is explained and tested without help | Observe the task; use the note as supporting evidence |
-| Next-case start | The learner voluntarily starts another investigation | Observation or a subsequent case-open event |
-| Return | The learner uses the site on a later occasion | A follow-up conversation or an optional local timeline |
+| Useful first comparison | A reader runs a comparison and explains what changed | Direct observation |
+| Independent transfer | The first prediction on an unfamiliar example is explained and tested without help | Observe the task and explanation |
+| Next-case start | The learner voluntarily starts another investigation | Direct observation |
+| Return | The learner uses the site on a later occasion | A follow-up conversation |
 
-Report numerators and denominators, which tasks were used, and how much help was given. Treat a small convenience sample as formative feedback, not proof of efficacy. Local counters can be incomplete after deletion, use on another device, blocked storage or the 200-event limit. They cannot identify an aggregate retention rate by themselves.
+Report numerators and denominators, which tasks were used, and how much help was given. Treat a small convenience sample as formative feedback, not proof of efficacy. This protocol does not produce an aggregate retention rate; that requires a separate, consented measurement process.
 
 ## Report a problem
 
-Use **Report a problem with this page** at the bottom of the relevant case. Include the input, the intervention, what you expected, what happened, browser/device and whether the issue repeats. Share an export only if you want to and have reviewed its contents. There is no automatic upload.
+Use **Report a problem with this page** at the bottom of the relevant case. Include the input, the intervention, what you expected, what happened, browser/device and whether the issue repeats. There is no automatic upload.

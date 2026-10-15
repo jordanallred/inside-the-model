@@ -8,3 +8,7 @@
 /code/*
   Content-Type: text/plain; charset=utf-8
   Content-Disposition: attachment
+
+/code/inside-the-model-starter.zip
+  Content-Type: application/zip
+  Content-Disposition: attachment

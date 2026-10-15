@@ -43,14 +43,4 @@ for(let n=0;n<4;n++) {
   assert.ok(p.cases.place.completed);
   p=C.transition(p,'place','reset');
 }
-await import('../public/js/notebook-store.js').catch(()=>{});
-assert.ok(globalThis.ITMNotebook,'a portable notebook store exists');
-const N=globalThis.ITMNotebook;
-const note=N.normalize({version:1,notes:{place:{question:'Why?',conclusion:'<script>alert(1)</script>'},unknown:{question:'drop'}},events:[]});
-assert.equal(note.notes.place.question,'Why?');
-assert.equal(note.notes.unknown,undefined);
-assert.ok(N.markdown(note).includes('Why?'));
-assert.equal(N.normalize(JSON.parse(JSON.stringify(note))).notes.place.conclusion,'<script>alert(1)</script>','store preserves text; renderer must escape it');
-assert.equal(N.normalize({version:1,notes:{place:{question:'a'.repeat(9000)}}}).notes.place.question.length,2000);
-assert.doesNotThrow(()=>N.load({getItem(){throw Error('blocked');}}));
-console.log('Experiment design, sufficiency, temperature, unseen transfer and notebook checks passed.');
+console.log('Experiment design, sufficiency, temperature and legacy transfer checks passed.');

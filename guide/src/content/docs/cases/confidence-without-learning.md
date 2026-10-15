@@ -15,4 +15,4 @@ You will keep the input, model weights and logits fixed. The only change is the 
 
 Dividing logits by the same positive number preserves their order. Softmax changes how concentrated their probability distribution is. A sampled token may still differ from one run to another. None of these sampling operations updates a weight.
 
-Read [probability and softmax](/guide/softmax-and-loss/), or use your [optional notes](/notebook/?case=confidence) to explain why a sharper distribution does not establish greater correctness.
+Read [probability and softmax](/guide/softmax-and-loss/), or [run the comparison locally](/run-locally/) to inspect why a sharper distribution does not establish greater correctness.

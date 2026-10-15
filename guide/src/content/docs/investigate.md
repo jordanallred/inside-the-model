@@ -60,6 +60,6 @@ Edit the arguments to test a hypothesis of your own. The output records the actu
 
 ## Follow the question further
 
-Use the [Model Explorer](/explorer/) when you want to trace the actual arithmetic, and [reproduce the forward pass](/labs/explorer-forward-pass/) when you want to implement it. [Methods and provenance](/methods/) describe what is checked and what remains unvalidated.
+[Download the local model project](/run-locally/) when you want to set a breakpoint or change the code. Use the [Model Explorer](/explorer/) when you want to trace the actual arithmetic, and [reproduce the forward pass](/labs/explorer-forward-pass/) when you want to implement it. [Methods and provenance](/methods/) describe what is checked and what remains unvalidated.
 
 Other resources serve complementary needs: [Transformer Explainer](https://poloclub.github.io/transformer-explainer/) visualizes GPT-2's architecture; the [Hugging Face course](https://huggingface.co/learn/llm-course/chapter1/1) teaches its model and training ecosystem; [ARENA](https://www.arena.education/) provides a broader technical AI-safety curriculum. Here, the focus is the controlled comparison between a behavior and an explanation.

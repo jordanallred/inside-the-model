@@ -1,6 +1,6 @@
 ---
 title: Understand language models by taking them apart
-description: Open experiments for developers who want to reason about LLM behavior. Isolate changes, inspect measurements and reproduce the comparisons.
+description: See how a language model turns a prompt into a prediction. Explore attention, training and sampling through live computations in your browser.
 template: splash
 head:
   - tag: style
@@ -11,11 +11,11 @@ head:
 <header class="home-stage" data-home-hero>
   <div class="home-stage-inner">
     <div class="home-hero-copy">
-      <h1>Understand language models by taking them apart.</h1>
-      <p class="home-deck">You build with language models. Learn to test explanations for their behavior: isolate a change, inspect the computed effect, and reproduce the comparison in code.</p>
+      <h1>See how a language model turns text into a prediction.</h1>
+      <p class="home-deck">Follow a prompt through a working model, from tokens to attention to next-word probabilities. Change the inputs, inspect the actual numbers, and understand what each step does. It all runs in your browser.</p>
       <div class="home-actions">
-        <a class="home-action-primary" data-case-start href="/cases/place-or-animal/">Start: The place detector</a>
-        <a class="home-action-secondary" href="/investigate/">Start with a question from your work <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
+        <a class="home-action-primary" href="/explorer/">Open the Model Explorer</a>
+        <a class="home-action-secondary" href="/cases/">Explore attention, training and sampling <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
       </div>
       <p class="home-reading-note">Start in the browser. Follow the equations and reproduce the measurements in Python when you want more depth.</p>
     </div>
@@ -76,7 +76,7 @@ head:
     <a href="/teardown/"><b>Model teardowns</b><span>Published architectures, layer by layer</span></a>
     <a href="/reference/papers/"><b>Papers &amp; sources</b><span>151 linked references</span></a>
     <a href="/reference/security-guidance/"><b>Security guidance</b><span>Public guidance from security agencies</span></a>
-    <a href="/notebook/"><b>Notes</b><span>A private scratchpad for anything worth keeping</span></a>
+    <a href="/run-locally/"><b>Run locally</b><span>Download the model and a ready-to-run Python experiment</span></a>
     <a href="/python-tools/"><b>Python tools</b><span>Develop with uv, Ruff and ty from Astral</span></a>
     <a href="/teach/"><b>Teach a workshop</b><span>Session plan, discussion rubric and instructor notes</span></a>
     <a href="/methods/"><b>Methods &amp; evidence</b><span>Verification, provenance and review status</span></a>

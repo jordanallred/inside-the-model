@@ -79,6 +79,6 @@ The [GPT-2 model card](https://huggingface.co/openai-community/gpt2) describes t
 
 This is an executed replication of a causal-mask property, not a new interpretability discovery or an independent explanation of GPT-2's decisions. Two examples do not validate all inputs, architectures or numerical environments. Floating-point differences can depend on implementation and hardware; compare with the stated tolerance and retain positive controls.
 
-Try a new token-controlled example before inspecting its result. Record the prediction, observation and limitations in your [notes](/notebook/?case=future). See [methods and review status](/methods/) for how this result is checked and corrected.
+Try a new token-controlled example before inspecting its result. For a smaller first project, [run the teaching model in your IDE](/run-locally/). See [methods and review status](/methods/) for how this result is checked and corrected.
 `);
 console.log('Generated teaching evidence, executed GPT-2 report, requirements and runnable notebook.');

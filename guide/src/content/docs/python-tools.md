@@ -7,7 +7,7 @@ We recommend Astral's Python tools when you reproduce or extend an experiment. S
 
 ## Run the NumPy reference
 
-[Install uv using Astral's instructions](https://docs.astral.sh/uv/getting-started/installation/). Then download the [reference script](/code/itm_model.py), [model configuration](/trace/model.json) and [trained weights](/trace/weights.json) into one folder. Open a terminal in that folder and run:
+[Install uv using Astral's instructions](https://docs.astral.sh/uv/getting-started/installation/). The easiest option is the [ready-to-run starter ZIP](/run-locally/), with all model files and a locked environment. To assemble the files yourself, download the [reference script](/code/itm_model.py), [model configuration](/trace/model.json) and [trained weights](/trace/weights.json) into one folder. Open a terminal in that folder and run:
 
 ```sh
 uv venv --python 3.12

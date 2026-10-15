@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { unzipSync } from 'fflate';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dist = path.join(root, 'dist');
@@ -36,6 +37,21 @@ function read(relative) {
 const headers = read('_headers');
 if(!/\/code\/\*[\s\S]*Content-Disposition: attachment/.test(headers))failures.push('code files must download as attachments');
 const home = read('index.html');
+for (const file of walk(dist).filter(f => f.endsWith('.html'))) {
+  if (/href=["'][^"']*\/notebook\//.test(fs.readFileSync(file,'utf8'))) failures.push(`${path.relative(root,file)} still links to retired Notes`);
+}
+for (const script of ['notebook.js','notebook-store.js']) {
+  if (fs.existsSync(path.join(dist,'js',script))) failures.push(`retired Notes script still ships: ${script}`);
+}
+try {
+  const starter=unzipSync(fs.readFileSync(path.join(dist,'code/inside-the-model-starter.zip')));
+  for (const [name,source] of Object.entries({
+    'itm_model.py':'public/code/itm_model.py','model.json':'public/trace/model.json','weights.json':'public/trace/weights.json',
+    'experiment.py':'tools/local-starter/experiment.py','uv.lock':'tools/local-starter/uv.lock','pyproject.toml':'tools/local-starter/pyproject.toml',
+  })) {
+    if (new TextDecoder().decode(starter['inside-the-model/'+name]) !== fs.readFileSync(path.join(root,source),'utf8').replace(/\r\n/g,'\n')) failures.push(`local starter has stale or missing ${name}`);
+  }
+} catch(error) { failures.push(`local starter ZIP cannot be read: ${error.message}`); }
 const notFound = read('404.html');
 const robots = read('robots.txt');
 const sitemap = read('sitemap-index.xml');

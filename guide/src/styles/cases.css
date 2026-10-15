@@ -65,21 +65,10 @@
 .iv-design-options button { padding: .8rem; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: var(--itm-radius-sm); text-align: left; font: inherit; }
 .iv-design-options button[aria-pressed=true] { border-color: var(--accent); }
 .iv-design h4:focus { outline: 2px solid var(--accent); outline-offset: 4px; }
-.nb select { display: block; max-width: 100%; min-height: 2.75rem; padding: .5rem; margin-top: .4rem; background: var(--bg); color: var(--fg); border: 1px solid var(--line); font: inherit; }
-.nb-field { display: block; margin-top: 1.5rem; font-weight: 600; }
-.nb-field span { display: block; margin-block: .3rem .5rem; font-weight: 400; color: var(--muted); font-size: .85rem; line-height: 1.6; }
-.nb textarea { display: block; width: 100%; resize: vertical; min-height: 7rem; padding: .75rem; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: var(--itm-radius-sm); font: inherit; line-height: 1.6; }
-.nb section { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line); }
-.nb form > button { margin-top: 1rem; }
-.nb-include { display: flex; gap: .5rem; align-items: baseline; margin-block: 1rem; font-size: .85rem; }
-.nb input[type=file] { display: block; max-width: 100%; padding-block: .6rem; font: inherit; font-size: .85rem; }
-.nb textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
 .iv-explore { margin-left: .8rem; padding: .55rem .7rem; border: 0; background: transparent; color: var(--accent); font: inherit; text-decoration: underline; text-underline-offset: .2em; }
 @media (max-width: 30rem) { .iv-explore { display: block; margin: .5rem 0 0; text-align: left; } }
 
-.widget:has(.nb) { border: 0; background: transparent; padding: 0; }
-.nb textarea { min-height: 16rem; }
 
 /* Open workbenches keep inputs, measurements and interpretation within reach. */
 .iv-fields { display: grid; gap: .85rem; margin-block: 1rem; }

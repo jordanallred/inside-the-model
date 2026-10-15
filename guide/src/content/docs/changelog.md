@@ -7,6 +7,12 @@ New chapters, teardowns, tools and corrections, newest first. Follow along with 
 
 Found a mistake? Every page ends with a link to report it, and corrections are listed here.
 
+## 2026-10-15: Browser first, with a local project when you need it
+
+Removed the Notes editor, its navigation links and local activity recording. Experiments still run in the browser and retain their input settings. Previously saved notes are left untouched in browser storage.
+
+[Run the model in your IDE](/run-locally/) offers one ZIP with the reference model, weights, configuration, an editable experiment and locked Python dependencies. Extract it, open the folder and run two uv commands. The browser remains the starting point; local development is optional.
+
 ## 2026-10-15: Open workbenches for practical model reasoning
 
 The six investigations now expose editable prompts and measured results immediately. Explanations and worked comparisons are freely available; the Explorer and story-circuit case also use open explanations instead of scored quizzes or unlocks. Settings and exploration history stay local, and older saved progress remains readable.
@@ -17,7 +23,7 @@ The six investigations now expose editable prompts and measured results immediat
 
 ## 2026-10-15: Explore freely, keep simple notes, and develop with Astral
 
-Investigations now offer a direct route into the experiment without recording a prediction. Feedback focuses on measured results rather than scores. [Notes](/notebook/) is an optional, autosaved scratchpad; older structured notes and JSON backups still open. Backup and restore controls stay out of the writing area.
+Investigations now offer a direct route into the experiment without recording a prediction. Feedback focuses on measured results rather than scores. Notes (retired) is an optional, autosaved scratchpad; older structured notes and JSON backups still open. Backup and restore controls stay out of the writing area.
 
 Fixed a stale-tab bug that could erase completed progress and exposure history. Invalid prompts now stay editable and clearly identify the last valid result. Glossary definitions have native keyboard-operable buttons, and long reference navigation stays collapsed until needed.
 
@@ -27,7 +33,7 @@ The new [Python tools guide](/python-tools/) recommends Astral’s uv, Ruff and 
 
 Three new guided cases teach [experimental controls](/cases/choose-the-control/), [conditional sufficiency](/cases/necessary-and-sufficient/), and [temperature without learning](/cases/confidence-without-learning/). The first case now requires choosing a discriminating experiment. Three verified transfer variants rotate before reuse; repeated examples are marked as practice.
 
-The [evidence notebook](/notebook/) keeps local observations and offers Markdown/JSON backups, with optional learning-activity export for [beta sessions](/beta/). A [workshop pack](/teach/) and [methods record](/methods/) support teaching and review. The [GPT-2 replication](/replications/gpt2-causality/) includes executed CPU results, positive controls, pinned weights, a Python script and a runnable notebook.
+The evidence notebook (retired) keeps local observations and offers Markdown/JSON backups, with optional learning-activity export for [beta sessions](/beta/). A [workshop pack](/teach/) and [methods record](/methods/) support teaching and review. The [GPT-2 replication](/replications/gpt2-causality/) includes executed CPU results, positive controls, pinned weights, a Python script and a runnable notebook.
 
 ## 2026-10-14: Investigate a working model
 

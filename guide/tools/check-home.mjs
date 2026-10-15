@@ -34,8 +34,7 @@ for (const c of globalThis.ITMCaseCatalog) {
   for (const page of [generated, index]) assert.ok(page.includes('/cases/' + c.slug + '/'), c.title + ' is discoverable');
   assert.ok(fs.existsSync('src/content/docs/cases/' + c.slug + '.md'), 'advertised cases are published');
 }
-assert.ok(generated.indexOf('/cases/place-or-animal/') < generated.indexOf('/explorer/'), 'investigation is the primary entrance');
-assert.match(generated, /data-case-start/, 'primary action can resume local progress');
+assert.match(generated, /class="home-action-primary" href="\/explorer\/"/, 'live model exploration is the primary entrance');
 assert.match(generated, /<details class="home-syllabus">/, 'curriculum is available on demand');
 const box = { innerHTML: '', dispatchEvent() {} };
 const win = { ITM: globalThis.ITM, ITMCases: globalThis.ITMCases };

@@ -47,8 +47,8 @@ Published results remain tied to their source/model versions. A new model revisi
 
 ## Local data and sharing
 
-The six workbenches store input settings and whether an experiment has been explored. Notes stores free-form text and the latest 200 local activity events. New experiment events identify the case, action, time and elapsed page time; they do not record prompt text, note text or a correctness score. Older records may include assessment attempts from earlier releases and are retained for compatibility. Notes contains whatever you write in the editor. Its export includes activity only when selected.
+The six workbenches store input settings and whether an experiment has been explored in this browser. The site does not record an activity timeline or provide a notes editor. Data saved by retired versions remains untouched in browser storage; the current site does not read or export those notes.
 
 An explored label records interaction, not demonstrated understanding. Explanations and worked comparisons are available without passing a quiz. The random reference weights use a fixed illustrative seed and scale; they are not the original pre-training checkpoint.
 
-There is no account, remote inference dependency or learning-analytics submission for these tools. Hosting providers may retain ordinary request logs; the website does not control their policies. External links and the optional model-download notebook contact their respective providers. Clearing browser data removes local records. Use notebook backups for portability, and review free text before sharing it manually.
+There is no account, remote inference dependency or learning-analytics submission for these tools. Hosting providers may retain ordinary request logs; the website does not control their policies. External links and the optional model-download notebook contact their respective providers. Clearing browser data removes local records. The local starter project contains the teaching-model code and weights; it does not include your browser settings.
