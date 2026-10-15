@@ -80,3 +80,14 @@
 
 .widget:has(.nb) { border: 0; background: transparent; padding: 0; }
 .nb textarea { min-height: 16rem; }
+
+/* Open workbenches keep inputs, measurements and interpretation within reach. */
+.iv-fields { display: grid; gap: .85rem; margin-block: 1rem; }
+.iv-field { display: flex; flex-direction: column; gap: .4rem; font-weight: 600; }
+.iv-field :is(input,select) { width: 100%; min-height: 2.75rem; min-width: 0; padding: .65rem .75rem; font: .85rem var(--itm-font-code); color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: var(--itm-radius-sm); }
+.iv-field input[type=number] { max-width: 12rem; }
+.iv-open h3 { font-family: var(--itm-font-display); font-size: 1.6rem; font-weight: 500; line-height: 1.3; }
+.iv-open .iv-use { margin-bottom: 1.5rem; }
+.iv-interpretation { padding-block: 1rem; border-block: 1px solid var(--line); }
+.iv-open .iv-example { margin-top: 1rem; }
+.iv-open [hidden] { display: none; }

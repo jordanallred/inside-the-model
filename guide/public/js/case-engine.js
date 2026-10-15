@@ -38,12 +38,13 @@
     const A = tokens(a), B = tokens(b);
     if (!Number.isInteger(position) || position < 1 || position >= Math.min(A.length, B.length) - 1) throw Error('Choose a prefix position with words after it.');
     if (A.length !== B.length || A.slice(0, position + 1).some((v, i) => v !== B[i])) throw Error('The inputs need an identical prefix and equal length.');
+    if(A.every((v,i)=>v===B[i]))throw Error('Change at least one token after the measured position; identical inputs are not a suffix intervention.');
     const ta = ITM.forward(ITM.weights().W, A), tb = ITM.forward(ITM.weights().W, B);
     const pa = ta.probs[position], pb = tb.probs[position];
     return { a: pa, b: pb, maxDifference: Math.max(...pa.map((p, i) => Math.abs(p - pb[i]))), futureAttention: Math.max(...[ta, tb].flatMap(t => t.layers.flatMap(l => l.heads.flatMap(h => h.weights[position].slice(position + 1))))), attention: ta.layers[0].heads[0].weights[position], words: A.map(i => ITM.CFG.vocab[i]), position };
   }
   function runControl(plan) {
-    const prompts = {diagnostic:['the cat saw on the','the cat sat the'],confounded:['the cat saw the'],repeat:['the cat sat on the']}[plan];
+    const prompts = {diagnostic:['the cat saw on the','the cat sat and the'],confounded:['the cat saw and the'],repeat:['the cat sat on the']}[plan];
     if (!prompts) throw Error('Choose an experimental design.');
     const baseline = runPlace('the cat sat on the').place;
     const probes = prompts.map(prompt => ({prompt,place:runPlace(prompt).place}));
@@ -150,7 +151,7 @@
     if(action==='experiment'&&s.prediction&&!s.explanation&&(id==='place'?Number.isInteger(value)&&value>=0&&value<4:id==='controls'?plans.includes(value):value===true))s.experiment=value;
     if(action==='design'&&id==='place'&&evidence(id,s.experiment)&&!s.explanation&&plans.includes(value))s.design=value;
     if(action==='explanation'&&evidence(id,s.experiment)&&(id!=='place'||s.design==='diagnostic')&&!s.transfer&&explanationOptions[id].includes(value))s.explanation=value;
-    if(action==='transfer'&&s.explanation===answers(id,s.variant).explanation&&transferSpec(id,s.variant).choices.some(([key])=>key===value)){s.transfer=value;s.attempts++;}
+    if(action==='transfer'&&!s.completed&&s.explanation===answers(id,s.variant).explanation&&transferSpec(id,s.variant).choices.some(([key])=>key===value)){s.transfer=value;s.attempts++;}
     if (action === 'hint') s.hint = Math.min(2, s.hint + 1);
     if (action === 'prompt' && id === 'place' && typeof value === 'string' && value.length <= 250 && validatePrompt(value).ok) s.prompt = value;
     return normalizeProgress(p);

@@ -7,7 +7,7 @@ The same model can look more or less confident without learning anything. Change
 
 You will keep the input, model weights and logits fixed. The only change is the positive number that divides the logits before softmax.
 
-**About 10 minutes.** Connects model internals to a setting developers use in generation APIs.
+**Self-paced.** Connects model internals to a setting developers use in generation APIs.
 
 <div class="widget not-content" data-w="caseconfidence" data-title="Change confidence without training"><p data-widget-fallback>The interactive experiment uses JavaScript. If it does not appear, enable JavaScript or reload. You can also <a href="/guide/attention/">read how attention works</a>.</p></div>
 
@@ -15,4 +15,4 @@ You will keep the input, model weights and logits fixed. The only change is the 
 
 Dividing logits by the same positive number preserves their order. Softmax changes how concentrated their probability distribution is. A sampled token may still differ from one run to another. None of these sampling operations updates a weight.
 
-Read [probability and softmax](/guide/softmax-and-loss/), or use your [evidence notebook](/notebook/?case=confidence) to explain why a sharper distribution does not establish greater correctness.
+Read [probability and softmax](/guide/softmax-and-loss/), or use your [optional notes](/notebook/?case=confidence) to explain why a sharper distribution does not establish greater correctness.

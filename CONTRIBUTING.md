@@ -35,6 +35,12 @@ npm run check
 
 If you changed the model engine (`guide/public/js/itm-model.js`) or the NumPy reference (`guide/public/code/itm_model.py`), also run `npm run verify`. The two must agree to within 1e-9.
 
+## What an investigation must deliver
+
+Each investigation should start with a concrete behavioral question a developer might need to reason about. It must provide an inspectable baseline, an explicit intervention, measured effects, relevant controls and a bounded conclusion. Readers should be able to change inputs or reproduce the experiment. Explain why the comparison is useful and what it does not establish about other models.
+
+Keep reasoning and further experiments available without answer-key gates, scores or achievement claims. A page being explored is not evidence that its reader learned the concept. Preserve token positions where a control depends on them, reject non-informative comparisons, and keep provenance tied to the code and weights that produced the measurement.
+
 ## Writing guidelines
 
 - **Be exact.** Prefer a concrete number or worked example to a general statement, and show the calculation before stating the rule.

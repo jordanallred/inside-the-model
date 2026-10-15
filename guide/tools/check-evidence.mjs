@@ -18,6 +18,9 @@ for(const r of record.measurements){
   assert.ok(r.max_probability_difference<=record.tolerance);
   assert.equal(r.max_future_attention,0);
   assert.ok(r.positive_control_max_probability_difference>record.tolerance);
+  assert.equal(r.token_ids_positive_control.length,r.token_ids_a.length);
+  assert.deepEqual(r.token_ids_positive_control.slice(r.position+1),r.token_ids_a.slice(r.position+1));
+  assert.ok(r.token_ids_positive_control.slice(0,r.position+1).some((v,i)=>v!==r.token_ids_a[i]));
 }
 const notebook=JSON.parse(fs.readFileSync('public/code/gpt2-causality.ipynb','utf8'));
 assert.equal(notebook.nbformat,4);

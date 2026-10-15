@@ -38,11 +38,15 @@ No environment activation is needed. Existing pip-based environments also work w
 
 The first run downloads roughly 0.5 GB of weights. Allow several GB of available RAM. No account, GPU or remote inference is required. The website displays saved measurements; loading this page does not download or run GPT-2.
 
+## Try your own comparison
+
+The script accepts a prefix, two suffixes and a changed-prefix positive control. All four custom arguments must be supplied together. See the [practical investigation workflow](/investigate/#reproduce-a-comparison-on-gpt-2) for a command you can adapt. It validates token IDs from the complete texts, equal sequence lengths and an actual suffix change before reporting a result.
+
 ## Provenance and conditions
 
 - Model: [openai-community/gpt2](https://huggingface.co/openai-community/gpt2/tree/607a30d783dfa663caf39e06633721c8d4cfcd7e), revision `607a30d783dfa663caf39e06633721c8d4cfcd7e`.
 - Weight-file SHA-256: `248dfc3911869ec493c76e65bf2fcf7f615828b0254c12b473182f0f81d3a707`.
-- Execution: `2026-10-15T01:25:06.648313+00:00` (UTC), Windows-11-10.0.26300-SP0, Python 3.12.14.
+- Execution: `2026-10-15T22:03:11.703396+00:00` (UTC), Windows-11-10.0.26300-SP0, Python 3.12.14.
 - Packages: PyTorch 2.14.1+cpu, Transformers 5.19.0, Hugging Face Hub 2.2.0.
 - Device and numbers: cpu, torch.float32; eager attention; dropout disabled with eval().
 - Measurement: all 2 suffix comparisons and their positive controls passed the assertions in the downloadable script.

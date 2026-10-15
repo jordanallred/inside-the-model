@@ -1,6 +1,6 @@
 ---
 title: Understand language models by taking them apart
-description: Guided investigations for developers who want to understand LLM internals. Predict, experiment on a working model, and test your explanation.
+description: Open experiments for developers who want to reason about LLM behavior. Isolate changes, inspect measurements and reproduce the comparisons.
 template: splash
 head:
   - tag: style
@@ -12,12 +12,12 @@ head:
   <div class="home-stage-inner">
     <div class="home-hero-copy">
       <h1>Understand language models by taking them apart.</h1>
-      <p class="home-deck">You build with language models. Now investigate what happens inside one. Make a prediction, change a component, and test your explanation against the actual computation.</p>
+      <p class="home-deck">You build with language models. Learn to test explanations for their behavior: isolate a change, inspect the computed effect, and reproduce the comparison in code.</p>
       <div class="home-actions">
         <a class="home-action-primary" data-case-start href="/cases/place-or-animal/">Start: The place detector</a>
-        <a class="home-action-secondary" href="/cases/">Explore the investigations <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
+        <a class="home-action-secondary" href="/investigate/">Start with a question from your work <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
       </div>
-      <p class="home-reading-note">Your first investigation takes about 10 minutes. No installation, GPU, or prior maths required.</p>
+      <p class="home-reading-note">Start in the browser. Follow the equations and reproduce the measurements in Python when you want more depth.</p>
     </div>
     <figure class="home-specimen">
       <div class="widget hv not-content" data-w="homehero"><p data-home-static>A small, trained transformer runs here in your browser. <a href="/cases/place-or-animal/">Investigate its place prediction.</a></p></div>
@@ -32,25 +32,25 @@ head:
 
 <section class="home-section home-routes" aria-labelledby="home-routes-title">
   <div class="home-section-heading">
-    <h2 id="home-routes-title">Six questions.<br>Learn to investigate.</h2>
-    <p>Start with the place detector. Build through learning and information flow, then design controls and challenge causal claims. Make a prediction, inspect what changes, and follow the questions that interest you.</p>
+    <h2 id="home-routes-title">Choose a question.<br>Test an explanation.</h2>
+    <p>Compare sampling settings, model weights, information flow and component interventions. Every workbench is open: change the inputs, inspect the measurements, and decide what the evidence supports.</p>
   </div>
   <nav class="home-route-list" aria-label="Investigations in learning order">
-    <a class="home-route home-case" href="/cases/place-or-animal/"><span class="home-case-number">01</span><span><b>The place detector</b><span class="home-case-question">Which part knows a place comes next?</span><small>Find a component by removing it · about 10 min</small><span class="home-case-status" data-case-status="place">Start investigation</span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
-    <a class="home-route home-case" href="/cases/what-training-changes/"><span class="home-case-number">02</span><span><b>What training changes</b><span class="home-case-question">Same model. Different weights. Different answer?</span><small>Compare predictions and measure loss · about 8 min</small><span class="home-case-status" data-case-status="training">Start investigation</span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
-    <a class="home-route home-case" href="/cases/hidden-future/"><span class="home-case-number">03</span><span><b>The hidden future</b><span class="home-case-question">Can an earlier token read words that come later?</span><small>Test information flow with a controlled change · about 8 min</small><span class="home-case-status" data-case-status="future">Start investigation</span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
-    <a class="home-route home-case" href="/cases/choose-the-control/"><span class="home-case-number">04</span><span><b>Choose the control</b><span class="home-case-question">Which experiment could distinguish two explanations?</span><small>Design a discriminating experiment · about 12 min</small><span class="home-case-status" data-case-status="controls">Start investigation</span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
-    <a class="home-route home-case" href="/cases/necessary-and-sufficient/"><span class="home-case-number">05</span><span><b>Necessary—and sufficient?</b><span class="home-case-question">What does removing a component actually establish?</span><small>Separate necessity from conditional sufficiency · about 12 min</small><span class="home-case-status" data-case-status="sufficiency">Start investigation</span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
-    <a class="home-route home-case" href="/cases/confidence-without-learning/"><span class="home-case-number">06</span><span><b>Confidence without learning</b><span class="home-case-question">Can a prediction become more confident without learning?</span><small>Separate sampling settings from model knowledge · about 10 min</small><span class="home-case-status" data-case-status="confidence">Start investigation</span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
+    <a class="home-route home-case" href="/cases/place-or-animal/"><span class="home-case-number">01</span><span><b>The place detector</b><span class="home-case-question">Which head outputs affect the place prediction?</span><small>Compare output interventions with attention patterns</small><span class="home-case-status" data-case-status="place">Start investigation</span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
+    <a class="home-route home-case" href="/cases/what-training-changes/"><span class="home-case-number">02</span><span><b>What training changes</b><span class="home-case-question">Same model. Different weights. Different answer?</span><small>Compare predictions and measure loss</small><span class="home-case-status" data-case-status="training">Start investigation</span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
+    <a class="home-route home-case" href="/cases/hidden-future/"><span class="home-case-number">03</span><span><b>The hidden future</b><span class="home-case-question">Can an earlier token read words that come later?</span><small>Test information flow with a controlled change</small><span class="home-case-status" data-case-status="future">Start investigation</span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
+    <a class="home-route home-case" href="/cases/choose-the-control/"><span class="home-case-number">04</span><span><b>Choose the control</b><span class="home-case-question">Which experiment could distinguish two explanations?</span><small>Construct and compare your own prompt pair</small><span class="home-case-status" data-case-status="controls">Start investigation</span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
+    <a class="home-route home-case" href="/cases/necessary-and-sufficient/"><span class="home-case-number">05</span><span><b>Necessary—and sufficient?</b><span class="home-case-question">What does removing a component actually establish?</span><small>Separate necessity from conditional sufficiency</small><span class="home-case-status" data-case-status="sufficiency">Start investigation</span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
+    <a class="home-route home-case" href="/cases/confidence-without-learning/"><span class="home-case-number">06</span><span><b>Confidence without learning</b><span class="home-case-question">Can a prediction become more confident without learning?</span><small>Separate sampling settings from model knowledge</small><span class="home-case-status" data-case-status="confidence">Start investigation</span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
   </nav>
 </section>
 
 <section class="home-section home-method" aria-labelledby="home-method-title">
   <div class="home-section-heading"><h2 id="home-method-title">Build an explanation you can test.</h2><p>You do the investigating. The site gives you the instruments, the evidence, and help when you need it.</p></div>
   <ol class="home-method-list">
-    <li><b>Observe &amp; predict</b><p>Start with a concrete behavior. Commit to what you think will happen before seeing the result.</p></li>
+    <li><b>Choose a baseline</b><p>Start with a concrete behavior and a comparison you can interpret. Form a prediction if it helps your reasoning.</p></li>
     <li><b>Intervene &amp; measure</b><p>Remove a head, swap weights, or change the input. Compare the actual probabilities and intermediate values.</p></li>
-    <li><b>Explain &amp; test again</b><p>Use the evidence to choose an explanation, then make a prediction on a fresh example.</p></li>
+    <li><b>Interpret &amp; reproduce</b><p>Inspect the reasoning, test another context, and reproduce the comparison in Python. State what the evidence leaves unresolved.</p></li>
   </ol>
 </section>
 

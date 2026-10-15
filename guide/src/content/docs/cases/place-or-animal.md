@@ -1,13 +1,13 @@
 ---
 title: "Case 1: The place detector"
-description: Predict, remove one attention head, and test which input signal makes the teaching model expect a place. Finish with a fresh-example check.
+description: Predict, remove one attention head, and test which input signal makes the teaching model expect a place. Compare editable inputs and inspect measured effects.
 ---
 
 The model in the [Model Explorer](/explorer/) has learned that after <code>the cat sat on the</code> comes a place: <code>mat</code> or <code>bed</code>. That is not as easy as it sounds. Most of the time in its training sentences, “the” is followed by an animal, as in <code>the dog</code> or <code>chased the cat</code>. So something inside the model must notice that this “the” is different.
 
-The model has two layers, each with two attention heads, and 4,496 trained parameters in all. Your job is to find which part of it knows a place is coming, and what that part is looking at.
+The model has two layers, each with two attention heads, and 4,496 trained parameters in all. Compare which head outputs affect that preference, then inspect what the heads read.
 
-**About 10 minutes.** Make a prediction, run a controlled experiment, then test your explanation on a fresh example. No installation or prior maths required.
+**Self-paced.** Switch head outputs on or off, change the prompt, and inspect the measured differences. No installation or prior maths required.
 
 <div class="widget not-content" data-w="caseplace" data-title="Case 1: The place detector"><p data-widget-fallback>The interactive experiment uses JavaScript. If it does not appear, enable JavaScript or reload. You can also <a href="/guide/attention/">read how attention works</a>.</p></div>
 

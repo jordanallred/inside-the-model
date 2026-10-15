@@ -1,193 +1,93 @@
-/* Guided investigations: commit a prediction, collect evidence, then test transfer. */
+/* Open experiment workbenches: change inputs, compare measurements, inspect the reasoning. */
 (function () {
-  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const pct = n => (n * 100).toFixed(2) + '%', catalog = window.ITMCaseCatalog || [];
-  window.W = window.W || {};
-  function storage() { try { return window.localStorage; } catch (_) { return null; } }
-  function refreshStatus() {
-    const C = window.ITMCases; if (!C) return;
-    const p = C.loadProgress(storage());
-    document.querySelectorAll('[data-case-status]').forEach(el => {
-      const s = p.cases[el.dataset.caseStatus];
-      el.textContent = s?.completed ? 'Explored' : s?.prediction ? 'In progress' : 'Start investigation';
-    });
-    const next = catalog.find(c => !p.cases[c.id].completed);
-    document.querySelectorAll('[data-case-start]').forEach(el => {
-      el.href = next ? '/cases/' + next.slug + '/' : '/cases/';
-      el.textContent = next ? (p.cases[next.id].prediction ? 'Resume: ' : 'Start: ') + next.title : 'Revisit the investigations';
-    });
+  const C=window.ITMCases, W=window.ITMWorkspace, ITM=window.ITM, catalog=window.ITMCaseCatalog||[];
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const pct=p=>p>0&&p<.0001?'less than 0.01%':(100*p).toFixed(2)+'%';
+  window.W=window.W||{};
+  const backing=()=>{try{return window.localStorage;}catch(_){return null;}};
+  function refreshStatus(){
+    if(!W)return;const state=W.load(backing());
+    document.querySelectorAll('[data-case-status]').forEach(el=>{el.textContent=state.cases[el.dataset.caseStatus]?.explored?'Explored':'Open experiment';});
+    const next=catalog.find(c=>!state.cases[c.id].explored);
+    document.querySelectorAll('[data-case-start]').forEach(el=>{el.href=next?'/cases/'+next.slug+'/':'/cases/';el.textContent=next?'Investigate: '+next.title:'Choose another investigation';});
   }
-  const definitions = {
-    controls:{prediction:'Is the place prediction caused by the verb, the preposition, or is the evidence not enough yet?',choices:[['verb','My starting hypothesis is the verb'],['preposition','My starting hypothesis is the preposition'],['uncertain','I need an experiment first']],mission:'Two explanations fit the original prompt: the verb matters, or the preposition matters. Choose a comparison that separates them.',explanation:'Why is the successful design more informative?',explanations:[['isolated','It changes one candidate cause at a time'],['any-change','Any changed prediction proves the explanation'],['proved','It proves the rule for every possible sentence']],transfers:[],hints:['If you change two candidate causes together, either one could explain the change.','Use one probe that changes the verb and another that removes the preposition.'],wrong:'A controlled experiment separates the candidate causes. A changed output alone cannot tell you which of two simultaneous changes mattered.',conclusion:'You chose an experiment that distinguishes competing explanations. Changing the verb collapses the place signal, while removing the preposition preserves it in these probes. This is evidence about these inputs, including counterfactual inputs outside the training grammar; it is not proof of a universal linguistic rule.',limit:'An experiment is informative when competing explanations predict different outcomes. A confounded comparison can change the output without resolving the question.'},
-    sufficiency:{prediction:'If layer 0, head 1 is the only attention head left active, will the model still favor a place after “the cat sat on the”?',choices:[['retains','The place preference will remain'],['loses','The place preference will disappear']],mission:'Compare removing the candidate with retaining only that head among the four attention heads. All embeddings, MLPs, residual paths and output operations remain.',explanation:'What is the strongest supported conclusion?',explanations:[['conditional','The head retains this preference with the other head outputs removed, in the tested context'],['entire','This head is the entire model and works independently'],['universal','This head solves every possible place prediction']],transfers:[],hints:['Removal and isolation ask different questions. Compare both interventions with the baseline.','“Only head left active” does not mean only component left in the model. The MLPs and residual pathways still compute.'],wrong:'The model still includes embeddings, MLPs, normalization and output operations. The measurement supports a conditional statement about the tested head interventions, not an independent model or a universal rule.',conclusion:'Removing the candidate destroys this preference; retaining it while removing the other three head outputs preserves the preference. That is evidence of necessity under one intervention and sufficiency relative to the tested head-output interventions. Other model components remain active, and one context does not establish the full algorithm.',limit:'The intervention zeros head outputs. It does not remove embeddings, MLPs, normalization, residual paths or the output layer. State the context and threshold whenever claiming sufficiency.'},
-    confidence:{prediction:'Raise temperature from 1 to 2. Will the identity of the highest-probability next token change?',choices:[['changes','The top token will change'],['same','The top token will stay the same']],mission:'Reuse exactly the same logits and weights. Divide logits by a different positive temperature before softmax; do not sample a token.',explanation:'What caused the probability changes?',explanations:[['temperature','Temperature rescaled the logits before softmax'],['learning','The model learned a new fact'],['architecture','The model acquired additional layers']],transfers:[],hints:['Dividing all logits by the same positive number preserves their ordering.','Probabilities can become sharper or flatter even though the weights and the top-ranked token remain unchanged.'],wrong:'The weight checksum stays the same. Positive temperature rescales logits and changes the distribution without a training update; it preserves their ranking.',conclusion:'You changed the displayed probability distribution without changing a weight. Positive temperature preserves logit order while changing how sharply probability is concentrated. A more confident distribution is not evidence that the model learned or became more correct. Sampling from that distribution can still produce different tokens.',limit:'The ranking statement requires positive temperature. We compare distributions before sampling and do not treat an individual sampled word as a deterministic result.'},
-    place: {
-      prediction: 'What will happen if you remove one attention head?', choices: [['changes', 'At least one head will change the prediction'], ['same', 'The prediction will stay roughly the same']],
-      mission: 'Find a head whose removal takes the chance of a place below 10%. Change one component at a time.',
-      explanation: 'Which input is the strongest explanation for the place signal in these tests?', explanations: [['verb', 'The verb, such as “sat”'], ['preposition', 'The preposition, such as “on”'], ['the', 'The final word “the”']],
-      transfer: 'With all heads restored, after “the dog ran to the”, is a place or an animal more likely?', transfers: [['place', 'A place'], ['animal', 'An animal']],
-      hints: ['Compare all four heads individually. A useful intervention changes one part and keeps everything else fixed.', 'Once you find the head, compare “the cat saw on the” with “the cat sat the”. Which change follows the prediction?'],
-      wrong: 'Keep the last “the” and replace “sat” with “saw”. Then keep “sat” and remove “on”. Compare the two results above.',
-      conclusion: 'You identified a head whose output is necessary for this place prediction, then used input changes to test an explanation. The verb is the useful signal in these examples. This does not prove the head is sufficient by itself, or that prepositions never matter elsewhere.',
-      limit: 'Ablation tests necessity under a particular intervention. Attention weights show what a head reads; alone, they do not establish what causes an output.'
-    },
-    training: {
-      prediction: 'After “the cat sat on the”, which weights give “mat” a higher probability?', choices: [['trained', 'Trained weights'], ['random', 'Untrained weights'], ['same', 'They will be the same']],
-      mission: 'Keep the architecture and input fixed. Change only the weights, and measure the probability of “mat” and its loss.',
-      explanation: 'What explains the difference you measured?', explanations: [['weights', 'Learning changed the numerical weights'], ['architecture', 'Training added more layers'], ['sampling', 'A lucky random token was sampled']],
-      transfer: 'After “the dog chased the”, which weights will give the target “cat” a lower loss?', transfers: [['trained', 'Trained weights'], ['random', 'Untrained weights']],
-      hints: ['Probability is assigned before any token is sampled. Compare the same target word in both configurations.', 'For a fixed target, loss is −ln(probability). Increasing its probability reduces that loss.'],
-      wrong: 'Both runs have two layers and two heads per layer, and no token is sampled. The weight values are the controlled difference.',
-      conclusion: 'The architecture specifies the computation; the weights determine the learned behavior. In the starting mat example, trained weights lower the loss. Which weights win for a particular target depends on the input and target; untrained weights can win a specific comparison. This comparison is not a replay of training, and it does not mean every possible input improves.',
-      limit: 'These are two fixed weight sets and selected examples from a synthetic grammar. A single target-token loss is not a measure of general intelligence or overall model quality.'
-    },
-    future: {
-      prediction: 'Change the last word from “mat” to “bed”. Will the prediction at the earlier word “sat” change?', choices: [['changes', 'The earlier prediction will change'], ['same', 'It will stay the same']],
-      mission: 'Keep the prefix and its positions fixed. Change only a later word, then compare the entire next-token distribution at “sat”.',
-      explanation: 'Why is the earlier prediction unchanged?', explanations: [['mask', 'The causal mask blocks information from later positions'], ['ignored', 'The model ignores every noun'], ['training', 'Training removed the word “bed”']],
-      transfer: 'Compare “a dog ran to the mat” and “a dog ran to the bed”. At the earlier token “dog”, will the next-token distributions be the same?', transfers: [['same', 'The same'], ['changes', 'Different']],
-      hints: ['The selected position is “sat”, not the final word. Watch where its attention weights are exactly zero.', 'The restriction holds in every layer. Later tokens cannot send information back into an earlier position.'],
-      wrong: 'Look at the zero attention weights after the selected position. The mask blocks later information before attention is normalized, in every layer.',
-      conclusion: 'You changed a suffix and measured an unchanged earlier distribution. The causal mask prevents a token from reading future positions in this forward pass. This differs from predicting at the end of two different prompts, where a changed word can be part of the visible prefix.',
-      limit: 'This is a test of information flow during a forward pass. It does not imply that later words were absent from training data.'
-    }
+  const context={
+    place:{question:'Which head outputs matter for this prediction?',use:'You are evaluating a claim that an attention pattern explains an output. Compare the output under an intervention before interpreting the pattern.',insight:'An attention map shows what a head reads. Removing its output tests how later computations depend on it. A large change is evidence of sensitivity to that intervention; it does not identify the whole algorithm.',limit:'Zeroing a head changes the downstream computation and can leave the training distribution. A result applies to this model, input and intervention.'},
+    training:{question:'What changes when you swap the weights?',use:'You are comparing model versions or a fine-tune. Separate the architecture, the chosen target and the weights before treating a loss difference as an improvement.',insight:'The architecture is identical in both runs. The target probability and loss change because the weight values differ. A trained model can assign less probability to an unusual target than a random reference does.',limit:'The random reference is a separate fixed initialization, not the exact starting checkpoint of this training run. One target-token loss does not establish overall quality.'},
+    future:{question:'Can a later word change an earlier next-token distribution?',use:'You are inspecting next-token scores, training labels or evaluation code. Check which tokens are actually visible at the measured position.',insight:'In this causal transformer, each position can read its own token and earlier tokens. A changed suffix cannot affect an earlier distribution when token IDs and positions in the prefix are held fixed.',limit:'This tests information flow in a forward pass. A later instruction can affect a newly generated answer because that instruction is then part of the answer’s prefix.'},
+    controls:{question:'Which comparison separates the candidate explanations?',use:'Two prompts produce different behavior. Before attributing the difference to a particular word, separate the changes and measure each comparison.',insight:'A change in output alone does not identify its cause. Compare candidate changes separately while preserving the other token IDs and positions. Then test another context.',limit:'The and-substitution probe is outside the training grammar. Preserving positions removes one confound; it does not make every word substitution an isolated change in linguistic meaning.'},
+    sufficiency:{question:'Does removing a head answer the same question as retaining it?',use:'You are reading an ablation result or considering a component-removal claim. Ask which other components remain active and what behavior is being measured.',insight:'Removing a component and keeping it while removing other head outputs are different interventions. State both the context and the behavior threshold before calling something necessary or sufficient.',limit:'Keeping one head among the four attention heads still leaves embeddings, MLPs, normalization, residual paths and the output layer. It is not an independently functioning model.'},
+    confidence:{question:'Can the probabilities change without a weight update?',use:'An answer changes after you adjust generation settings. First distinguish a changed sampling distribution from changed weights or factual accuracy.',insight:'Dividing fixed logits by a positive temperature preserves their order while changing the probability distribution. Sampling can produce a different token even when the highest-ranked token is unchanged.',limit:'These are next-token probabilities before sampling. A sharper distribution is not evidence of truth or new knowledge; an entire generated continuation can take a different path.'}
   };
-  function explorerLink(id, prompt) {
-    return '/explorer/#' + new URLSearchParams({ p: prompt, step: id === 'training' ? 25 : 7, t: id === 'future' ? 3 : window.ITM.tokenize(prompt).ids.length - 1, l: 0, h: id === 'place' ? 1 : 0, v: 'visual', w: 'trained' }).toString();
+  const table=(caption,heads,rows)=>'<div class="iv-table-wrap"><table><caption>'+esc(caption)+'</caption><thead><tr>'+heads.map(h=>'<th scope="col">'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map((v,i)=>'<'+(i?'td':'th scope="row"')+'>'+esc(v)+'</'+(i?'td':'th')+'>').join('')+'</tr>').join('')+'</tbody></table></div>';
+  function placeMetrics(r){return table('Next-token category probabilities',['Category','Probability'],[['Place: mat, bed or home',pct(r.place)],['Animal: cat, dog or bird',pct(r.animal)]]);}
+  function trainingResult(prompt,target){const r=C.runTraining(prompt,target);return '<p>Prompt: <code>'+esc(prompt)+'</code> · target: <code>'+esc(target)+'</code></p>'+table('Identical computation, different weight values',['Weights','Target probability','Loss (nats)'],[['Trained',pct(r.trained.probability),r.trained.loss.toFixed(4)],['Fixed random reference',pct(r.random.probability),r.random.loss.toFixed(4)]])+'<p class="iv-note">Loss = −ln(P(target)). Lower loss means more probability on this target, not better performance on every input.</p>';}
+  function sufficiencyResult(prompt){const r=C.runSufficiency(prompt);return '<p>Prompt: <code>'+esc(prompt)+'</code></p>'+table('Chance of a place under head-output interventions',['Intervention','Probability'],[['All four heads active',pct(r.baseline)],['Remove layer 0, head 1',pct(r.removed)],['Keep only layer 0, head 1 among heads',pct(r.kept)]])+'<p class="iv-note">“Preference remains” here means place probability above 50%. All non-attention components remain active.</p>';}
+  function confidenceResult(prompt,temperature){const r=C.runConfidence(prompt,temperature),V=ITM.CFG.vocab;return '<p>Prompt: <code>'+esc(prompt)+'</code></p>'+table('Four highest-ranked tokens; same logits and weights',['Next token','T = 1','T = '+temperature],r.original.map((p,i)=>[p,i]).sort((a,b)=>b[0]-a[0]).slice(0,4).map(([,i])=>[V[i],pct(r.original[i]),pct(r.adjusted[i])]))+'<p>Highest-ranked token: <b>'+esc(V[r.originalTop])+' → '+esc(V[r.adjustedTop])+'</b>. Weight checksum: <code>'+r.checksum+'</code> (unchanged). No token was sampled.</p>';}
+  function futureResult(a,b,position){const r=C.runFuture(a,b,position);return '<div class="iv-prompts"><code>'+esc(a)+'</code><code>'+esc(b)+'</code></div>'+table('Measure at '+r.words[position]+' (position '+position+'; the start token is 0)',['Measurement','Value'],[['Largest change across 25 next-token probabilities',r.maxDifference.toExponential(3)],['Maximum attention to future positions',r.futureAttention.toFixed(3)]])+'<p class="iv-note">Token IDs and positions in the measured prefix are identical. The suffixes differ. Comparison tolerance: 1e-12.</p>';}
+  function controlResult(plan){const r=C.runControl(plan);return table('All heads active; probability of a place',['Input','Probability'],[['the cat sat on the — baseline',pct(r.baseline)],...r.probes.map(p=>[p.prompt,pct(p.place)])])+'<p>'+ (plan==='diagnostic'?'Each probe replaces one token and preserves sequence length and token positions. The verb substitution sharply changes this signal; the on → and substitution mostly preserves it.':plan==='confounded'?'Two token identities changed together. This output cannot distinguish which substitution mattered.':'The same deterministic computation is repeated. It checks consistency without distinguishing the explanations.')+'</p>';}
+  function measured(id,s){
+    if(id==='training')return trainingResult(s.prompt,s.target);
+    if(id==='future')return futureResult(s.a,s.b,s.position);
+    if(id==='sufficiency')return sufficiencyResult(s.prompt);
+    if(id==='confidence')return confidenceResult(s.prompt,s.temperature);
+    if(id==='controls'){
+      if(!s.custom)return controlResult(s.plan);
+      const a=C.runPlace(s.a),b=C.runPlace(s.b),A=ITM.tokenize(s.a).ids,B=ITM.tokenize(s.b).ids;
+      return table('Your prompt pair; all heads active',['Input','Chance of a place','Chance of an animal'],[[s.a,pct(a.place),pct(a.animal)],[s.b,pct(b.place),pct(b.animal)]])+'<p>Token counts including the start token: <b>'+A.length+' and '+B.length+'</b>. '+(A.length!==B.length?'The lengths differ, so some token positions also change.':'Lengths match. Inspect which token identities changed; equal length alone does not establish a clean causal comparison.')+'</p>';
+    }
+    const baseline=C.runPlace(s.prompt),r=C.runPlace(s.prompt,s.head===null?[]:[s.head]);
+    const head=s.head===null?'All four heads active':'Layer '+Math.floor(s.head/2)+', head '+s.head%2+' output removed';
+    const tk=ITM.tokenize(s.prompt),selected=s.head===null?1:s.head,attention=r.tr.layers[Math.floor(selected/2)].heads[selected%2].weights.at(-1);
+    return '<p>Results for <code>'+esc(s.prompt)+'</code>. <b>'+esc(head)+'.</b></p>'+table('Compare the same input with and without the intervention',['Run','Chance of a place','Chance of an animal'],[['All heads active',pct(baseline.place),pct(baseline.animal)],[head,pct(r.place),pct(r.animal)]])+'<details><summary>Inspect the selected head’s attention</summary><p>Attention at the final token, layer '+Math.floor(selected/2)+', head '+selected%2+'. The head’s output may be removed; this table shows its computed attention weights.</p>'+table('Attention to each input token',['Token','Weight'],tk.ids.map((v,i)=>[ITM.CFG.vocab[v],attention[i].toFixed(3)]))+'</details><p class="iv-note">Place = mat, bed or home. Animal = cat, dog or bird. Other vocabulary remains possible. Small probabilities are not rounded to an exact zero.</p>';
   }
-  function mount(el, id) {
-    const C = window.ITMCases, ITM = window.ITM, def = definitions[id], meta = catalog.find(c => c.id === id);
-    if (!C || !ITM || !meta) { el.innerHTML = '<p>The experiment could not load. Reload this page, or <a href="/guide/attention/">read the explanation of attention</a>.</p>'; return; }
-    let progress = C.loadProgress(storage()), notice = '', customPrompt = 'the cat saw on the', customResult = '', sessionOnly = false;
-    const openedAt=performance.now(),N=window.ITMNotebook;
-    N?.record(storage(),id,'case-open');
-    customPrompt = progress.cases[id].prompt || customPrompt;
-    let promptDraft=customPrompt,promptError=false;
-    try { sessionOnly = !storage(); } catch (_) { sessionOnly = true; }
-    const baseline = id === 'place' ? C.runPlace(meta.prompt) : null;
-    const choices = (name, entries, selected) => entries.map(([value, label]) => '<label class="iv-option"><input type="radio" name="' + name + '" value="' + value + '"' + (value === selected ? ' checked' : '') + '> <span>' + esc(label) + '</span></label>').join('');
-    const form = (action, title, options, selected, button) => '<form data-form="' + action + '"><fieldset><legend>' + esc(title) + '</legend>' + choices(action, options, selected) + '</fieldset><button class="btn" type="submit">' + button + '</button></form>';
-    const metric = (label, value, note) => '<div class="iv-measure"><span>' + esc(label) + '</span><strong>' + esc(value) + '</strong><small>' + esc(note) + '</small></div>';
-    const placeResult = r => '<div class="iv-measures">' + metric('Chance of a place', pct(r.place), 'mat, bed or home') + metric('Chance of an animal', pct(r.animal), 'cat, dog or bird') + '</div>';
-    const distribution = probs => '<div class="iv-bars">' + probs.map((p, i) => [ITM.CFG.vocab[i], p]).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([word, p]) => '<div class="iv-bar"><code>' + esc(word) + '</code><span><i style="width:' + (p * 100).toFixed(2) + '%"></i></span><b>' + pct(p) + '</b></div>').join('') + '</div>';
-    function trainingResult(prompt, target) {
-      const r = C.runTraining(prompt, target);
-      return '<p>Prompt: <code>' + esc(prompt) + '</code> · target: <code>' + target + '</code></p><div class="iv-table-wrap"><table><caption>Same architecture and prompt; different weights</caption><thead><tr><th scope="col">Weights</th><th scope="col">P(' + target + ')</th><th scope="col">Loss (nats)</th></tr></thead><tbody>' + [['Trained', r.trained], ['Untrained', r.random]].map(([name, row]) => '<tr><th scope="row">' + name + '</th><td>' + pct(row.probability) + '</td><td>' + row.loss.toFixed(4) + '</td></tr>').join('') + '</tbody></table></div><p class="iv-note">Loss = −ln(P(target)). Lower loss means more probability assigned to this particular target.</p>';
+  function example(id,n){const t=C.transferSpec(id,n);let html;
+    if(t.kind==='training')html=trainingResult(t.prompt,t.target);
+    else if(t.kind==='future')html=futureResult(t.a,t.b,t.position);
+    else if(t.kind==='sufficiency')html=sufficiencyResult(t.prompt);
+    else if(t.kind==='confidence')html=confidenceResult(t.prompt,t.result.temperature);
+    else if(t.kind==='control')html=table('Only the verb token differs; positions are preserved',['Input','Chance of a place'],t.result.map(p=>[p.prompt,pct(p.place)]));
+    else html='<p>Prompt: <code>'+esc(t.prompt)+'</code></p>'+placeMetrics(t.result);
+    return '<div class="iv-example">'+html+'<p class="iv-note">Computed with the same published teaching model and weights.</p></div>';
+  }
+  function mount(el,id){
+    const meta=catalog.find(c=>c.id===id),guide=context[id];
+    if(!C||!W||!ITM||!meta){el.innerHTML='<p>The experiment could not load. Reload this page, or <a href="/cases/">choose another investigation</a>.</p>';return;}
+    let state=W.load(backing()),draft={...state.cases[id]},error='',message='',sessionOnly=false;
+    const opened=performance.now();window.ITMNotebook?.record(backing(),id,'case-open');
+    const field=(name,label,type='text',extra='')=>'<label class="iv-field" for="iv-'+name+'">'+esc(label)+'<input id="iv-'+name+'" name="'+name+'" type="'+type+'" value="'+esc(draft[name])+'" '+(type==='text'?'maxlength="250" autocomplete="off" spellcheck="false" ':'')+extra+' aria-describedby="iv-error"'+(error?' aria-invalid="true"':'')+'></label>';
+    function inputs(){
+      if(id==='future')return field('a','First input')+field('b','Second input')+field('position','Measure at token position','number','min="1" max="14" step="1"');
+      if(id==='controls')return field('a','First prompt')+field('b','Second prompt');
+      return field('prompt','Prompt')+(id==='training'?'<label class="iv-field" for="iv-target">Target token<select id="iv-target" name="target">'+ITM.CFG.vocab.slice(1).map(w=>'<option'+(draft.target===w?' selected':'')+'>'+esc(w)+'</option>').join('')+'</select></label>':'')+(id==='confidence'?field('temperature','Positive temperature','number','min="0.25" max="4" step="0.25"'):'');
     }
-    function futureResult(a, b, pos) {
-      const r = C.runFuture(a, b, pos);
-      return '<div class="iv-prompts"><code>' + esc(a) + '</code><code>' + esc(b) + '</code></div><p>Measure at <b>' + esc(r.words[pos]) + '</b> (position ' + pos + '; start token is position 0).</p><div class="iv-measures">' + metric('Largest probability change', r.maxDifference.toExponential(2), 'Across all 25 next-token probabilities') + metric('Attention to future positions', r.futureAttention.toFixed(2), 'Maximum over both inputs, every layer and head') + '</div><p class="iv-note">Distributions are treated as equal within 1e-12. This is a numerical comparison, not a sampled output.</p><div class="iv-attention" role="list" aria-label="Layer 0, head 0 attention at the selected position">' + r.words.map((word, i) => '<span role="listitem" class="' + (i > pos ? 'iv-masked' : '') + '"><code>' + esc(word) + '</code><b>' + r.attention[i].toFixed(3) + '</b>' + (i > pos ? '<small>masked</small>' : '') + '</span>').join('') + '</div>';
+    function render(focus){
+      const s=state.cases[id];let result='';try{result=measured(id,s);}catch(e){error=e.message;result='<p>Adjust the inputs above to run a comparison.</p>';}
+      const presets=id==='controls'?'<div class="iv-design-options" role="group" aria-label="Worked control designs">'+[['diagnostic','Change each candidate token separately'],['confounded','Change both candidate tokens together'],['repeat','Repeat the baseline']].map(([value,label])=>'<button type="button" data-plan="'+value+'" aria-pressed="'+(!s.custom&&s.plan===value)+'">'+label+'</button>').join('')+'</div>':'';
+      const heads=id==='place'?'<div class="iv-heads" role="group" aria-label="Head-output intervention">'+[[null,'All heads active'],...[0,1,2,3].map(h=>[h,'Remove layer '+Math.floor(h/2)+', head '+h%2])].map(([h,label])=>'<button type="button" data-head="'+(h===null?'all':h)+'" aria-pressed="'+(s.head===h)+'">'+label+'</button>').join('')+'</div>':'';
+      el.innerHTML='<div class="iv iv-open"><p class="iv-use">'+esc(guide.use)+'</p><h3>'+esc(guide.question)+'</h3><form data-run><div class="iv-fields">'+inputs()+'</div><button class="btn" type="submit">Run comparison</button></form>'+presets+heads+'<p id="iv-error" class="iv-feedback" role="alert"'+(error?'':' hidden')+'>'+esc(error)+'</p><section class="iv-stage" aria-labelledby="iv-result"><h3 id="iv-result" tabindex="-1">Measurements</h3>'+result+'</section><details class="iv-interpretation"><summary>Interpret the comparison</summary><p>'+esc(guide.insight)+'</p><p class="iv-note">'+esc(guide.limit)+'</p></details><section class="iv-stage"><h3>Try another context</h3><p>Change the inputs above or inspect one of three worked comparisons. Consider what you expect before revealing it, if that helps your reasoning.</p><button type="button" class="btn" data-example>'+(s.exampleShown?'Next worked comparison':'Show a worked comparison')+'</button>'+(s.exampleShown?example(id,s.example):'')+'</section><p class="iv-save" role="status">'+esc(message||(sessionOnly?'Storage is unavailable; settings last for this page session.':'Settings stay in this browser when storage is available.'))+'</p><div class="iv-tools"><button type="button" data-reset>Reset inputs</button><a href="/notebook/?case='+id+'">Notes</a></div><details><summary>Teaching-model vocabulary</summary><p>'+esc(ITM.CFG.vocab.slice(1).join(', '))+'</p><p>This model uses a small synthetic grammar. A supported word sequence may still lie outside that grammar.</p></details><section class="iv-resources"><h3>Use this reasoning in your work</h3><p><a href="/investigate/">Investigate a changed LLM response</a> connects these controlled comparisons to a practical debugging workflow.</p><ul>'+meta.resources.map(([label,href])=>'<li><a href="'+href+'">'+esc(label)+'</a></li>').join('')+'<li><a href="/methods/">Methods, provenance and limitations</a></li></ul><p><a href="/cases/">Choose another question</a></p></section></div>';
+      if(focus){const node=el.querySelector(focus);node?.focus({preventScroll:true});if(node?.tagName==='H3')node.scrollIntoView({block:'nearest'});}
     }
-    function evidencePanel(s) {
-      if(id==='controls')return designPanel(s,true);
-      if (id === 'place') {
-        const r = Number.isInteger(s.experiment) ? C.runPlace(meta.prompt, [s.experiment]) : baseline;
-        return '<p><b>All heads on:</b> ' + pct(baseline.place) + ' chance of a place. Select a head to remove only its output; the other three stay on.</p><div class="iv-heads" role="group" aria-label="Remove one attention head">' + [0, 1, 2, 3].map(i => '<button type="button" data-head="' + i + '" aria-pressed="' + (s.experiment === i) + '"' + (s.explanation ? ' disabled' : '') + '>Layer ' + Math.floor(i / 2) + ', head ' + (i % 2) + '<small>' + (s.experiment === i ? 'output removed' : 'test this head') + '</small></button>').join('') + '</div><div aria-live="polite"><p><b>Current intervention:</b> ' + (Number.isInteger(s.experiment) ? 'layer ' + Math.floor(s.experiment / 2) + ', head ' + s.experiment % 2 + ' removed' : 'none; all heads on') + '.</p>' + placeResult(r) + distribution(r.probs) + (s.experiment !== null ? '<p>' + (C.evidence(id, s.experiment) ? '<b>Evidence found.</b> This single-head intervention takes the place probability below 10%.' : 'The model still expects a place. Try a different head.') + '</p>' : '') + '</div>';
-      }
-      if (s.experiment !== true) return '<button type="button" class="btn" data-action="experiment">Run the controlled comparison</button>';
-      if(id==='sufficiency')return sufficiencyResult(meta.prompt);
-      if(id==='confidence')return confidenceResult(meta.prompt,2);
-      return id === 'training' ? trainingResult(meta.prompt, 'mat') : futureResult(meta.prompt, 'the cat sat on the bed', 3);
+    function run(patch={}){
+      const next={...state.cases[id],...draft,...patch};
+      if(id==='controls'&&!('plan'in patch))next.custom=true;
+      try{measured(id,next);}catch(e){error=e.message;message='The last valid measurement is retained below.';render('[name="'+(id==='future'||id==='controls'?'a':'prompt')+'"]');return;}
+      const result=W.commit(sessionOnly?null:backing(),state,id,{...next,explored:true});state=result.state;sessionOnly=!result.persisted;draft={...state.cases[id]};error='';message=sessionOnly?'Computed. Storage is unavailable; settings last for this page session.':'Comparison computed; settings saved in this browser.';
+      window.ITMNotebook?.record(backing(),id,'experiment',{seconds:(performance.now()-opened)/1000});window.dispatchEvent(new Event('itm:case-progress'));render('#iv-result');
     }
-    function controlResult(plan){
-      const r=C.runControl(plan);
-      return '<div class="iv-table-wrap"><table><caption>Chance of a place; all heads on</caption><thead><tr><th scope="col">Input</th><th scope="col">Probability</th></tr></thead><tbody><tr><th scope="row">the cat sat on the (baseline)</th><td>'+pct(r.baseline)+'</td></tr>'+r.probes.map(p=>'<tr><th scope="row">'+esc(p.prompt)+'</th><td>'+pct(p.place)+'</td></tr>').join('')+'</tbody></table></div><p role="status">'+(r.discriminates?'This design separates the two candidate causes: the verb changes in one probe; the preposition is removed in the other.':plan==='confounded'?'Both the verb and preposition changed. This measurement cannot distinguish which change mattered. Choose a more informative design.':'Repeating the same computation checks consistency, but does not distinguish the two explanations. Choose another design.')+'</p>';
-    }
-    function designPanel(s,standalone=false){
-      const plan=standalone?s.experiment:s.design;
-      const labels=[['diagnostic','Change the verb, then separately remove the preposition'],['confounded','Change the verb and remove the preposition together'],['repeat','Run the original input again']];
-      return '<div class="iv-design"><h4 tabindex="-1">Choose a test of competing explanations</h4><p>The candidate causes are the verb and the preposition. What comparison would distinguish them?</p><div class="iv-design-options" role="group" aria-label="Experimental designs">'+labels.map(([key,label])=>'<button type="button" data-plan="'+key+'" aria-pressed="'+(plan===key)+'"'+(s.explanation?' disabled':'')+'>'+label+'</button>').join('')+'</div>'+(plan?controlResult(plan):'<p class="iv-note">Select a design before its measurements are revealed.</p>')+'</div>';
-    }
-    function sufficiencyResult(prompt){
-      const r=C.runSufficiency(prompt);
-      return '<p>Input: <code>'+esc(prompt)+'</code></p><div class="iv-table-wrap"><table><caption>Chance of a place under head-output interventions</caption><thead><tr><th scope="col">Intervention</th><th scope="col">Probability</th></tr></thead><tbody>'+[['All four heads active',r.baseline],['Remove layer 0, head 1',r.removed],['Keep only layer 0, head 1 among heads',r.kept]].map(([label,p])=>'<tr><th scope="row">'+label+'</th><td>'+pct(p)+'</td></tr>').join('')+'</tbody></table></div><p class="iv-note">All non-attention components remain. “Preference remains” means place probability is above 50% for this input.</p>';
-    }
-    function confidenceResult(prompt,temperature){
-      const r=C.runConfidence(prompt,temperature),V=ITM.CFG.vocab,top=r.original.map((p,i)=>[p,i]).sort((a,b)=>b[0]-a[0]).slice(0,4);
-      return '<p>Input: <code>'+esc(prompt)+'</code></p><div class="iv-table-wrap"><table><caption>Same logits, different positive temperature</caption><thead><tr><th scope="col">Next token</th><th scope="col">T = 1</th><th scope="col">T = '+temperature+'</th></tr></thead><tbody>'+top.map(([,i])=>'<tr><th scope="row">'+esc(V[i])+'</th><td>'+pct(r.original[i])+'</td><td>'+pct(r.adjusted[i])+'</td></tr>').join('')+'</tbody></table></div><p><b>Top token:</b> '+esc(V[r.originalTop])+' → '+esc(V[r.adjustedTop])+'. <b>Weights:</b> unchanged (checksum <code>'+r.checksum+'</code>).</p>';
-    }
-    function inspection() {
-      if (id !== 'place') return '';
-      const r = C.runPlace(customPrompt), tk = ITM.tokenize(customPrompt), att = r.tr.layers[0].heads[1].weights.at(-1);
-      return '<div class="iv-input-study"><h4>Test the input signal</h4><p>All four heads are restored for these input comparisons. The attention row below is layer 0, head 1, read from the final word.</p><div class="iv-tests" role="group" aria-label="Controlled input comparisons">' + ['the cat saw on the', 'the cat sat the', 'the cat slept on the'].map(t => '<button type="button" data-prompt="' + t + '" aria-pressed="' + (t === customPrompt) + '">' + t + '</button>').join('') + '</div><form data-form="prompt"><label for="iv-prompt">Try a supported prompt</label><div class="iv-input-row"><input id="iv-prompt" name="prompt" maxlength="250" value="' + esc(promptDraft) + '" aria-describedby="iv-prompt-status" aria-invalid="'+promptError+'" autocomplete="off" spellcheck="false"><button type="submit" class="btn">Run prompt</button></div></form><p id="iv-prompt-status" role="status">' + esc(customResult) + '</p><p>Results for <code>'+esc(customPrompt)+'</code>, all heads on.</p>' + placeResult(r) + '<div class="iv-attention" role="list" aria-label="Measured attention by token">' + tk.ids.map((token, i) => '<span role="listitem"><code>' + esc(ITM.CFG.vocab[token]) + '</code><b>' + att[i].toFixed(3) + '</b></span>').join('') + '</div><details><summary>Words this model knows</summary><p>' + esc(ITM.CFG.vocab.slice(1).join(', ')) + '</p></details></div>';
-    }
-    function transferResult() {
-      const t=C.transferSpec(id,progress.cases[id].variant);
-      if(t.kind==='place')return '<p><b>Transfer measurement, all heads on:</b> <code>'+esc(t.prompt)+'</code></p>'+placeResult(t.result);
-      if(t.kind==='training')return trainingResult(t.prompt,t.target);
-      if(t.kind==='sufficiency')return sufficiencyResult(t.prompt);
-      if(t.kind==='confidence')return confidenceResult(t.prompt,t.result.temperature);
-      if(t.kind==='control')return '<div class="iv-measures">'+t.result.map(p=>metric(p.prompt,pct(p.place),'Chance of a place, all heads on')).join('')+'</div><p>Only the verb differs between these two inputs.</p>';
-      return futureResult(t.a,t.b,t.position);
-    }
-    function render(focus) {
-      const s = progress.cases[id], hasEvidence = C.evidence(id, s.experiment), correctExplanation = s.explanation === C.answers(id,s.variant).explanation;
-      const transfer=C.transferSpec(id,s.variant),canExplain=id!=='place'||s.design==='diagnostic';
-      const stage = s.completed ? 4 : correctExplanation ? 3 : hasEvidence ? 2 : s.prediction ? 1 : 0;
-      const next = catalog[catalog.findIndex(c => c.id === id) + 1];
-      el.innerHTML = '<div class="iv"><nav class="iv-progress" aria-label="Investigation progress"><ol>' + ['Predict', 'Experiment', 'Explain', 'Explore further'].map((t, i) => '<li' + (i === Math.min(stage, 3) ? ' aria-current="step"' : '') + '>' + (i + 1) + '. ' + t + (i < stage ? '<span class="iv-done"> · done</span>' : '') + '</li>').join('') + '</ol></nav>' +
-        (s.legacy ? '<p class="iv-note">Welcome back. Your earlier work is recognized; this version adds a fresh-example check.</p>' : '') +
-        '<p class="iv-save">' + (sessionOnly ? 'Browser storage is unavailable. Progress lasts until you leave this page.' : 'Progress saves in this browser. No account needed.') + '</p>' +
-        '<section class="iv-stage" aria-labelledby="iv-predict"><h3 id="iv-predict" tabindex="-1">1. Make a prediction</h3>' + (s.prediction ? '<p>Starting point: <b>' + esc((s.prediction==='uncertain'?'Explore first; no prediction recorded':def.choices.find(c => c[0] === s.prediction)[1])) + '</b>. Compare it with the measured result.</p>' : form('prediction', def.prediction, def.choices, '', 'Record my prediction')+'<button type="button" class="iv-explore" data-action="explore">Go straight to the experiment</button>') + '</section>' +
-        (s.prediction ? '<section class="iv-stage" aria-labelledby="iv-experiment"><h3 id="iv-experiment" tabindex="-1">2. Collect evidence</h3><p>' + def.mission + '</p>' + evidencePanel(s) + '</section>' : '<p class="iv-locked">A prediction gives you something to compare with the result. You can also explore first.</p>') +
-        (hasEvidence ? '<section class="iv-stage" aria-labelledby="iv-explain"><h3 id="iv-explain" tabindex="-1">3. Explain the result</h3>'+(id==='place'?designPanel(s):'')+(canExplain?inspection()+(correctExplanation?'<p><b>Explanation supported.</b> '+esc(def.explanations.find(c=>c[0]===s.explanation)[1])+'.</p>':form('explanation',def.explanation,def.explanations,s.explanation,'Check against the evidence')+(s.explanation?'<p class="iv-feedback" role="status">'+def.wrong+'</p>':'')):'')+'<p class="iv-note">'+def.limit+'</p></section>':'') +
-        (correctExplanation ? '<section class="iv-stage" aria-labelledby="iv-transfer"><h3 id="iv-transfer" tabindex="-1">4. Try another input</h3>' + (s.priorExposure ? '<p class="iv-note">You have seen this example’s result before. This is a practice check, rather than a new blind assessment.</p>' : '') + (s.completed ? '<p><b>Comparison complete.</b> ' + (s.priorExposure ? 'Your prediction matches the measurement on this previously explored input.' : s.attempts > 1 ? 'The measurements helped you refine your prediction.' : 'Your prediction matches the measurement on this new input.') + '</p>' : form('transfer', transfer.question, transfer.choices, s.transfer, s.transfer ? 'Run the revised prediction' : 'Run this prediction')) + (s.transfer ? transferResult() + (!s.completed ? '<p class="iv-feedback" role="status">The result differs from your prediction. Compare the values above: what would explain the difference? You can revise the prediction and run it again.</p>' : '') : '<p class="iv-note">The measurement stays hidden until you commit a prediction.</p>') + '</section>' : '') +
-        (s.completed ? '<section class="iv-conclusion" aria-labelledby="iv-closed"><h3 id="iv-closed" tabindex="-1">What the experiment shows</h3><p>' + def.conclusion + '</p><div class="iv-next">' + (next ? '<a class="btn" href="/cases/' + next.slug + '/">Next: ' + next.title + '</a>' : '<a class="btn" href="/explorer/">Continue in the Model Explorer</a>') + '<a href="/cases/">All investigations</a><a href="/notebook/?case='+id+'">Save a note</a></div></section>' : '') +
-        '<p class="iv-notice" role="status">' + esc(notice) + '</p><div class="iv-tools"><button type="button" data-action="hint"' + (s.hint >= 2 ? ' disabled' : '') + '>Show a hint' + (s.hint ? ' (' + s.hint + '/2)' : '') + '</button><button type="button" data-action="reset">Restart this investigation</button></div>' + (s.hint ? '<aside class="iv-hint" tabindex="-1"><p>' + def.hints[s.hint - 1] + '</p></aside>' : '') +
-        '<section class="iv-resources"><h3>Follow the mechanism</h3><p>Inspect the calculation, read the explanation, or reproduce it in code.</p><ul><li><a href="' + explorerLink(id, meta.prompt) + '">Inspect this case in the Model Explorer</a></li>' + meta.resources.map(([label, href]) => '<li><a href="' + href + '">' + label + '</a></li>').join('') + '<li><a href="/methods/">Methods, verification and limitations</a></li></ul></section></div>';
-      if (focus) {
-        const target = el.querySelector(focus);
-        target?.focus({ preventScroll: true });
-        if (target?.tagName === 'H3' || target?.classList.contains('iv-hint')) target.scrollIntoView({ block: 'nearest' });
-      }
-    }
-    function update(action, value, focus) {
-      const backing = storage(), base = backing && !sessionOnly ? C.loadProgress(backing) : progress;
-      const pending = C.transition(base, id, action, value);
-      const merged = backing ? C.mergeCaseProgress(C.loadProgress(backing), pending, id) : pending;
-      sessionOnly = !C.saveProgress(backing, merged);
-      progress = sessionOnly ? pending : merged;
-      const state=progress.cases[id];
-      N?.record(backing,id,action,{seconds:(performance.now()-openedAt)/1000,attempt:state.attempts,practice:state.priorExposure,correct:action==='transfer'?state.transfer===C.answers(id,state.variant).transfer:action==='explanation'?state.explanation===C.answers(id,state.variant).explanation:null});
-      if(action==='transfer'&&state.completed)N?.record(backing,id,'completed',{seconds:(performance.now()-openedAt)/1000});
-      window.dispatchEvent(new Event('itm:case-progress'));
-      render(focus);
-    }
-    el.addEventListener('submit', event => {
-      event.preventDefault(); const action = event.target.dataset.form;
-      if (action === 'prompt') {
-        const text = event.target.elements.prompt.value.trim(), valid = C.validatePrompt(text);
-        promptDraft=text;promptError=!valid.ok;
-        customResult = valid.ok ? 'Computed with all heads on.' : valid.message;
-        if (valid.ok) { customPrompt = text; update('prompt', text, '#iv-prompt'); } else render('#iv-prompt');
-        return;
-      }
-      const pick = event.target.querySelector('input:checked');
-      if (!pick) { notice = 'Choose a prediction or explanation before continuing.'; render('form[data-form="' + action + '"] input'); return; }
-      notice = '';
-      update(action,pick.value,action==='prediction'?'#iv-experiment':action==='explanation'?(pick.value===C.answers(id,progress.cases[id].variant).explanation?'#iv-transfer':'#iv-explain'):(pick.value===C.answers(id,progress.cases[id].variant).transfer?'#iv-closed':'#iv-transfer'));
-    });
-    el.addEventListener('click', event => {
-      const head = event.target.closest('[data-head]');
-      const plan=event.target.closest('[data-plan]');
-      if(plan){update(id==='place'?'design':'experiment',plan.dataset.plan,'.iv-design h4');return;}
-      if (head) { notice = ''; update('experiment', +head.dataset.head, '[data-head="' + head.dataset.head + '"]'); return; }
-      const prompt = event.target.closest('[data-prompt]');
-      if (prompt) { customPrompt = prompt.dataset.prompt; promptDraft=customPrompt;promptError=false; customResult = 'Computed with all heads on.'; update('prompt', customPrompt, '[data-prompt="' + customPrompt + '"]'); return; }
-      const action = event.target.closest('[data-action]')?.dataset.action;
-      if (!action) return;
-      notice = '';
-      if(action==='explore'){update('prediction','uncertain','#iv-experiment');return;}
-      if (action === 'reset') { customPrompt = 'the cat saw on the'; promptDraft=customPrompt;promptError=false; customResult = ''; }
-      update(action, action === 'experiment' ? true : undefined, action === 'reset' ? '#iv-predict' : action === 'hint' ? '.iv-hint' : '#iv-explain');
+    el.addEventListener('input',e=>{if(e.target.name)draft[e.target.name]=e.target.type==='number'?Number(e.target.value):e.target.value;});
+    el.addEventListener('change',e=>{if(e.target.name)draft[e.target.name]=e.target.type==='number'?Number(e.target.value):e.target.value;});
+    el.addEventListener('submit',e=>{if(!e.target.matches('[data-run]'))return;e.preventDefault();run();});
+    el.addEventListener('click',e=>{
+      const head=e.target.closest('[data-head]'),plan=e.target.closest('[data-plan]');
+      if(head){run({head:head.dataset.head==='all'?null:Number(head.dataset.head)});return;}
+      if(plan){const value=plan.dataset.plan;run({plan:value,custom:false,a:'the cat sat on the',b:value==='repeat'?'the cat sat on the':value==='confounded'?'the cat saw and the':'the cat saw on the'});return;}
+      if(e.target.closest('[data-example]')){const s=state.cases[id],result=W.commit(sessionOnly?null:backing(),state,id,{example:s.exampleShown?(s.example+1)%3:0,exampleShown:true,explored:true});state=result.state;sessionOnly=!result.persisted;error='';message='Worked comparison shown. Change the inputs above to investigate another context.';window.dispatchEvent(new Event('itm:case-progress'));render();}
+      if(e.target.closest('[data-reset]')){const result=W.reset(sessionOnly?null:backing(),state,id);state=result.state;draft={...state.cases[id]};sessionOnly=!result.persisted;error='';message='Inputs reset. Earlier exploration history is retained.';render();}
     });
     render();
   }
-  [['caseplace','place'],['casetraining','training'],['casefuture','future'],['casecontrols','controls'],['casesufficiency','sufficiency'],['caseconfidence','confidence']].forEach(([name,id])=>{
-    window.W[name] = el => { try { mount(el, id); } catch (e) { console.error('Investigation initialization failed', e); el.innerHTML = '<p>The experiment could not start. Reload the page, or <a href="/cases/">return to the investigations</a>.</p>'; } };
-  });
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', refreshStatus); else refreshStatus();
-  window.addEventListener('itm:case-progress', refreshStatus);
-  window.addEventListener('pageshow', refreshStatus);
-  window.addEventListener('storage', refreshStatus);
+  [['caseplace','place'],['casetraining','training'],['casefuture','future'],['casecontrols','controls'],['casesufficiency','sufficiency'],['caseconfidence','confidence']].forEach(([name,id])=>{window.W[name]=el=>{try{mount(el,id);}catch(e){console.error('Experiment initialization failed',e);el.innerHTML='<p>The experiment could not start. Reload, or <a href="/cases/">choose another investigation</a>.</p>';}};});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refreshStatus);else refreshStatus();
+  for(const event of ['itm:case-progress','storage','pageshow'])window.addEventListener(event,refreshStatus);
 })();

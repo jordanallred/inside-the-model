@@ -8,7 +8,7 @@ export function renderHome({ CH, PARTS, labs, rows, params, cases }) {
   }).join('\n');
   return `---
 title: Understand language models by taking them apart
-description: Guided investigations for developers who want to understand LLM internals. Predict, experiment on a working model, and test your explanation.
+description: Open experiments for developers who want to reason about LLM behavior. Isolate changes, inspect measurements and reproduce the comparisons.
 template: splash
 head:
   - tag: style
@@ -20,12 +20,12 @@ head:
   <div class="home-stage-inner">
     <div class="home-hero-copy">
       <h1>Understand language models by taking them apart.</h1>
-      <p class="home-deck">You build with language models. Now investigate what happens inside one. Make a prediction, change a component, and test your explanation against the actual computation.</p>
+      <p class="home-deck">You build with language models. Learn to test explanations for their behavior: isolate a change, inspect the computed effect, and reproduce the comparison in code.</p>
       <div class="home-actions">
         <a class="home-action-primary" data-case-start href="/cases/place-or-animal/">Start: The place detector</a>
-        <a class="home-action-secondary" href="/cases/">Explore the investigations ${arrow}</a>
+        <a class="home-action-secondary" href="/investigate/">Start with a question from your work ${arrow}</a>
       </div>
-      <p class="home-reading-note">Your first investigation takes about 10 minutes. No installation, GPU, or prior maths required.</p>
+      <p class="home-reading-note">Start in the browser. Follow the equations and reproduce the measurements in Python when you want more depth.</p>
     </div>
     <figure class="home-specimen">
       <div class="widget hv not-content" data-w="homehero"><p data-home-static>A small, trained transformer runs here in your browser. <a href="/cases/place-or-animal/">Investigate its place prediction.</a></p></div>
@@ -40,20 +40,20 @@ head:
 
 <section class="home-section home-routes" aria-labelledby="home-routes-title">
   <div class="home-section-heading">
-    <h2 id="home-routes-title">Six questions.<br>Learn to investigate.</h2>
-    <p>Start with the place detector. Build through learning and information flow, then design controls and challenge causal claims. Make a prediction, inspect what changes, and follow the questions that interest you.</p>
+    <h2 id="home-routes-title">Choose a question.<br>Test an explanation.</h2>
+    <p>Compare sampling settings, model weights, information flow and component interventions. Every workbench is open: change the inputs, inspect the measurements, and decide what the evidence supports.</p>
   </div>
   <nav class="home-route-list" aria-label="Investigations in learning order">
-${cases.map((c, i) => `    <a class="home-route home-case" href="/cases/${c.slug}/"><span class="home-case-number">${String(i + 1).padStart(2, '0')}</span><span><b>${esc(c.title)}</b><span class="home-case-question">${esc(c.question)}</span><small>${esc(c.skill)} · about ${c.minutes} min</small><span class="home-case-status" data-case-status="${c.id}">Start investigation</span></span>${arrow}</a>`).join('\n')}
+${cases.map((c, i) => `    <a class="home-route home-case" href="/cases/${c.slug}/"><span class="home-case-number">${String(i + 1).padStart(2, '0')}</span><span><b>${esc(c.title)}</b><span class="home-case-question">${esc(c.question)}</span><small>${esc(c.skill)}</small><span class="home-case-status" data-case-status="${c.id}">Start investigation</span></span>${arrow}</a>`).join('\n')}
   </nav>
 </section>
 
 <section class="home-section home-method" aria-labelledby="home-method-title">
   <div class="home-section-heading"><h2 id="home-method-title">Build an explanation you can test.</h2><p>You do the investigating. The site gives you the instruments, the evidence, and help when you need it.</p></div>
   <ol class="home-method-list">
-    <li><b>Observe &amp; predict</b><p>Start with a concrete behavior. Commit to what you think will happen before seeing the result.</p></li>
+    <li><b>Choose a baseline</b><p>Start with a concrete behavior and a comparison you can interpret. Form a prediction if it helps your reasoning.</p></li>
     <li><b>Intervene &amp; measure</b><p>Remove a head, swap weights, or change the input. Compare the actual probabilities and intermediate values.</p></li>
-    <li><b>Explain &amp; test again</b><p>Use the evidence to choose an explanation, then make a prediction on a fresh example.</p></li>
+    <li><b>Interpret &amp; reproduce</b><p>Inspect the reasoning, test another context, and reproduce the comparison in Python. State what the evidence leaves unresolved.</p></li>
   </ol>
 </section>
 
@@ -99,15 +99,15 @@ ${cases.map((c, i) => `    <a class="home-route home-case" href="/cases/${c.slug
 export function renderCases(cases) {
   return `---
 title: Investigate how language models work
-description: Six guided investigations on a working transformer. Predict, change one variable, inspect the evidence, and test your understanding.
+description: Six open investigations on a working transformer. Change the inputs, inspect the evidence and build a better explanation.
 ---
 
 Understand language models by taking them apart. These investigations are for developers who build with LLMs and want to understand the computation behind their predictions.
 
-Start with **The place detector**. Each investigation asks you to make a prediction, change one variable, and explain the measured result. A fresh example checks whether your explanation transfers. No installation or GPU needed; progress stays in this browser.
+Start with a question you care about, or use **The place detector** to practice a component intervention. Change the inputs or settings, compare measured outputs, and open the explanation whenever it is useful. The [practical investigation guide](/investigate/) connects these comparisons to LLM development. No installation or GPU needed; input settings stay in this browser.
 
 <ol class="case-list">
-${cases.map((c, i) => `<li><a href="/cases/${c.slug}/">${i + 1}. ${esc(c.title)}</a><p>${esc(c.question)}</p><p>${esc(c.skill)}</p><small>About ${c.minutes} minutes <span data-case-status="${c.id}">Start investigation</span></small></li>`).join('\n')}
+${cases.map((c, i) => `<li><a href="/cases/${c.slug}/">${i + 1}. ${esc(c.title)}</a><p>${esc(c.question)}</p><p>${esc(c.skill)}</p><small>Self-paced · <span data-case-status="${c.id}">Start investigation</span></small></li>`).join('\n')}
 </ol>
 
 ## The model is small on purpose
@@ -122,6 +122,6 @@ Open the [Model Explorer](/explorer/) to inspect the calculations, [read the gui
 
 ## Keep investigating: Who gets the ball?
 
-Ready for a more open investigation? [Who gets the ball?](/cases/story-circuit/) asks how a model chooses between two names in a story. It uses a second, larger-vocabulary teaching model and lets you investigate a decision across 24 stories. The published case and its experiments remain available alongside the six guided investigations above.
+Ready for a more open investigation? [Who gets the ball?](/cases/story-circuit/) asks how a model chooses between two names in a story. It uses a second, larger-vocabulary teaching model and lets you investigate a decision across 24 stories. Its head switches, story builder and explanations are available from the start.
 `;
 }

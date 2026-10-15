@@ -61,12 +61,13 @@
     "params": 4496
   },
   "source_hashes": {
-    "public/js/itm-model.js": "767bc7b4f83c3d9aa04c9b43ae2cc04b65ad2de5cfbaf12f9f2d48830578418c",
+    "public/js/itm-model.js": "14a2df8ca2067d1f4ec83c593522ed7966c6376c993f2133a4a6cad32f331f50",
     "public/js/itm-weights.js": "c38919050b6507e4a65c6ec0d271ec97d7e4868db32aed8e8612e32536f5f56e",
-    "public/js/case-engine.js": "ef0db03e87c76a711a153763b33e8c54f6c0f0e414e2683139b3fd0234f42fa4",
+    "public/js/case-engine.js": "cba16a4db87d8bb01e0244ec00fe69d4914d9f40196732e89d799115d5c022f7",
+    "public/js/case-workspace.js": "3cecfad0c2a43bac6f9448794e6e8dcb2427d0a0a7cc171bc217be58e25f4766",
     "public/code/itm_model.py": "2076c7c73b59e8ffa61d1030934c8c4ad8427c954c686296e921acddb52eed97",
     "public/trace/weights.json": "00ec8b56c700ee720b94b3884d6ee8aae9da314ebb93ff28aa6f2498ec9521f6",
-    "public/code/replicate_gpt2_causality.py": "ef93f35bacaa1f3bbf1e9fd8d4523c86742e5f9cabf39cb6d47a0c5419485298"
+    "public/code/replicate_gpt2_causality.py": "168a85665c3808aef23bd406f1385b088ab722f8d571bb94a2dff93fae60f0f9"
   },
   "measurements": {
     "place": {
@@ -81,8 +82,8 @@
           "place": 0.00014770217220022916
         },
         {
-          "prompt": "the cat sat the",
-          "place": 0.9988366373709727
+          "prompt": "the cat sat and the",
+          "place": 0.986309484327925
         }
       ],
       "discriminates": true
@@ -207,6 +208,6 @@
     "node tools/check-cases.mjs",
     "node tools/check-investigation-expansion.mjs"
   ],
-  "scope": "Computed teaching-model fixtures. Transfer answers are included for reproducibility; this is a small practice bank, not a validated examination.",
+  "scope": "Computed teaching-model fixtures. Worked-comparison outcomes are included for reproducibility. They are freely visible and do not assess learning.",
   "hash_normalization": "SHA-256 of UTF-8 text with CRLF normalized to LF"
 }

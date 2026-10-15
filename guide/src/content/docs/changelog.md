@@ -7,6 +7,14 @@ New chapters, teardowns, tools and corrections, newest first. Follow along with 
 
 Found a mistake? Every page ends with a link to report it, and corrections are listed here.
 
+## 2026-10-15: Open workbenches for practical model reasoning
+
+The six investigations now expose editable prompts and measured results immediately. Explanations and worked comparisons are freely available; the Explorer and story-circuit case also use open explanations instead of scored quizzes or unlocks. Settings and exploration history stay local, and older saved progress remains readable.
+
+[Investigate a changed LLM response](/investigate/) connects the experiments to development questions: separate sampling changes from weight changes, preserve token positions, compare interventions, and state the limits of a conclusion. The [GPT-2 replication](/replications/gpt2-causality/) now accepts your own validated prefix, suffixes and positive control in both Python and its notebook.
+
+**Scientific correction:** the control-design example now substitutes `on` with `and` rather than deleting `on`. Deletion also shifted later token positions and could not isolate the intended comparison. The replacement preserves positions but remains outside the training grammar; that limitation is explicit. The random-weight comparison now explicitly identifies its reference as a separate initialization rather than the model’s original training checkpoint.
+
 ## 2026-10-15: Explore freely, keep simple notes, and develop with Astral
 
 Investigations now offer a direct route into the experiment without recording a prediction. Feedback focuses on measured results rather than scores. [Notes](/notebook/) is an optional, autosaved scratchpad; older structured notes and JSON backups still open. Backup and restore controls stay out of the writing area.

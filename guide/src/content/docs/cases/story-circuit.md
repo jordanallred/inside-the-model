@@ -19,7 +19,7 @@ Answering needs more than recognizing names. The model has to keep track of who 
 
 **Two measures, not one.** Some heads break the model so badly that it stops expecting a name at all. That tells you the head matters, but not that it makes the choice you are studying. So the case tracks two things separately: whether the model still expects a name, and whether it prefers the right person over the giver. Choosing what to measure is a large part of real interpretability work.
 
-**Reasoning from what a head can see.** An attention head can only pass on information from the words it reads. If a head reads only one word, everything it contributes must come from that word. Combined with switching the head off, that tells you what kind of information the choice depends on.
+**Reasoning from what a head can see.** An attention head reads vectors at token positions. In a later layer, those vectors can already contain information from earlier context. A strong attention weight identifies where a head reads, but does not establish which features it passes on. Compare attention with output interventions to constrain an explanation, while keeping those limits explicit.
 
 **A stranger as the giver.** You can make someone who is not in the story give the ball, as in <code>tom and ann went to the park . sam gave a ball to</code>. The model never saw a sentence like that while training, so it is a fair test of any explanation you come up with.
 

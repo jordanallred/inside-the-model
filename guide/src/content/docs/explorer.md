@@ -35,8 +35,8 @@ To see how this model relates to real ones, read [Compare with the toy model](/t
 6. Follow an earlier word to the last step. The model makes a prediction at every position; the Notice tells you whether it guessed the word that actually comes next.
 7. Shorten the prompt and compare: earlier tokens' outputs do not change, because a token never reads the tokens after it.
 
-## Test yourself
+## Worked comparisons
 
-Predict first, then check. Each answer is computed from the model above.
+A few concrete questions about the model above. Predict an answer, then open each one to see the computed result and the reasoning behind it.
 
-<div class="widget not-content" data-w="challenges" data-title="Explorer challenges"></div>
+<div class="widget not-content" data-w="challenges" data-title="Explorer worked comparisons"></div>

@@ -484,7 +484,9 @@
     draw();
   };
 
-  /* Test-yourself challenges. Every answer is computed from the live trace, so questions and answers cannot drift from the model. */
+  /* Worked comparisons: concrete questions with the computed answer and reasoning revealed on demand.
+     Every number is computed from the live trace, so the reveal cannot drift from the model. No answer is
+     graded, scored, or stored; <details> lets a reader predict silently, then check their own reasoning. */
   window.W.challenges = el => {
     const { ITM } = window; if (!ITM) { el.insertAdjacentHTML('beforeend', '<p class="src">The model engine failed to load.</p>'); return; }
     const V = ITM.CFG.vocab, P0 = ITM.CFG.prompts[0], P3 = ITM.CFG.prompts[3];
@@ -493,37 +495,24 @@
     const f = x => x.toFixed(3);
     const Q = [];
     { const { tk } = run(P0), t = 3, n = tk.ids.length - 1 - t;
-      Q.push({ id: 'mask', q: 'In “' + P0 + '”, token 3 (“sat”) can read only itself and earlier tokens. Counting <bos> as token 0 and the last token as token ' + (tk.ids.length - 1) + ', how many positions get exactly zero attention weight from “sat”?', opts: [n - 3, n, n + 3, 0].map(String), ans: String(n),
+      Q.push({ id: 'mask', q: 'In “' + P0 + '”, token 3 (“sat”) can read only itself and earlier tokens. Counting <bos> as token 0 and the last token as token ' + (tk.ids.length - 1) + ', how many positions get exactly zero attention weight from “sat”?', ans: String(n) + ' positions',
         why: 'Tokens ' + (t + 1) + ' to ' + (tk.ids.length - 1) + ' come after “sat”, so their scores are set to −∞ and softmax turns them into exactly 0: ' + n + ' positions.', go: link(P0, 6, t, 0, 0) }); }
-    Q.push({ id: 'sum', q: 'Softmax is applied to each row of masked scores. What does each row of attention weights add up to?', opts: ['0', '1', 'The number of tokens', 'It depends on the head'], ans: '1',
+    Q.push({ id: 'sum', q: 'Softmax is applied to each row of masked scores. What does each row of attention weights add up to?', ans: '1',
       why: 'Softmax outputs are non-negative and normalized, so every row sums to 1 (up to rounding). The Numbers view of the softmax step prints the sum to 12 decimals.', go: link(P0, 7, 3, 0, 0) });
     { const { tr, words } = run(P0), w = tr.layers[0].heads[0].weights[3], j = w.indexOf(Math.max(...w)), cands = [0, 1, 2, 3];
-      Q.push({ id: 'argmax', q: 'In layer 0, head 0, which word does “sat” (token 3) give the most attention weight to?', opts: cands.map(i => i + ' ' + words[i]), ans: j + ' ' + words[j],
+      Q.push({ id: 'argmax', q: 'In layer 0, head 0, which word does “sat” (token 3) give the most attention weight to?', ans: j + ' ' + words[j],
         why: 'The weights are ' + cands.map(i => words[i] + ' ' + f(w[i])).join(', ') + '. Heads do not have to look at other words; a head may mostly read the current token.', go: link(P0, 7, 3, 0, 0) }); }
-    Q.push({ id: 'scale', q: 'Scores are q·k divided by what, in this model whose heads are 8 numbers wide?', opts: ['8', '√8', '16', '√16'], ans: '√8',
+    Q.push({ id: 'scale', q: 'Scores are q·k divided by what, in this model whose heads are 8 numbers wide?', ans: '√8',
       why: 'Dividing by √d_k keeps the scores from growing with head width, so softmax does not saturate. Here d_k = 8, so the divisor is √8 ≈ 2.83.', go: link(P0, 5, 3, 0, 0) });
     { const r = run(P3), pr = r.tr.probs.at(-1), cands = ['mat', 'dog', 'sat', '.'], best = cands.reduce((a, b) => pr[V.indexOf(b)] > pr[V.indexOf(a)] ? b : a);
-      Q.push({ id: 'next', q: 'After “' + P3 + '”, which of these words does the trained model rate most likely?', opts: cands, ans: best,
+      Q.push({ id: 'next', q: 'After “' + P3 + '”, which of these does the trained model rate most likely: ' + cands.join(', ') + '?', ans: best,
         why: 'The trained model gives “' + best + '” ' + f(pr[V.indexOf(best)]) + ', while ' + cands.filter(c => c !== best).map(c => c + ' gets ' + f(pr[V.indexOf(c)])).join(', ') + '. In its training grammar, “on the” is always followed by a place.', go: link(P3, 25, r.tk.ids.length - 1, 1, 0) }); }
     { const a = run(P3), b = run(P3, 'random'), pt = a.tr.probs.at(-1), pr = b.tr.probs.at(-1), top = p => V[p.indexOf(Math.max(...p))];
-      Q.push({ id: 'random', q: 'Run the same prompt (“' + P3 + '”) with random, untrained weights. Which statement is true?', opts: ['Probabilities are computed differently', 'The arithmetic is identical; only the weight values differ', 'The random model cannot run', 'The mask is disabled'], ans: 'The arithmetic is identical; only the weight values differ',
+      Q.push({ id: 'random', q: 'Run the same prompt (“' + P3 + '”) with random, untrained weights. Does the arithmetic change, or only the weight values?', ans: 'Only the weight values; the arithmetic (the sequence of operations) is identical',
         why: 'Same code, same steps. Trained weights put ' + f(pt[V.indexOf('mat')] + pt[V.indexOf('bed')]) + ' on mat or bed; random weights put ' + f(pr[V.indexOf('mat')] + pr[V.indexOf('bed')]) + ' there and prefer “' + top(pr) + '”. Learning changes numbers, not the operations.', go: link(P3, 25, a.tk.ids.length - 1, 1, 0, 'random') }); }
-    let saved = {}; try { saved = JSON.parse(localStorage.getItem('itm-challenges') || '{}'); } catch (e) {}
-    const save = () => { try { localStorage.setItem('itm-challenges', JSON.stringify(saved)); } catch (e) {} };
-    el.innerHTML = '<p class="src">Questions are generated from the live model, so every answer is checkable in the Explorer. Your results stay in this browser.</p><div class="ch-score" role="status" data-score></div>' +
-      Q.map((q, i) => '<fieldset class="ch-q" data-q="' + q.id + '"><legend>' + (i + 1) + '. ' + esc(q.q) + '</legend>' + q.opts.map(o => '<label class="ch-o"><input type="radio" name="' + q.id + '" value="' + esc(o) + '"> ' + esc(o) + '</label>').join('') +
-        '<button class="btn" data-ck="' + q.id + '">Check</button><div class="ch-fb" aria-live="polite"></div></fieldset>').join('') + '<button class="btn" data-reset>Reset answers</button>';
-    const show = () => { const n = Q.filter(q => saved[q.id] === 1).length; el.querySelector('[data-score]').textContent = n + ' of ' + Q.length + ' answered correctly'; };
-    const mark = (q, fs, ok) => { fs.querySelector('.ch-fb').innerHTML = '<b>' + (ok ? 'Correct.' : 'Not quite.') + '</b> ' + esc(q.why) + ' <a href="' + q.go + '">See it in the Model Explorer</a>'; fs.classList.toggle('ok', ok); fs.classList.toggle('no', !ok); };
-    Q.forEach(q => { if (q.id in saved) mark(q, el.querySelector('[data-q="' + q.id + '"]'), saved[q.id] === 1); });
-    show();
-    el.addEventListener('click', e => {
-      if (e.target.closest('[data-reset]')) { saved = {}; save(); el.querySelectorAll('.ch-q').forEach(fs => { fs.classList.remove('ok', 'no'); fs.querySelector('.ch-fb').innerHTML = ''; fs.querySelectorAll('input').forEach(i => { i.checked = false; }); }); show(); return; }
-      const b = e.target.closest('[data-ck]'); if (!b) return;
-      const q = Q.find(x => x.id === b.dataset.ck), fs = b.closest('fieldset'), pick = fs.querySelector('input:checked');
-      if (!pick) { fs.querySelector('.ch-fb').textContent = 'Pick an answer first.'; return; }
-      const ok = pick.value === q.ans; saved[q.id] = ok ? 1 : 0; save(); mark(q, fs, ok); show();
-    });
+    el.innerHTML = '<p class="src">Each question is generated from the live model above. Make your own prediction, then open the answer to see the computed result and why.</p>' +
+      Q.map((q, i) => '<div class="ch-q" data-q="' + q.id + '"><p class="ch-q-text">' + (i + 1) + '. ' + esc(q.q) + '</p>' +
+        '<details class="wk-more"><summary>Reveal the computed answer</summary><p><b>Computed answer:</b> ' + esc(q.ans) + '</p><p>' + esc(q.why) + ' <a href="' + q.go + '">See it in the Model Explorer</a></p></details></div>').join('');
   };
 
   /* Chapter widget: what a mask does to the model's real attention scores. */

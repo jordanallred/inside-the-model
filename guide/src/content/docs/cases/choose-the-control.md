@@ -5,12 +5,12 @@ description: Two explanations fit the same prediction. Design a comparison that 
 
 After **the cat sat on the**, the model favors a place. Perhaps **sat** carries the signal. Perhaps **on** does. Both explanations fit the starting example.
 
-Your task is to choose an experiment that separates them. A dramatic change in a prediction can still leave the cause unclear if you changed two things at once.
+Compare the worked designs, then enter your own prompt pair. A dramatic change in a prediction can still leave the cause unclear if you changed two things at once.
 
-**About 12 minutes.** Useful after [The place detector](/cases/place-or-animal/), or as a standalone lesson in experimental design.
+**Self-paced.** Useful after [The place detector](/cases/place-or-animal/), or as a standalone lesson in experimental design.
 
 <div class="widget not-content" data-w="casecontrols" data-title="Design a discriminating control"><p data-widget-fallback>The interactive experiment uses JavaScript. If it does not appear, enable JavaScript or reload. You can also <a href="/guide/attention/">read how attention works</a>.</p></div>
 
 ## Evidence has a scope
 
-Some probes deliberately leave the grammar used for training. That lets us challenge a hypothesis, but it means the model's response describes this trained model under these inputs, rather than a rule about English. Record an alternative explanation in your [evidence notebook](/notebook/?case=controls).
+Some probes deliberately leave the grammar used for training. That lets us challenge a hypothesis, but it means the model's response describes this trained model under these inputs, rather than a rule about English. The clean preset replaces one token at a time: sat → saw, then on → and. All token positions stay fixed. The and probe is outside the grammar; the result does not prove that prepositions never matter in other contexts.

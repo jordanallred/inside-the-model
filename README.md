@@ -4,9 +4,9 @@ Understand language models by taking them apart.
 
 Found a mistake or a broken widget? Use the **Report a problem with this page** link at the bottom of any page, or see [CONTRIBUTING.md](CONTRIBUTING.md). Licensing terms are in [LICENSE](LICENSE).
 
-Guided investigations for developers who build with LLMs and want to understand their internals. Predict an outcome, change a component or input in a working teaching transformer, inspect the evidence, and test your explanation on a fresh example. The chapters, labs, and model teardowns form the supporting reference library.
+Open experiments for developers who build with LLMs and want to test explanations for model behavior. Change an input or component, inspect measured effects, and reproduce the comparison. The chapters, labs, and model teardowns form the supporting reference library.
 
-It is a static Astro site. Experiments run locally in the browser, and investigation progress stays in that browser. Start with **The place detector**, then follow six guided cases through training, causal masking, experimental controls, conditional sufficiency and temperature. **Who gets the ball?** remains a further investigation on the case-file model.
+It is a static Astro site. Experiments run locally in the browser, and input settings stay in that browser. Use the [practical investigation workflow](https://insidethemodel.app/investigate/), then choose among six open cases on training, causal masking, experimental controls, conditional sufficiency and temperature. **Who gets the ball?** remains a further investigation on the case-file model.
 
 The site also includes an optional, autosaved Notes scratchpad, educator workshop materials, a beta-session protocol, a public methods record and an executed GPT-2 replication with downloadable Python and Jupyter artifacts. No expert endorsement or validated learning-efficacy claim is made.
 

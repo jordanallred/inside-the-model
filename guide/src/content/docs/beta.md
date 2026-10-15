@@ -26,7 +26,7 @@ Use 25–35 minutes per participant. Recruit developers with experience using LL
 
 | Outcome | Definition | How to collect it |
 | --- | --- | --- |
-| First-case completion | A learner reaches a checked transfer result | Direct observation and, optionally, local activity export |
+| Useful first comparison | A reader runs a comparison and explains what changed | Direct observation; experiment activity is supporting context only |
 | Independent transfer | The first prediction on an unfamiliar example is explained and tested without help | Observe the task; use the note as supporting evidence |
 | Next-case start | The learner voluntarily starts another investigation | Observation or a subsequent case-open event |
 | Return | The learner uses the site on a later occasion | A follow-up conversation or an optional local timeline |

@@ -4,7 +4,7 @@
    the constants in CFG below equal public/trace/model.json, the architecture both implementations share.
    Pure, deterministic, float64, no dependencies. Works in the browser (window.ITM) and in Node (globalThis.ITM).
    Weights are trained offline (tools/train_model.py) and loaded from itm-weights.js. seeded() gives the random,
-   untrained weights the Explorer offers for contrast; verify-trace runs those through the reference as well. */
+   reference weights the Explorer offers for contrast. Their fixed seed and scales are illustrative, not the exact initialization used by tools/train_model.py; verify-trace runs those through the reference as well. */
 (function (root) {
   const CFG = {
     version: 'itm-toy-2.0', seed: 20261012,
