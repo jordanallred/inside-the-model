@@ -31,7 +31,7 @@ assert.match(styles, /--home-link:/, 'small homepage links use a contrast-safe t
 
 const index = fs.readFileSync('src/content/docs/cases/index.md', 'utf8');
 for (const c of globalThis.ITMCaseCatalog) {
-  for (const page of [generated, index]) assert.ok(page.includes('/cases/' + c.slug + '/'), c.title + ' is discoverable');
+  assert.ok(index.includes('/cases/' + c.slug + '/'), c.title + ' is discoverable');
   assert.ok(fs.existsSync('src/content/docs/cases/' + c.slug + '.md'), 'advertised cases are published');
 }
 assert.match(generated, /class="home-action-primary" href="\/explorer\/"/, 'live model exploration is the primary entrance');

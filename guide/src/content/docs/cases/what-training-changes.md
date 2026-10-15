@@ -1,13 +1,11 @@
 ---
-title: "Case 2: What training changes"
+title: "Trained and random weights"
 description: Keep the model and prompt fixed, swap trained and untrained weights, and measure the difference in probability and loss.
 ---
 
 The same architecture can produce very different predictions. What changes when a model learns?
 
 In this investigation you will compare two sets of weights in the same two-layer transformer. Your target is **mat** after **the cat sat on the**. Change the prompt and target, run the comparison, and inspect where the trained model and random reference differ.
-
-**Self-paced.** Runs locally in your browser. Loss is explained beside the measurement.
 
 <div class="widget not-content" data-w="casetraining" data-title="Investigate what training changes"><p data-widget-fallback>The interactive experiment uses JavaScript. If it does not appear, enable JavaScript or reload. You can also <a href="/guide/attention/">read how attention works</a>.</p></div>
 

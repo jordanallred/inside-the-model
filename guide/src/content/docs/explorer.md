@@ -37,6 +37,6 @@ To see how this model relates to real ones, read [Compare with the toy model](/t
 
 ## Worked comparisons
 
-A few concrete questions about the model above. Predict an answer, then open each one to see the computed result and the reasoning behind it.
+Inspect specific calculations from the model, with computed results and explanations.
 
 <div class="widget not-content" data-w="challenges" data-title="Explorer worked comparisons"></div>

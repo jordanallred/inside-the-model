@@ -1,5 +1,5 @@
 ---
-title: "Case 1: The place detector"
+title: "Attention and head ablation"
 description: Predict, remove one attention head, and test which input signal makes the teaching model expect a place. Compare editable inputs and inspect measured effects.
 ---
 
@@ -7,9 +7,7 @@ The model in the [Model Explorer](/explorer/) has learned that after <code>the c
 
 The model has two layers, each with two attention heads, and 4,496 trained parameters in all. Compare which head outputs affect that preference, then inspect what the heads read.
 
-**Self-paced.** Switch head outputs on or off, change the prompt, and inspect the measured differences. No installation or prior maths required.
-
-<div class="widget not-content" data-w="caseplace" data-title="Case 1: The place detector"><p data-widget-fallback>The interactive experiment uses JavaScript. If it does not appear, enable JavaScript or reload. You can also <a href="/guide/attention/">read how attention works</a>.</p></div>
+<div class="widget not-content" data-w="caseplace" data-title="Attention and head ablation"><p data-widget-fallback>The interactive experiment uses JavaScript. If it does not appear, enable JavaScript or reload. You can also <a href="/guide/attention/">read how attention works</a>.</p></div>
 
 ## How the tools work
 

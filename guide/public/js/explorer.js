@@ -510,8 +510,8 @@
     { const a = run(P3), b = run(P3, 'random'), pt = a.tr.probs.at(-1), pr = b.tr.probs.at(-1), top = p => V[p.indexOf(Math.max(...p))];
       Q.push({ id: 'random', q: 'Run the same prompt (“' + P3 + '”) with random, untrained weights. Does the arithmetic change, or only the weight values?', ans: 'Only the weight values; the arithmetic (the sequence of operations) is identical',
         why: 'Same code, same steps. Trained weights put ' + f(pt[V.indexOf('mat')] + pt[V.indexOf('bed')]) + ' on mat or bed; random weights put ' + f(pr[V.indexOf('mat')] + pr[V.indexOf('bed')]) + ' there and prefer “' + top(pr) + '”. Learning changes numbers, not the operations.', go: link(P3, 25, a.tk.ids.length - 1, 1, 0, 'random') }); }
-    el.innerHTML = '<p class="src">Each question is generated from the live model above. Make your own prediction, then open the answer to see the computed result and why.</p>' +
-      Q.map((q, i) => '<div class="ch-q" data-q="' + q.id + '"><p class="ch-q-text">' + (i + 1) + '. ' + esc(q.q) + '</p>' +
+    el.innerHTML = '<p class="src">Computed from the model and linked to the corresponding Explorer step.</p>' +
+      Q.map(q => '<div class="ch-q" data-q="' + q.id + '"><p class="ch-q-text">' + esc(q.q) + '</p>' +
         '<details class="wk-more"><summary>Reveal the computed answer</summary><p><b>Computed answer:</b> ' + esc(q.ans) + '</p><p>' + esc(q.why) + ' <a href="' + q.go + '">See it in the Model Explorer</a></p></details></div>').join('');
   };
 

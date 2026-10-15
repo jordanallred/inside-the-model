@@ -1,13 +1,11 @@
 ---
-title: "Case 6: Confidence without learning"
+title: "Temperature and probability"
 description: Change a model's probabilities without updating a single weight. Separate positive temperature, ranking and sampled output from learning.
 ---
 
 The same model can look more or less confident without learning anything. Change temperature and compare the probabilities before sampling.
 
 You will keep the input, model weights and logits fixed. The only change is the positive number that divides the logits before softmax.
-
-**Self-paced.** Connects model internals to a setting developers use in generation APIs.
 
 <div class="widget not-content" data-w="caseconfidence" data-title="Change confidence without training"><p data-widget-fallback>The interactive experiment uses JavaScript. If it does not appear, enable JavaScript or reload. You can also <a href="/guide/attention/">read how attention works</a>.</p></div>
 

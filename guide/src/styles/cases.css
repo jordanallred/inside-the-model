@@ -58,7 +58,6 @@
 .case-list a { font-family: var(--itm-font-display); font-size: 1.45rem; }
 .case-list p { margin-block: .4rem; }
 .case-list small { color: var(--sl-color-gray-2); }
-.case-list [data-case-status] { display: inline-block; margin-left: .5rem; font-weight: 600; }
 @media (max-width: 30rem) { .iv-measures { grid-template-columns: 1fr; gap: .25rem; } .iv-heads { gap: .4rem; } .iv-heads button { padding: .65rem; font-size: .82rem; } .iv-bar { grid-template-columns: 3rem minmax(0, 1fr) 4.5rem; gap: .4rem; } }
 @media (prefers-reduced-motion: reduce) { .iv * { scroll-behavior: auto; } }
 .iv-design-options { display: flex; flex-direction: column; gap: .6rem; margin-block: 1rem; }

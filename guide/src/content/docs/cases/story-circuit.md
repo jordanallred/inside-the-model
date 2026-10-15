@@ -1,5 +1,5 @@
 ---
-title: "Who gets the ball?"
+title: "A name-selection circuit"
 description: In “tom and ann went to the park . ann gave a ball to”, the model answers tom, every time. Find the heads that make the choice, and how the model rules out the wrong person.
 ---
 
@@ -11,7 +11,7 @@ The next word has to be <code>tom</code>. Ann is giving the ball, so it goes to 
 
 Answering needs more than recognizing names. The model has to keep track of who is in the story, notice who is giving, and pick the other one. Your job is to find the parts of the model that make that choice, and work out how they make it.
 
-<div class="widget not-content" data-w="casestory" data-title="Further investigation: Who gets the ball?"><p data-widget-fallback>The interactive experiment uses JavaScript. If it does not appear, enable JavaScript or reload. You can also <a href="/guide/attention/">read how attention works</a>.</p></div>
+<div class="widget not-content" data-w="casestory" data-title="A name-selection circuit"><p data-widget-fallback>The interactive experiment uses JavaScript. If it does not appear, enable JavaScript or reload. You can also <a href="/guide/attention/">read how attention works</a>.</p></div>
 
 ## New tools in this case
 

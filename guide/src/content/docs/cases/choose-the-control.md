@@ -1,13 +1,11 @@
 ---
-title: "Case 4: Choose the control"
+title: "Controlled prompt comparisons"
 description: Two explanations fit the same prediction. Design a comparison that makes them disagree, then inspect the model's measured response.
 ---
 
 After **the cat sat on the**, the model favors a place. Perhaps **sat** carries the signal. Perhaps **on** does. Both explanations fit the starting example.
 
 Compare the worked designs, then enter your own prompt pair. A dramatic change in a prediction can still leave the cause unclear if you changed two things at once.
-
-**Self-paced.** Useful after [The place detector](/cases/place-or-animal/), or as a standalone lesson in experimental design.
 
 <div class="widget not-content" data-w="casecontrols" data-title="Design a discriminating control"><p data-widget-fallback>The interactive experiment uses JavaScript. If it does not appear, enable JavaScript or reload. You can also <a href="/guide/attention/">read how attention works</a>.</p></div>
 

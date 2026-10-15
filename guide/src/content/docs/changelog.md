@@ -7,6 +7,10 @@ New chapters, teardowns, tools and corrections, newest first. Follow along with 
 
 Found a mistake? Every page ends with a link to report it, and corrections are listed here.
 
+## 2026-10-15: A more focused reference
+
+Simplified the homepage and navigation around the Model Explorer, experiments and technical reference. Removed the public beta and workshop guides, duplicate field notes and application-debugging framing. Experiment titles now describe their subject directly; progress labels and the repeated homepage method section are gone. Existing bookmarks redirect to the relevant experiments or methods.
+
 ## 2026-10-15: Browser first, with a local project when you need it
 
 Removed the Notes editor, its navigation links and local activity recording. Experiments still run in the browser and retain their input settings. Previously saved notes are left untouched in browser storage.
@@ -17,7 +21,7 @@ Removed the Notes editor, its navigation links and local activity recording. Exp
 
 The six investigations now expose editable prompts and measured results immediately. Explanations and worked comparisons are freely available; the Explorer and story-circuit case also use open explanations instead of scored quizzes or unlocks. Settings and exploration history stay local, and older saved progress remains readable.
 
-[Investigate a changed LLM response](/investigate/) connects the experiments to development questions: separate sampling changes from weight changes, preserve token positions, compare interventions, and state the limits of a conclusion. The [GPT-2 replication](/replications/gpt2-causality/) now accepts your own validated prefix, suffixes and positive control in both Python and its notebook.
+Investigate a changed LLM response (retired) connects the experiments to development questions: separate sampling changes from weight changes, preserve token positions, compare interventions, and state the limits of a conclusion. The [GPT-2 replication](/replications/gpt2-causality/) now accepts your own validated prefix, suffixes and positive control in both Python and its notebook.
 
 **Scientific correction:** the control-design example now substitutes `on` with `and` rather than deleting `on`. Deletion also shifted later token positions and could not isolate the intended comparison. The replacement preserves positions but remains outside the training grammar; that limitation is explicit. The random-weight comparison now explicitly identifies its reference as a separate initialization rather than the model’s original training checkpoint.
 
@@ -33,7 +37,7 @@ The new [Python tools guide](/python-tools/) recommends Astral’s uv, Ruff and 
 
 Three new guided cases teach [experimental controls](/cases/choose-the-control/), [conditional sufficiency](/cases/necessary-and-sufficient/), and [temperature without learning](/cases/confidence-without-learning/). The first case now requires choosing a discriminating experiment. Three verified transfer variants rotate before reuse; repeated examples are marked as practice.
 
-The evidence notebook (retired) keeps local observations and offers Markdown/JSON backups, with optional learning-activity export for [beta sessions](/beta/). A [workshop pack](/teach/) and [methods record](/methods/) support teaching and review. The [GPT-2 replication](/replications/gpt2-causality/) includes executed CPU results, positive controls, pinned weights, a Python script and a runnable notebook.
+The evidence notebook (retired) keeps local observations and offers Markdown/JSON backups, with optional learning-activity export for beta sessions (retired). A workshop pack (retired) and [methods record](/methods/) support teaching and review. The [GPT-2 replication](/replications/gpt2-causality/) includes executed CPU results, positive controls, pinned weights, a Python script and a runnable notebook.
 
 ## 2026-10-14: Investigate a working model
 

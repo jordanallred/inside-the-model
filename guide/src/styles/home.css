@@ -28,7 +28,7 @@ body:has(.home-landing) .content-panel:has(> .sl-container > h1#_top) { display:
 .home-landing ::selection { background: #cbd3ec; color: #222724; }
 .home-landing :is(.home-actions, .home-route, .home-curriculum-intro, .home-proof) svg { flex: 0 0 auto; width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .home-landing a:focus-visible { outline: 2px solid var(--home-link); outline-offset: 5px; }
-.home-stage, .home-section, .home-resources { padding-inline: clamp(1.25rem, 4vw, 4rem); }
+.home-stage, .home-section { padding-inline: clamp(1.25rem, 4vw, 4rem); }
 .home-stage { max-width: 84rem; margin-inline: auto; }
 .home-stage-inner { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(2rem, 4vw, 4rem); align-items: center; padding-block: 3.5rem 2.5rem; }
 .home-hero-copy { max-width: 33rem; }
@@ -83,8 +83,8 @@ body:has(.home-landing) .content-panel:has(> .sl-container > h1#_top) { display:
 .hv-tok.off { opacity: 0.8; }
 .home-proof { display: flex; justify-content: space-between; align-items: baseline; gap: 1.5rem; border-block: 1px solid var(--home-line); padding-block: 1rem; color: var(--home-muted); font-size: 0.78rem; line-height: 1.6; }
 .home-proof a { display: inline-flex; gap: 0.4rem; align-items: center; color: var(--home-link); text-underline-offset: 0.25rem; }
-.home-section, .home-resources { max-width: 84rem; margin-inline: auto; padding-block: 3.5rem; }
-.home-section h2, .home-resources h2 { color: var(--home-ink); font-family: var(--home-display); font-weight: 500; font-size: clamp(1.8rem, 2.8vw, 2.5rem); line-height: 1.18; letter-spacing: -0.02em; }
+.home-section { max-width: 84rem; margin-inline: auto; padding-block: 3.5rem; }
+.home-section h2 h2 { color: var(--home-ink); font-family: var(--home-display); font-weight: 500; font-size: clamp(1.8rem, 2.8vw, 2.5rem); line-height: 1.18; letter-spacing: -0.02em; }
 .home-routes { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: clamp(2rem, 5vw, 5rem); }
 .home-section-heading p { margin-top: 0.85rem !important; max-width: 34ch; color: var(--home-muted); line-height: 1.7; }
 .home-route-list { border-bottom: 1px solid var(--home-line); }
@@ -100,8 +100,7 @@ body:has(.home-landing) .content-panel:has(> .sl-container > h1#_top) { display:
 .home-why-small { font-size: 0.84rem !important; }
 .home-why-small b { color: var(--home-ink); }
 .home-inspection-list { border-bottom: 1px solid var(--home-line); }
-.home-inspection-row { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); gap: 0.35rem 1rem; padding: 1.25rem 0; border-top: 1px solid var(--home-line); text-decoration: none; }
-.home-inspection-row > span { grid-row: 1 / 3; color: var(--home-muted); font-size: 0.8rem; }
+.home-inspection-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.35rem 1rem; padding: 1.25rem 0; border-top: 1px solid var(--home-line); text-decoration: none; }
 .home-inspection-row b { font: 600 1rem/1.5 var(--itm-font-body); }
 .home-inspection-row small { color: var(--home-muted); font-size: 0.84rem; line-height: 1.6; }
 .home-inspection-row:hover b { text-decoration: underline; text-underline-offset: 0.25rem; }
@@ -121,13 +120,6 @@ body:has(.home-landing) .content-panel:has(> .sl-container > h1#_top) { display:
 .home-curriculum-part li > span { color: var(--home-muted); font-size: 0.72rem; font-variant-numeric: tabular-nums; }
 .home-curriculum-part li a { font-size: 0.85rem; text-underline-offset: 0.25rem; text-decoration-color: var(--home-line); }
 .home-curriculum-part li a:hover { color: var(--home-link); text-decoration-color: currentColor; }
-.home-resources { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 2rem clamp(2rem, 5vw, 5rem); border-top: 1px solid var(--home-line); }
-.home-resources > div > p { margin-top: 1rem !important; max-width: 35ch; color: var(--home-muted); line-height: 1.7; font-size: 0.94rem; }
-.home-resources nav { border-bottom: 1px solid var(--home-line); }
-.home-resources nav a { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 1rem; padding-block: 1rem; border-top: 1px solid var(--home-line); text-decoration: none; }
-.home-resources nav b { font-size: 0.9rem; font-weight: 600; }
-.home-resources nav span { color: var(--home-muted); font-size: 0.8rem; }
-.home-resources nav a:hover b { text-decoration: underline; text-underline-offset: 0.25rem; }
 .home-sourcing { grid-column: 1 / -1; max-width: 85ch; padding-top: 1rem; color: var(--home-muted); font-size: 0.78rem; line-height: 1.7; }
 @media (max-width: 56rem) {
   .home-stage-inner { grid-template-columns: 1fr; padding-block: 2.5rem 1.5rem; gap: 2rem; }
@@ -135,13 +127,13 @@ body:has(.home-landing) .content-panel:has(> .sl-container > h1#_top) { display:
   .home-deck { max-width: 50ch; }
   .home-actions { flex-direction: row; align-items: center; flex-wrap: wrap; gap: 1rem; }
   .home-reading-note { max-width: none; margin-top: 1rem !important; }
-  .home-inspection, .home-curriculum, .home-resources, .home-routes { grid-template-columns: 1fr; gap: 1.5rem; }
+  .home-inspection, .home-curriculum, .home-routes { grid-template-columns: 1fr; gap: 1.5rem; }
   .home-curriculum-intro { position: static; }
   .home-section-heading p { max-width: 60ch; }
 }
 @media (max-width: 44rem) {
   .home-proof { flex-direction: column; gap: 0.5rem; }
-  .home-section, .home-resources { padding-block: 2.5rem; }
+  .home-section { padding-block: 2.5rem; }
   .home-specimen .widget.hv { padding-inline: 0.75rem; }
   .hv-head { align-items: flex-start; flex-direction: column; gap: 0.5rem; }
   .hv-coords { justify-content: flex-start; }
@@ -152,8 +144,7 @@ body:has(.home-landing) .content-panel:has(> .sl-container > h1#_top) { display:
   .home-curriculum-part header { grid-template-columns: 1.5rem minmax(0, 1fr); }
   .home-curriculum-part header > small { grid-column: 2; }
   .home-curriculum-part ol { padding-left: 0; }
-  .home-inspection-row { grid-template-columns: 3.75rem minmax(0, 1fr); gap: 0.35rem 0.6rem; }
-  .home-resources nav a { grid-template-columns: 1fr; gap: 0.25rem; }
+  .home-inspection-row { grid-template-columns: minmax(0, 1fr); gap: 0.35rem 0.6rem; }
 }
 @media (prefers-reduced-motion: reduce) { .home-landing * { animation: none; transition: none; } }
 
@@ -172,20 +163,9 @@ body:has(.home-landing) .content-panel:has(> .sl-container > h1#_top) { display:
 .hp-baseline strong { color: #f8fafc; font-weight: 600; }
 .hp-mystery { margin-top: .8rem !important; max-width: 36ch; color: #eef3fb; line-height: 1.6; }
 .hp-source { margin-top: 1rem !important; color: #aebbd0; font-size: .7rem; }
-.home-case { display: grid; grid-template-columns: 1.75rem minmax(0, 1fr) 1.1rem; gap: 1rem; padding-block: 1.4rem; }
-.home-case-number { align-self: start; padding-top: .15rem; color: var(--home-muted); font: .75rem var(--itm-font-code); }
-.home-case-question { font-size: .9rem; line-height: 1.6; margin-block: .15rem; }
-.home-case-status { color: var(--home-link); font-size: .78rem; font-weight: 600; margin-top: .4rem; }
-.home-method { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: clamp(2rem, 5vw, 5rem); border-top: 1px solid var(--home-line); }
-.home-method-list { padding: 0; list-style-position: inside; }
-.home-method-list li { padding-block: 1rem; border-top: 1px solid var(--home-line); }
-.home-method-list li::marker { color: var(--home-muted); font-size: .8rem; }
-.home-method-list b { margin-left: .5rem; font-size: 1rem; font-weight: 600; }
-.home-method-list p { margin-top: .5rem !important; color: var(--home-muted); line-height: 1.7; font-size: .9rem; }
 .home-syllabus { min-width: 0; }
 .home-syllabus summary { display: list-item; padding-block: 1rem; min-height: 2.75rem; cursor: pointer; color: var(--home-link); font-weight: 600; }
 .home-syllabus summary:focus-visible { outline: 2px solid var(--home-link); outline-offset: 4px; }
 .home-syllabus .home-curriculum-part header { grid-template-columns: 1fr; }
 .home-syllabus .home-curriculum-part ol { padding-left: 0; }
-@media (max-width: 56rem) { .home-method { grid-template-columns: 1fr; gap: 1.5rem; } }
-@media (max-width: 44rem) { .home-specimen .widget.hv { padding: 1.1rem; } .home-case { grid-template-columns: 1.4rem minmax(0, 1fr) 1rem; gap: .6rem; } .hp-prediction { grid-template-columns: 2.5rem minmax(0, 1fr) 4.5rem; gap: .5rem; } }
+@media (max-width: 44rem) { .home-specimen .widget.hv { padding: 1.1rem; } .hp-prediction { grid-template-columns: 2.5rem minmax(0, 1fr) 4.5rem; gap: .5rem; } }

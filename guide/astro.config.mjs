@@ -75,10 +75,9 @@ export default defineConfig({
         },
       ].concat(['papers','glossary','itm-weights','itm-model','itm-train','case-catalog','case-engine','case-workspace','explorer','trainer','home','compare','kit','widgets','widgets2','cases','cases-story','interaction','site'].map(f => ({ tag: 'script', attrs: { src: `/js/${f}.js?v=${stamp(f)}`, defer: true } }))),
       sidebar: [
-        { label: 'Start here', items: [{ slug: 'index', label: 'Overview' }, {slug:'investigate',label:'Investigate a changed response'}, { slug: 'changelog', label: "What's new" }] },
-        {label:'Investigations',items:[{slug:'cases',label:'Choose an investigation'},...globalThis.ITMCaseCatalog.map((c,i)=>({slug:'cases/'+c.slug,label:(i+1)+'. '+c.title})),{slug:'cases/story-circuit',label:'Further: Who gets the ball?'}]},
-        { label: 'Model workbench', items: [{ slug: 'explorer', label: 'Model Explorer' }] },
-        {label:'Resources',collapsed:true,items:[{slug:'run-locally',label:'Run locally in your IDE'},{slug:'python-tools',label:'Python tools: uv, Ruff & ty'},{slug:'replications/gpt2-causality',label:'Replicate a GPT-2 experiment'},{slug:'field-notes',label:'Field notes'},{slug:'teach',label:'Teach a workshop'},{slug:'methods',label:'Methods & evidence'}]},
+        { label: 'Start here', items: [{ slug: 'index', label: 'Overview' }, {slug:'explorer',label:'Model Explorer'}] },
+        {label:'Experiments',collapsed:true,items:[{slug:'cases',label:'All experiments'},...globalThis.ITMCaseCatalog.map((c,i)=>({slug:'cases/'+c.slug,label:c.title})),{slug:'cases/story-circuit',label:'A name-selection circuit'}]},
+        {label:'Resources',collapsed:true,items:[{slug:'run-locally',label:'Run locally in your IDE'},{slug:'python-tools',label:'Python tools: uv, Ruff & ty'},{slug:'replications/gpt2-causality',label:'Replicate a GPT-2 experiment'},{slug:'methods',label:'Methods & evidence'},{slug:'changelog',label:"What's new"}]},
         ...guideGroups,
         {
           label: 'Hands-on labs',

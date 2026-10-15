@@ -62,7 +62,13 @@ The first run downloads roughly 0.5 GB of weights. Allow several GB of available
 
 ## Try your own comparison
 
-The script accepts a prefix, two suffixes and a changed-prefix positive control. All four custom arguments must be supplied together. See the [practical investigation workflow](/investigate/#reproduce-a-comparison-on-gpt-2) for a command you can adapt. It validates token IDs from the complete texts, equal sequence lengths and an actual suffix change before reporting a result.
+The script accepts a prefix, two suffixes and a changed-prefix positive control. All four custom arguments must be supplied together. The command below can be adapted to another token-controlled comparison. It validates token IDs from the complete texts, equal sequence lengths and an actual suffix change before reporting a result.
+
+\`\`\`sh
+uv run --no-project python replicate_gpt2_causality.py --prefix "The dog ran" --suffix-a " to the park" --suffix-b " to the beach" --control-prefix "The cat ran" --output my-causal-check.json
+\`\`\`
+
+The leading spaces in the suffixes are intentional. The changed-prefix control must produce a detectable difference. The output records token IDs and numerical differences so the comparison can be inspected.
 
 ## Provenance and conditions
 

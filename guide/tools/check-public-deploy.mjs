@@ -38,7 +38,7 @@ const headers = read('_headers');
 if(!/\/code\/\*[\s\S]*Content-Disposition: attachment/.test(headers))failures.push('code files must download as attachments');
 const home = read('index.html');
 for (const file of walk(dist).filter(f => f.endsWith('.html'))) {
-  if (/href=["'][^"']*\/notebook\//.test(fs.readFileSync(file,'utf8'))) failures.push(`${path.relative(root,file)} still links to retired Notes`);
+  if (/href=["']\/(?:notebook|beta|teach|field-notes|investigate)(?:\/|["'])/.test(fs.readFileSync(file,'utf8'))) failures.push(`${path.relative(root,file)} still links to a retired page`);
 }
 for (const script of ['notebook.js','notebook-store.js']) {
   if (fs.existsSync(path.join(dist,'js',script))) failures.push(`retired Notes script still ships: ${script}`);
