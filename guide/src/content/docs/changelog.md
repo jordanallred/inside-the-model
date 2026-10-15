@@ -7,6 +7,12 @@ New chapters, teardowns, tools and corrections, newest first. Follow along with 
 
 Found a mistake? Every page ends with a link to report it, and corrections are listed here.
 
+## 2026-10-14: Design experiments, keep evidence, and reproduce GPT-2
+
+Three new guided cases teach [experimental controls](/cases/choose-the-control/), [conditional sufficiency](/cases/necessary-and-sufficient/), and [temperature without learning](/cases/confidence-without-learning/). The first case now requires choosing a discriminating experiment. Three verified transfer variants rotate before reuse; repeated examples are marked as practice.
+
+The [evidence notebook](/notebook/) keeps local observations and offers Markdown/JSON backups, with optional learning-activity export for [beta sessions](/beta/). A [workshop pack](/teach/) and [methods record](/methods/) support teaching and review. The [GPT-2 replication](/replications/gpt2-causality/) includes executed CPU results, positive controls, pinned weights, a Python script and a runnable notebook.
+
 ## 2026-10-14: Investigate a working model
 
 The site now starts with [guided investigations](/cases/): **The place detector**, **What training changes**, and **The hidden future**. Make a prediction, run an experiment on the teaching transformer, inspect the evidence, and test your explanation on a fresh example. Progress saves locally, with a next case and focused links into the Explorer, chapters, and labs. The place detector now requires an experiment and a fresh-example prediction to complete; earlier progress is recognized without skipping the new assessment.

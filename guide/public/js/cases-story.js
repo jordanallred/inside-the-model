@@ -140,7 +140,7 @@
         const t = run(st); went += t.layers[HL].heads[HH].weights[GIVER2][4] / ALL.length;
         const P = Object.fromEntries(NAMES.map(n => [n, push(t, n)])); below += P[st.g] < P[st.ans]; lowest += NAMES.every(n => n === st.g || P[st.g] < P[n]);
       });
-      const share = 'I solved Case 2 on Inside the Model: I found how a language model works out who gets the ball, by elimination. ' + location.origin + location.pathname;
+      const share = 'I solved Who gets the ball? on Inside the Model: I found how a language model works out who gets the ball, by elimination. ' + location.origin + location.pathname;
       return '<section class="cs-step cs-closed" aria-labelledby="cs2-3"><h3 id="cs2-3">Case closed</h3>' +
         '<p>The model answers by <b>elimination</b>. ' + headName(EL, EH) + ' looks back from “to” at the person who gave the ball, and passes that on. The model rules the giver out, and of the two people in the story, the one left over wins. Switch the head off and the model still knows who is in the story, but nothing tells it whom to rule out, so it picks between the two at random.</p>' +
         '<p>Researchers found a circuit for the same kind of sentence in GPT-2 small, a real language model with 124 million parameters, spread across many more heads. The paper is linked below the case.</p>' +

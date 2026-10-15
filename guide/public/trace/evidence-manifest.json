@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "model": {
+    "version": "itm-toy-2.0",
+    "seed": 20261012,
+    "vocab": [
+      "<bos>",
+      "the",
+      "a",
+      "cat",
+      "dog",
+      "bird",
+      "sat",
+      "ran",
+      "slept",
+      "on",
+      "under",
+      "mat",
+      "bed",
+      "and",
+      "chased",
+      "saw",
+      ".",
+      "big",
+      "small",
+      "red",
+      "then",
+      "to",
+      "home",
+      "it",
+      "was"
+    ],
+    "dModel": 16,
+    "nHeads": 2,
+    "dHead": 8,
+    "dMlp": 32,
+    "nLayers": 2,
+    "maxCtx": 16,
+    "eps": 0.00001,
+    "posScale": 0.5,
+    "std": {
+      "E": 0.5,
+      "Wq": 0.5,
+      "Wk": 0.5,
+      "Wv": 0.25,
+      "Wo": 0.25,
+      "W1": 0.25,
+      "W2": 0.18
+    },
+    "checksum": "0d7945de",
+    "training": {
+      "trained": true,
+      "steps": 4000,
+      "batch": 64,
+      "optimizer": "Adam, cosine learning-rate decay",
+      "initSeed": 20261012,
+      "heldOutLoss": 0.9664,
+      "uniformLoss": 3.2189,
+      "corpus": "synthetic grammar over the 25-entry vocabulary (subject, verb, object, place, and \"then it ...\" follow-ups)"
+    },
+    "params": 4496
+  },
+  "source_hashes": {
+    "public/js/itm-model.js": "767bc7b4f83c3d9aa04c9b43ae2cc04b65ad2de5cfbaf12f9f2d48830578418c",
+    "public/js/itm-weights.js": "c38919050b6507e4a65c6ec0d271ec97d7e4868db32aed8e8612e32536f5f56e",
+    "public/js/case-engine.js": "92cc76f5a4d499f9d0a448fe8c32e2d0972d51880dcf86d4abf41ad60cbcc156",
+    "public/code/itm_model.py": "2076c7c73b59e8ffa61d1030934c8c4ad8427c954c686296e921acddb52eed97",
+    "public/trace/weights.json": "00ec8b56c700ee720b94b3884d6ee8aae9da314ebb93ff28aa6f2498ec9521f6",
+    "public/code/replicate_gpt2_causality.py": "ef93f35bacaa1f3bbf1e9fd8d4523c86742e5f9cabf39cb6d47a0c5419485298"
+  },
+  "measurements": {
+    "place": {
+      "baseline": 0.998990911422722,
+      "head_removed": 0.0005606709261258405
+    },
+    "control": {
+      "baseline": 0.998990911422722,
+      "probes": [
+        {
+          "prompt": "the cat saw on the",
+          "place": 0.00014770217220022916
+        },
+        {
+          "prompt": "the cat sat the",
+          "place": 0.9988366373709727
+        }
+      ],
+      "discriminates": true
+    },
+    "sufficiency": {
+      "baseline": 0.998990911422722,
+      "removed": 0.0005606709261258405,
+      "kept": 0.9972055161389008
+    },
+    "confidence": {
+      "temperature": 2,
+      "original_top": 11,
+      "adjusted_top": 11
+    }
+  },
+  "transfer_bank": {
+    "place": [
+      {
+        "variant": 0,
+        "question": "All heads on: after “the dog ran to the”, is a place or an animal more likely?",
+        "expected": "place"
+      },
+      {
+        "variant": 1,
+        "question": "All heads on: after “the bird sat under the”, is a place or an animal more likely?",
+        "expected": "place"
+      },
+      {
+        "variant": 2,
+        "question": "All heads on: after “the cat slept on the”, is a place or an animal more likely?",
+        "expected": "animal"
+      }
+    ],
+    "training": [
+      {
+        "variant": 0,
+        "question": "After “the dog chased the”, which weights give the specific target “cat” a lower loss? Compare this target, even if it is an unusual continuation.",
+        "expected": "trained"
+      },
+      {
+        "variant": 1,
+        "question": "After “the bird sat under the”, which weights give the specific target “bed” a lower loss? Compare this target, even if it is an unusual continuation.",
+        "expected": "trained"
+      },
+      {
+        "variant": 2,
+        "question": "After “the cat sat on the”, which weights give the specific target “cat” a lower loss? Compare this target, even if it is an unusual continuation.",
+        "expected": "random"
+      }
+    ],
+    "future": [
+      {
+        "variant": 0,
+        "question": "Compare “a dog ran to the mat” and “a dog ran to the bed”. At “dog” (position 2), are the next-token distributions the same?",
+        "expected": "same"
+      },
+      {
+        "variant": 1,
+        "question": "Compare “the bird sat on the mat” and “the bird sat on the bed”. At “sat” (position 3), are the next-token distributions the same?",
+        "expected": "same"
+      },
+      {
+        "variant": 2,
+        "question": "Compare “a cat sat under the mat” and “a cat sat under the bed”. At “cat” (position 2), are the next-token distributions the same?",
+        "expected": "same"
+      }
+    ],
+    "controls": [
+      {
+        "variant": 0,
+        "question": "In “the dog ran to the” versus “the dog saw to the”, which variable changes? This is a controlled prompt comparison, including inputs outside the training grammar.",
+        "expected": "verb"
+      },
+      {
+        "variant": 1,
+        "question": "In “the bird sat under the” versus “the bird saw under the”, which variable changes? This is a controlled prompt comparison, including inputs outside the training grammar.",
+        "expected": "verb"
+      },
+      {
+        "variant": 2,
+        "question": "In “the cat sat on the” versus “the cat saw on the”, which variable changes? This is a controlled prompt comparison, including inputs outside the training grammar.",
+        "expected": "verb"
+      }
+    ],
+    "sufficiency": [
+      {
+        "variant": 0,
+        "question": "For “the dog ran to the”, keep only layer 0, head 1 active among the attention heads. Do you predict more than 50% probability of a place? Embeddings, MLPs and all other model operations remain.",
+        "expected": "retains"
+      },
+      {
+        "variant": 1,
+        "question": "For “the bird sat under the”, keep only layer 0, head 1 active among the attention heads. Do you predict more than 50% probability of a place? Embeddings, MLPs and all other model operations remain.",
+        "expected": "retains"
+      },
+      {
+        "variant": 2,
+        "question": "For “the cat sat on the”, keep only layer 0, head 1 active among the attention heads. Do you predict more than 50% probability of a place? Embeddings, MLPs and all other model operations remain.",
+        "expected": "retains"
+      }
+    ],
+    "confidence": [
+      {
+        "variant": 0,
+        "question": "After “the dog chased the”, change temperature from 1 to 2. Will the identity of the highest-probability next token change? No token is sampled.",
+        "expected": "same"
+      },
+      {
+        "variant": 1,
+        "question": "After “the bird sat on the”, change temperature from 1 to 0.5. Will the identity of the highest-probability next token change? No token is sampled.",
+        "expected": "same"
+      },
+      {
+        "variant": 2,
+        "question": "After “the cat ran home”, change temperature from 1 to 3. Will the identity of the highest-probability next token change? No token is sampled.",
+        "expected": "same"
+      }
+    ]
+  },
+  "verification_commands": [
+    "npm run verify",
+    "node tools/check-cases.mjs",
+    "node tools/check-investigation-expansion.mjs"
+  ],
+  "scope": "Computed teaching-model fixtures. Transfer answers are included for reproducibility; this is a small practice bank, not a validated examination.",
+  "hash_normalization": "SHA-256 of UTF-8 text with CRLF normalized to LF"
+}

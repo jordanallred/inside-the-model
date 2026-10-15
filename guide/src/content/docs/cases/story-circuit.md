@@ -11,7 +11,7 @@ The next word has to be <code>tom</code>. Ann is giving the ball, so it goes to 
 
 Answering needs more than recognizing names. The model has to keep track of who is in the story, notice who is giving, and pick the other one. Your job is to find the parts of the model that make that choice, and work out how they make it.
 
-<div class="widget not-content" data-w="casestory" data-title="Case 2: Who gets the ball?"></div>
+<div class="widget not-content" data-w="casestory" data-title="Further investigation: Who gets the ball?"></div>
 
 ## New tools in this case
 

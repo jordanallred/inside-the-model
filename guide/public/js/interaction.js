@@ -2,6 +2,10 @@
    concrete experiment. Widget math stays in its own module. */
 (function () {
   const R = {
+    notebook:{bare:true,type:'Evidence notebook',mission:'Record an intervention, observation and bounded conclusion.',observation:'Notes stay local and can be exported deliberately.'},
+    casecontrols:{bare:true,type:'Investigation',mission:'Choose a comparison that separates competing explanations.',observation:'Changing two candidate causes at once can confound the result.'},
+    casesufficiency:{bare:true,type:'Investigation',mission:'Compare removing a candidate with retaining it among attention heads.',observation:'Sufficiency must be stated relative to a context and intervention.'},
+    caseconfidence:{bare:true,type:'Investigation',mission:'Change temperature without updating any weights.',observation:'Confidence, ranking, sampling and learning are distinct.'},
     homehero: { bare: true, type: 'Model trace', mission: 'Choose a token or attention head and trace which earlier words matter.', observation: 'A token prediction is built from many small, inspectable attention choices.' },
     explorer: { bare: true, type: 'Guided exploration', mission: 'Follow one token all the way from text to its next-token probabilities.', observation: 'Each panel is a real intermediate value from the same tiny model.' }, // carries its own guidance
     challenges: { type: 'Knowledge check', mission: 'Commit to an answer, then use the Explorer to verify the calculation.', observation: 'A wrong answer is useful when it tells you which stage to revisit.' },

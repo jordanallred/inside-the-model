@@ -20,7 +20,8 @@ for (const f of html) {
     let href = m[1].replace(/&amp;/g, '&');
     if (/^(https?:|mailto:|tel:|javascript:)/.test(href)) { if (/localhost/.test(href) && !/^http:\/\/localhost:8080/.test(href)) problems.push(`${here}: odd absolute link ${href}`); continue; }
     links++;
-    const [p0, hash] = href.split('#');
+    const [resource, hash] = href.split('#');
+    const p0 = resource.split('?')[0];
     let target = p0 ? (p0.startsWith('/') ? p0 : path.posix.join(here, p0)) : here;
     if (p0 && !target.endsWith('/') && !path.posix.extname(target)) target += '/';
     if (path.posix.extname(target) && !/\.html$/.test(target)) { if (!fs.existsSync(path.join(DIST, target))) problems.push(`${here}: missing file ${href}`); continue; }

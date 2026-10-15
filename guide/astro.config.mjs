@@ -7,6 +7,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { CH, PARTS } from './src/chapters.mjs';
 import { siteUrl, socialCardUrl, repoUrl } from './src/site-config.mjs';
+import './public/js/case-catalog.js';
 
 // Version browser scripts by content to prevent stale releases.
 const stamp = f => createHash('sha256').update(fs.readFileSync(new URL(`./public/js/${f}.js`, import.meta.url))).digest('hex').slice(0, 10);
@@ -72,11 +73,12 @@ export default defineConfig({
             ],
           }),
         },
-      ].concat(['papers', 'glossary', 'itm-weights', 'itm-model', 'itm-train', 'case-catalog', 'case-engine', 'explorer', 'trainer', 'home', 'compare', 'kit', 'widgets', 'widgets2', 'cases', 'cases-story', 'interaction', 'site'].map(f => ({ tag: 'script', attrs: { src: `/js/${f}.js?v=${stamp(f)}`, defer: true } }))),
+      ].concat(['papers','glossary','itm-weights','itm-model','itm-train','case-catalog','case-engine','notebook-store','explorer','trainer','home','compare','kit','widgets','widgets2','cases','cases-story','notebook','interaction','site'].map(f => ({ tag: 'script', attrs: { src: `/js/${f}.js?v=${stamp(f)}`, defer: true } }))),
       sidebar: [
         { label: 'Start here', items: [{ slug: 'index', label: 'Overview' }, { slug: 'changelog', label: "What's new" }] },
-        { label: 'Investigations', items: [{ slug: 'cases', label: 'Choose an investigation' }, { slug: 'cases/place-or-animal', label: '1. The place detector' }, { slug: 'cases/what-training-changes', label: '2. What training changes' }, { slug: 'cases/hidden-future', label: '3. The hidden future' }, { slug: 'cases/story-circuit', label: 'Further: Who gets the ball?' }] },
+        {label:'Investigations',items:[{slug:'cases',label:'Choose an investigation'},...globalThis.ITMCaseCatalog.map((c,i)=>({slug:'cases/'+c.slug,label:(i+1)+'. '+c.title})),{slug:'cases/story-circuit',label:'Further: Who gets the ball?'}]},
         { label: 'Model workbench', items: [{ slug: 'explorer', label: 'Model Explorer' }] },
+        {label:'Practice, reproduce & teach',items:[{slug:'notebook',label:'Your evidence notebook'},{slug:'replications/gpt2-causality',label:'Replicate a GPT-2 experiment'},{slug:'field-notes',label:'Field notes'},{slug:'teach',label:'Teach a workshop'},{slug:'beta',label:'Beta-session guide'},{slug:'methods',label:'Methods & evidence'}]},
         ...guideGroups,
         {
           label: 'Hands-on labs',

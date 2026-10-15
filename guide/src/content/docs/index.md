@@ -32,13 +32,16 @@ head:
 
 <section class="home-section home-routes" aria-labelledby="home-routes-title">
   <div class="home-section-heading">
-    <h2 id="home-routes-title">Three questions.<br>One model you can take apart.</h2>
-    <p>Start with the place detector, then investigate learning and information flow. Each case ends with a new example to test your understanding.</p>
+    <h2 id="home-routes-title">Six questions.<br>Learn to investigate.</h2>
+    <p>Start with the place detector. Build through learning and information flow, then design controls and challenge causal claims. Each guided case includes one of three rotating transfer examples.</p>
   </div>
   <nav class="home-route-list" aria-label="Investigations in learning order">
     <a class="home-route home-case" href="/cases/place-or-animal/"><span class="home-case-number">01</span><span><b>The place detector</b><span class="home-case-question">Which part knows a place comes next?</span><small>Find a component by removing it · about 10 min</small><span class="home-case-status" data-case-status="place">Start investigation</span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
     <a class="home-route home-case" href="/cases/what-training-changes/"><span class="home-case-number">02</span><span><b>What training changes</b><span class="home-case-question">Same model. Different weights. Different answer?</span><small>Compare predictions and measure loss · about 8 min</small><span class="home-case-status" data-case-status="training">Start investigation</span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
     <a class="home-route home-case" href="/cases/hidden-future/"><span class="home-case-number">03</span><span><b>The hidden future</b><span class="home-case-question">Can an earlier token read words that come later?</span><small>Test information flow with a controlled change · about 8 min</small><span class="home-case-status" data-case-status="future">Start investigation</span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
+    <a class="home-route home-case" href="/cases/choose-the-control/"><span class="home-case-number">04</span><span><b>Choose the control</b><span class="home-case-question">Which experiment could distinguish two explanations?</span><small>Design a discriminating experiment · about 12 min</small><span class="home-case-status" data-case-status="controls">Start investigation</span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
+    <a class="home-route home-case" href="/cases/necessary-and-sufficient/"><span class="home-case-number">05</span><span><b>Necessary—and sufficient?</b><span class="home-case-question">What does removing a component actually establish?</span><small>Separate necessity from conditional sufficiency · about 12 min</small><span class="home-case-status" data-case-status="sufficiency">Start investigation</span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
+    <a class="home-route home-case" href="/cases/confidence-without-learning/"><span class="home-case-number">06</span><span><b>Confidence without learning</b><span class="home-case-question">Can a prediction become more confident without learning?</span><small>Separate sampling settings from model knowledge · about 10 min</small><span class="home-case-status" data-case-status="confidence">Start investigation</span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
   </nav>
 </section>
 
@@ -73,6 +76,11 @@ head:
     <a href="/teardown/"><b>Model teardowns</b><span>Published architectures, layer by layer</span></a>
     <a href="/reference/papers/"><b>Papers &amp; sources</b><span>151 linked references</span></a>
     <a href="/reference/security-guidance/"><b>Security guidance</b><span>Public guidance from security agencies</span></a>
+    <a href="/notebook/"><b>Evidence notebook</b><span>Write up, save and export your findings</span></a>
+    <a href="/teach/"><b>Teach a workshop</b><span>Session plan, discussion rubric and instructor notes</span></a>
+    <a href="/methods/"><b>Methods &amp; evidence</b><span>Verification, provenance and review status</span></a>
+    <a href="/replications/gpt2-causality/"><b>Reproduce a GPT-2 experiment</b><span>Pinned weights, measured controls and a runnable notebook</span></a>
+    <a href="/field-notes/"><b>Field notes</b><span>Practical questions connected to testable explanations</span></a>
     <a href="/cases/story-circuit/"><b>Further investigation</b><span>Who gets the ball? Trace a decision in the larger case-file model.</span></a>
   </nav>
 </section>

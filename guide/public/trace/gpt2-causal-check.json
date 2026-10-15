@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "executed_at": "2026-10-15T01:25:06.648313+00:00",
+  "model": "openai-community/gpt2",
+  "revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e",
+  "weight_sha256": "248dfc3911869ec493c76e65bf2fcf7f615828b0254c12b473182f0f81d3a707",
+  "parameter_count": 124439808,
+  "device": "cpu",
+  "dtype": "torch.float32",
+  "attention_implementation": "eager",
+  "dropout": "disabled via eval()",
+  "python": "3.12.14",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "packages": {
+    "torch": "2.14.1+cpu",
+    "transformers": "5.19.0",
+    "huggingface_hub": "2.2.0"
+  },
+  "tolerance": 1e-06,
+  "measurements": [
+    {
+      "prefix": "The cat sat",
+      "input_a": "The cat sat on the mat",
+      "input_b": "The cat sat on the bed",
+      "positive_control": "The dog sat on the mat",
+      "token_ids_a": [
+        464,
+        3797,
+        3332,
+        319,
+        262,
+        2603
+      ],
+      "token_ids_b": [
+        464,
+        3797,
+        3332,
+        319,
+        262,
+        3996
+      ],
+      "position": 2,
+      "max_probability_difference": 0.0,
+      "max_future_attention": 0.0,
+      "positive_control_max_probability_difference": 0.019002247601747513,
+      "top_tokens_at_prefix": [
+        {
+          "token_id": 319,
+          "text": " on",
+          "probability": 0.22396625578403473
+        },
+        {
+          "token_id": 287,
+          "text": " in",
+          "probability": 0.1320129930973053
+        },
+        {
+          "token_id": 866,
+          "text": " down",
+          "probability": 0.0731624886393547
+        },
+        {
+          "token_id": 612,
+          "text": " there",
+          "probability": 0.06260020285844803
+        },
+        {
+          "token_id": 510,
+          "text": " up",
+          "probability": 0.04113385081291199
+        }
+      ]
+    },
+    {
+      "prefix": "Alice and Bob went",
+      "input_a": "Alice and Bob went to the park",
+      "input_b": "Alice and Bob went to the beach",
+      "positive_control": "Alice and Sam went to the park",
+      "token_ids_a": [
+        44484,
+        290,
+        5811,
+        1816,
+        284,
+        262,
+        3952
+      ],
+      "token_ids_b": [
+        44484,
+        290,
+        5811,
+        1816,
+        284,
+        262,
+        10481
+      ],
+      "position": 3,
+      "max_probability_difference": 0.0,
+      "max_future_attention": 0.0,
+      "positive_control_max_probability_difference": 0.022844083607196808,
+      "top_tokens_at_prefix": [
+        {
+          "token_id": 284,
+          "text": " to",
+          "probability": 0.4099133312702179
+        },
+        {
+          "token_id": 319,
+          "text": " on",
+          "probability": 0.08813945204019547
+        },
+        {
+          "token_id": 736,
+          "text": " back",
+          "probability": 0.06285841017961502
+        },
+        {
+          "token_id": 503,
+          "text": " out",
+          "probability": 0.0467858761548996
+        },
+        {
+          "token_id": 656,
+          "text": " into",
+          "probability": 0.04238182678818703
+        }
+      ]
+    }
+  ],
+  "scope": "Two controlled prefix/suffix comparisons and two changed-prefix positive controls. This tests causal information flow, not interpretability of GPT-2 behavior generally."
+}
