@@ -7,6 +7,10 @@ New chapters, teardowns, tools and corrections, newest first. Follow along with 
 
 Found a mistake? Every page ends with a link to report it, and corrections are listed here.
 
+## 2026-10-17: Faster page delivery
+
+Fonts now load locally in compressed WOFF2 format. Each page loads the scripts and styles needed by its widgets instead of downloading every experiment, training tool and equation stylesheet. The homepage retains its live calculation and existing design. Build checks verify widget dependencies and generated asset references.
+
 ## 2026-10-16: Remove speculative coverage and correct protocol guidance
 
 Fixed keyboard focus after Explorer and experiment controls redraw. Invalid numerical input now stays editable, identifies the relevant field and returns focus there. Custom prompt comparisons and fixed worked designs are explicitly distinguished.

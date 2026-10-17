@@ -1,6 +1,6 @@
 /* Preserve the published case-file-model investigation as a further investigation. */
 (function () {
-  const W = window.W, K = window.K, esc = K.esc;
+  const W = (window.W = window.W || {}), K = window.K, esc = K.esc;
   const HEADS = [[0, 0], [0, 1], [1, 0], [1, 1]];
   const headName = (l, h) => 'Layer ' + l + ', head ' + h;
   const pct = v => Math.round(v * 100) + '%';

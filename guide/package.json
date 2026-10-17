@@ -5,10 +5,10 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "astro dev",
-    "build": "node tools/check-workspace.mjs && node tools/check-launch.mjs && node tools/check-cases.mjs && node tools/check-investigation-expansion.mjs && node tools/check-evidence.mjs && node tools/check-interactions.mjs && node tools/check-js.mjs && node tools/check-brand.mjs && node tools/check-home.mjs && astro build",
+    "build": "node tools/check-performance.mjs && node tools/check-workspace.mjs && node tools/check-launch.mjs && node tools/check-cases.mjs && node tools/check-investigation-expansion.mjs && node tools/check-evidence.mjs && node tools/check-interactions.mjs && node tools/check-js.mjs && node tools/check-brand.mjs && node tools/check-home.mjs && astro build",
     "preview": "astro preview",
     "gen": "node tools/gen.mjs && node tools/gen-evidence.mjs && node tools/gen-starter.mjs",
-    "check": "node tools/check-workspace.mjs && node tools/check-launch.mjs && node tools/check-cases.mjs && node tools/check-investigation-expansion.mjs && node tools/check-evidence.mjs && node tools/check-interactions.mjs && node tools/check-links.mjs && node tools/check-brand.mjs && node tools/check-home.mjs && node tools/check-public-deploy.mjs",
+    "check": "node tools/check-performance.mjs --built && node tools/check-workspace.mjs && node tools/check-launch.mjs && node tools/check-cases.mjs && node tools/check-investigation-expansion.mjs && node tools/check-evidence.mjs && node tools/check-interactions.mjs && node tools/check-links.mjs && node tools/check-brand.mjs && node tools/check-home.mjs && node tools/check-public-deploy.mjs",
     "verify": "node tools/verify-trace.mjs"
   },
   "dependencies": {

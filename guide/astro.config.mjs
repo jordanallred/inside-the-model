@@ -1,5 +1,4 @@
 import fs from 'node:fs';
-import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
@@ -10,8 +9,6 @@ import { CH, PARTS } from './src/chapters.mjs';
 import { siteUrl, socialCardUrl, repoUrl } from './src/site-config.mjs';
 import './public/js/case-catalog.js';
 
-// Version browser scripts by content to prevent stale releases.
-const stamp = f => createHash('sha256').update(fs.readFileSync(new URL(`./public/js/${f}.js`, import.meta.url))).digest('hex').slice(0, 10);
 
 const num = Object.fromEntries(CH.map((c, i) => [c[0], i + 1]));
 const guideGroups = Object.keys(PARTS).map(part => ({
@@ -35,12 +32,10 @@ export default defineConfig({
       logo: { src: '/brand/logo-horizontal-light.svg', alt: 'Inside the Model', replacesTitle: true },
       favicon: '/favicon.svg',
       social: [{ icon: 'github', label: 'Source and issues on GitHub', href: repoUrl }],
-      components: { Footer: './src/components/Footer.astro' },
+      components: { Footer: './src/components/Footer.astro', Head: './src/components/Head.astro' },
       description: 'Understand language models by taking them apart. Guided experiments for developers, with live calculations and reproducible code.',
-      customCss: ['katex/dist/katex.min.css', './src/styles/brand-tokens.css', './src/styles/custom.css', './src/styles/brand.css', './src/styles/widgets.css', './src/styles/explorer.css', './src/styles/home.css', './src/styles/theme.css', './src/styles/cases.css'],
       head: [
-        { tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' } },
-        { tag: 'link', attrs: { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400..600&family=JetBrains+Mono:wght@400..600&display=swap' } },
+        ...['inter-latin','source-serif-4-medium-latin'].map(name=>({tag:'link',attrs:{rel:'preload',href:'/fonts/'+name+'.woff2',as:'font',type:'font/woff2',crossorigin:'anonymous'}})),
         { tag: 'link', attrs: { rel: 'alternate', type: 'application/rss+xml', title: "Inside the Model: What's new", href: `${siteUrl}/rss.xml` } },
         { tag: 'meta', attrs: { property: 'og:image', content: socialCardUrl } },
         { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
@@ -74,7 +69,7 @@ export default defineConfig({
             ],
           }),
         },
-      ].concat(['papers','glossary','itm-weights','itm-model','itm-train','case-catalog','case-engine','case-workspace','explorer','trainer','home','compare','kit','widgets','widgets2','cases','cases-story','interaction','site'].map(f => ({ tag: 'script', attrs: { src: `/js/${f}.js?v=${stamp(f)}`, defer: true } }))),
+      ],
       sidebar: [
         { label: 'Start here', items: [{ slug: 'index', label: 'Overview' }, {slug:'explorer',label:'Model Explorer'}] },
         {label:'Experiments',collapsed:true,items:[{slug:'cases',label:'All experiments'},...globalThis.ITMCaseCatalog.map((c,i)=>({slug:'cases/'+c.slug,label:c.title})),{slug:'cases/story-circuit',label:'A name-selection circuit'}]},

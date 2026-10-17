@@ -1,0 +1,26 @@
+---
+import Default from '@astrojs/starlight/components/Head.astro';
+import { scriptsFor, scriptUrl } from '../page-assets.mjs';
+import sharedCss from '../styles/shared.css?url';
+import themeCss from '../styles/theme.css?inline';
+import mathCss from 'katex/dist/katex.min.css?url';
+import widgetCss from '../styles/widgets.css?url';
+import explorerCss from '../styles/explorer.css?url';
+import homeCss from '../styles/home.css?url';
+import caseCss from '../styles/cases.css?url';
+
+const {entry}=Astro.locals.starlightRoute;
+const body=entry.body||'', scripts=scriptsFor(body,entry.id);
+const styles=[
+  sharedCss,
+  /\$|\\\(/.test(body)&&mathCss,
+  /data-w="(?!homehero)/.test(body)&&widgetCss,
+  scripts.includes('explorer')&&explorerCss,
+  scripts.includes('home')&&homeCss,
+  (scripts.includes('cases')||scripts.includes('cases-story'))&&caseCss,
+].filter(Boolean);
+---
+<Default />
+{styles.map(href=><link rel="stylesheet" href={href} />)}
+<style is:inline set:html={themeCss} />
+{scripts.map(name=><script is:inline src={scriptUrl(name)} defer></script>)}
