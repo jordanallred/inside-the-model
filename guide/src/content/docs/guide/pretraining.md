@@ -7,11 +7,7 @@ sidebar:
 
 _Data, scaling laws and training across thousands of GPUs_
 
-Chapter 16 of 24 · V. Training · about 40 minutes. Builds on: [9. The full model and its training loop](/guide/full-model/), [14. Mixture of experts](/guide/mixture-of-experts/), [15. Floating point and quantization](/guide/low-precision/).
-
-:::tip[Skip this chapter if]
-you can describe a pretraining data pipeline, state what the scaling laws say and their caveats, and explain data, tensor, pipeline, expert parallelism and optimizer-state sharding (ZeRO).
-:::
+Chapter 16 of 21 · V. Training · about 40 minutes. Builds on: [9. The full model and its training loop](/guide/full-model/), [14. Mixture of experts](/guide/mixture-of-experts/), [15. Floating point and quantization](/guide/low-precision/).
 
 ## Data
 
@@ -62,7 +58,7 @@ Real runs combine these ("3D" or "4D" parallelism) so that the most communicatio
 -   **Context extension:** train mostly on short sequences (cheap), then briefly continue on longer ones with a position-extension method ([Chapter 8](/guide/rope/)). DeepSeek-V3 pretrained at 4K and extended to 32K then 128K in two 1,000-step phases.
 -   **Reported cost:** DeepSeek-V3's report gives 2.788 million H800 GPU-hours in total, 2.664 million of them for pretraining.
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>You have 10²⁴ FLOPs. Using ~20 tokens per parameter and C = 6ND, what are N and D?</summary>

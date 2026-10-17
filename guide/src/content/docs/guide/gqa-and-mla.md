@@ -7,11 +7,7 @@ sidebar:
 
 _Cutting the cache without cutting quality_
 
-Chapter 11 of 24 · III. Fast attention and inference · about 35 minutes. Builds on: [8. Position and rotary embeddings](/guide/rope/), [10. Generating text: the KV cache and inference cost](/guide/kv-cache/).
-
-:::tip[Skip this chapter if]
-you can state the KV-cache sizes of multi-head, multi-query, grouped-query and latent attention, explain the "absorption" trick that lets latent attention avoid rebuilding keys, and say why latent attention needs a separate rotary key.
-:::
+Chapter 11 of 21 · III. Fast attention and inference · about 35 minutes. Builds on: [8. Position and rotary embeddings](/guide/rope/), [10. Generating text: the KV cache and inference cost](/guide/kv-cache/).
 
 ## The cache is the bottleneck
 
@@ -68,7 +64,7 @@ RoPE ([Chapter 8](/guide/rope/)) rotates the key by an angle that depends on its
 
 For the numbers in context, open the KV-cache calculator in [Chapter 10](/guide/kv-cache/) and switch between the three presets: 128 KiB per token for Llama 3 8B, about 70 KB per token for DeepSeek-V3.
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>For 32 query heads and 8 KV heads, by what factor does GQA shrink the cache versus MHA?</summary>

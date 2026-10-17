@@ -7,11 +7,7 @@ sidebar:
 
 _Turning scores into probabilities, and probabilities into text_
 
-Chapter 4 of 24 · I. Foundations · about 30 minutes. Builds on: [1. Functions, parameters and gradient descent](/guide/gradient-descent/).
-
-:::tip[Skip this chapter if]
-you can derive that the gradient of softmax cross-entropy with respect to the logits is $p - y$, define perplexity, and explain temperature and top-p sampling. These are the objects every later chapter uses to talk about a language model's output.
-:::
+Chapter 4 of 21 · I. Foundations · about 30 minutes. Builds on: [1. Functions, parameters and gradient descent](/guide/gradient-descent/).
 
 :::note[Inspect a real next-token distribution]
 See a real next-token distribution. Switch between trained and random weights to see what learning changes. [Open in the Model Explorer](/explorer/#step=25&t=9&v=visual).
@@ -84,7 +80,7 @@ If the average per-token loss is ℓ (in nats), the **perplexity** is $\exp(ℓ)
 
 Notice that the training loss uses $T = 1$ and the full distribution; sampling controls are applied only at generation time.
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>Derive ∂L/∂z for softmax cross-entropy.</summary>

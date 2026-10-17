@@ -7,6 +7,18 @@ New chapters, teardowns, tools and corrections, newest first. Follow along with 
 
 Found a mistake? Every page ends with a link to report it, and corrections are listed here.
 
+## 2026-10-16: Remove speculative coverage and correct protocol guidance
+
+Fixed keyboard focus after Explorer and experiment controls redraw. Invalid numerical input now stays editable, identifies the relevant field and returns focus there. Custom prompt comparisons and fixed worked designs are explicitly distinguished.
+
+Search excerpts no longer duplicate rendered equation markup. Removed memorization checklists and reframed the existing calculations as worked examples.
+
+Removed three unfinished outline chapters from the published guide; the guide now contains 21 chapters. Existing links lead to the relevant working explanations and experiments.
+
+Removed the “newest open models” roundup because it mixed verified and explicitly unconfirmed specifications. The architecture reference now contains inspected model configurations. Removed the agency-policy roundup to keep the reference focused on model mechanics and research.
+
+Corrected the application chapter’s description of MCP: the protocol includes an authorization specification. Authorization and the trustworthiness of tool-returned text are separate concerns; the chapter now links directly to the protocol’s documentation.
+
 ## 2026-10-15: A more focused reference
 
 Simplified the homepage and navigation around the Model Explorer, experiments and technical reference. Removed the public beta and workshop guides, duplicate field notes and application-debugging framing. Experiment titles now describe their subject directly; progress labels and the repeated homepage method section are gone. Existing bookmarks redirect to the relevant experiments or methods.

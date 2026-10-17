@@ -2,7 +2,7 @@
 //   src/content/docs/index.md     home page (from src/chapters.mjs)
 //   src/content/docs/labs/index.md  list of labs (from each lab's front matter)
 //   src/content/docs/reference/papers.md  every cited paper, with the chapters that cite it
-// Chapters, labs, teardowns and the security-guidance page are hand-edited Markdown and are never overwritten here.
+// Chapters, labs and teardowns are hand-edited Markdown and are never overwritten here.
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { CH, PARTS } from '../src/chapters.mjs';
@@ -31,12 +31,21 @@ ${labs.map(l => `${l.n}. [${l.title}](/labs/${l.slug}/): about ${l.min} minutes.
 /* paper index */
 const PAPERS = vm.runInNewContext('var window={};' + fs.readFileSync('public/js/papers.js', 'utf8') + ';window.PAPERS');
 const cited = {};
+const publishedCitations = new Set();
+function collectCitations(dir) {
+  for (const entry of fs.readdirSync(dir,{withFileTypes:true})) {
+    const file=dir+'/'+entry.name;
+    if(entry.isDirectory())collectCitations(file);
+    else if(file.endsWith('.md'))for(const match of fs.readFileSync(file,'utf8').matchAll(/data-p="([^"]+)"/g))publishedCitations.add(match[1]);
+  }
+}
+collectCitations(DOCS);
 for (const f of fs.readdirSync(`${DOCS}/guide`)) {
   const c = CH.find(x => x[1] === f.replace(/\.md$/, ''));
   if (!c) continue;
   for (const m of fs.readFileSync(`${DOCS}/guide/${f}`, 'utf8').matchAll(/data-p="([^"]+)"/g)) (cited[m[1]] = cited[m[1]] || new Set()).add(num[c[0]]);
 }
-const rows = Object.entries(PAPERS).map(([k, p]) => ({ k, p, ch: [...(cited[k] || [])].sort((a, b) => a - b) }))
+const rows = Object.entries(PAPERS).filter(([k])=>publishedCitations.has(k)).map(([k, p]) => ({ k, p, ch: [...(cited[k] || [])].sort((a, b) => a - b) }))
   .sort((a, b) => a.p.y - b.p.y || a.p.a.localeCompare(b.p.a));
 const link = p => (p.x ? `https://arxiv.org/abs/${p.x}` : p.u);
 fs.writeFileSync(`${DOCS}/reference/papers.md`, `---

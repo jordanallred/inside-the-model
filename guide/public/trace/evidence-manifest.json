@@ -64,7 +64,7 @@
     "public/js/itm-model.js": "14a2df8ca2067d1f4ec83c593522ed7966c6376c993f2133a4a6cad32f331f50",
     "public/js/itm-weights.js": "c38919050b6507e4a65c6ec0d271ec97d7e4868db32aed8e8612e32536f5f56e",
     "public/js/case-engine.js": "cba16a4db87d8bb01e0244ec00fe69d4914d9f40196732e89d799115d5c022f7",
-    "public/js/case-workspace.js": "3cecfad0c2a43bac6f9448794e6e8dcb2427d0a0a7cc171bc217be58e25f4766",
+    "public/js/case-workspace.js": "626e9555b358bf493fca048c20430e27a045fd5a9aaf086c1a43317ed303f87b",
     "public/code/itm_model.py": "2076c7c73b59e8ffa61d1030934c8c4ad8427c954c686296e921acddb52eed97",
     "public/trace/weights.json": "00ec8b56c700ee720b94b3884d6ee8aae9da314ebb93ff28aa6f2498ec9521f6",
     "public/code/replicate_gpt2_causality.py": "168a85665c3808aef23bd406f1385b088ab722f8d571bb94a2dff93fae60f0f9"

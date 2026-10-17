@@ -7,11 +7,7 @@ sidebar:
 
 _Residual stream, normalization and the gated MLP_
 
-Chapter 7 of 24 · II. The transformer · about 40 minutes. Builds on: [2. Neural networks and the multilayer perceptron](/guide/neural-networks/), [6. Attention](/guide/attention/).
-
-:::tip[Skip this chapter if]
-you can write the pre-norm transformer block from memory, give the formula for RMSNorm and for a SwiGLU MLP, and estimate the parameter count of a dense model from its width, depth and vocabulary.
-:::
+Chapter 7 of 21 · II. The transformer · about 40 minutes. Builds on: [2. Neural networks and the multilayer perceptron](/guide/neural-networks/), [6. Attention](/guide/attention/).
 
 :::note[Inspect a block's pieces]
 See a block's pieces with real numbers, starting at the output projection and first residual add of layer 0. [Open in the Model Explorer](/explorer/#step=9&t=3&l=0&v=visual).
@@ -84,7 +80,7 @@ Two things to notice. First, the MLP holds most of the layer parameters: two thi
 -   **Normalization of queries and keys** and other stability tricks are common in recent models.
 -   **Final norm.** After the last block, one more normalization is applied before the output matrix.
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>What is the gradient path from the loss back to layer 1 in a pre-norm residual stack?</summary>

@@ -7,11 +7,7 @@ sidebar:
 
 _Why decoding is memory-bound and what the cache costs_
 
-Chapter 10 of 24 · III. Fast attention and inference · about 35 minutes. Builds on: [9. The full model and its training loop](/guide/full-model/).
-
-:::tip[Skip this chapter if]
-you can explain the KV cache and compute its size from a model's configuration, why decoding is memory-bandwidth-bound, how continuous batching and paged memory help, and why speculative decoding preserves the output distribution.
-:::
+Chapter 10 of 21 · III. Fast attention and inference · about 35 minutes. Builds on: [9. The full model and its training loop](/guide/full-model/).
 
 :::note[Inspect the causal mask]
 See the causal mask that makes caching keys and values safe: earlier tokens never depend on later ones. [Open in the Model Explorer](/explorer/#step=6&t=3&l=0&h=0&v=visual).
@@ -75,7 +71,7 @@ At every decoding step the GPU must stream all the active weights and every sequ
 
 If decoding is memory-bound, checking several tokens costs about the same as generating one. <cite data-p="leviathan2022" data-s></cite> exploit this: a small, fast _draft_ model proposes $\gamma$ tokens; the large _target_ model scores all $\gamma$ positions in a single forward pass; and tokens are accepted left to right with a probability test. With draft probability $q(x)$ and target probability $p(x)$ for the proposed token $x$, accept with probability $\min(1, p(x) / q(x))$. At the first rejection, resample from the normalized residual distribution $\max(0, p - q)$. The accept/reject rule is constructed so the final tokens are distributed **exactly** as if sampled from the target alone. The speed-up depends on how often the draft agrees. Multi-token-prediction heads ([Chapter 9](/guide/full-model/)) can serve as a built-in draft.
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>Compute the KV cache per token for a model with 61 layers using a 576-number latent per layer (16-bit).</summary>

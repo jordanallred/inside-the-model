@@ -47,8 +47,8 @@
   function mount(el,id){
     const meta=catalog.find(c=>c.id===id),guide=context[id];
     if(!C||!W||!ITM||!meta){el.innerHTML='<p>The experiment could not load. Reload this page, or <a href="/cases/">choose another investigation</a>.</p>';return;}
-    let state=W.load(backing()),draft={...state.cases[id]},error='',message='',sessionOnly=false;
-    const field=(name,label,type='text',extra='')=>'<label class="iv-field" for="iv-'+name+'">'+esc(label)+'<input id="iv-'+name+'" name="'+name+'" type="'+type+'" value="'+esc(draft[name])+'" '+(type==='text'?'maxlength="250" autocomplete="off" spellcheck="false" ':'')+extra+' aria-describedby="iv-error"'+(error?' aria-invalid="true"':'')+'></label>';
+    let state=W.load(backing()),draft={...state.cases[id]},error='',invalidFields=[],message='',sessionOnly=false;
+    const field=(name,label,type='text',extra='')=>'<label class="iv-field" for="iv-'+name+'">'+esc(label)+'<input id="iv-'+name+'" name="'+name+'" type="'+type+'" value="'+esc(draft[name])+'" '+(type==='text'?'maxlength="250" autocomplete="off" spellcheck="false" ':'')+extra+' aria-describedby="iv-error"'+(error&&invalidFields.includes(name)?' aria-invalid="true"':'')+'></label>';
     function inputs(){
       if(id==='future')return field('a','First input')+field('b','Second input')+field('position','Measure at token position','number','min="1" max="14" step="1"');
       if(id==='controls')return field('a','First prompt')+field('b','Second prompt');
@@ -56,27 +56,40 @@
     }
     function render(focus){
       const s=state.cases[id];let result='';try{result=measured(id,s);}catch(e){error=e.message;result='<p>Adjust the inputs above to run a comparison.</p>';}
-      const presets=id==='controls'?'<div class="iv-design-options" role="group" aria-label="Worked control designs">'+[['diagnostic','Change each candidate token separately'],['confounded','Change both candidate tokens together'],['repeat','Repeat the baseline']].map(([value,label])=>'<button type="button" data-plan="'+value+'" aria-pressed="'+(!s.custom&&s.plan===value)+'">'+label+'</button>').join('')+'</div>':'';
+      const presets=id==='controls'?'<h4>Worked control designs</h4><p>Fixed example inputs; each result lists every prompt it measures.</p><div class="iv-design-options" role="group" aria-label="Worked control designs">'+[['diagnostic','Change each candidate token separately'],['confounded','Change both candidate tokens together'],['repeat','Repeat the baseline']].map(([value,label])=>'<button type="button" data-plan="'+value+'" aria-pressed="'+(!s.custom&&s.plan===value)+'">'+label+'</button>').join('')+'</div>':'';
       const heads=id==='place'?'<div class="iv-heads" role="group" aria-label="Head-output intervention">'+[[null,'All heads active'],...[0,1,2,3].map(h=>[h,'Remove layer '+Math.floor(h/2)+', head '+h%2])].map(([h,label])=>'<button type="button" data-head="'+(h===null?'all':h)+'" aria-pressed="'+(s.head===h)+'">'+label+'</button>').join('')+'</div>':'';
-      el.innerHTML='<div class="iv iv-open"><p class="iv-use">'+esc(guide.use)+'</p><h3>'+esc(guide.question)+'</h3><form data-run><div class="iv-fields">'+inputs()+'</div><button class="btn" type="submit">Run comparison</button></form>'+presets+heads+'<p id="iv-error" class="iv-feedback" role="alert"'+(error?'':' hidden')+'>'+esc(error)+'</p><section class="iv-stage" aria-labelledby="iv-result"><h3 id="iv-result" tabindex="-1">Measurements</h3>'+result+'</section><details class="iv-interpretation"><summary>Interpret the comparison</summary><p>'+esc(guide.insight)+'</p><p class="iv-note">'+esc(guide.limit)+'</p></details><section class="iv-stage"><h3>Try another context</h3><p>Change the inputs above or inspect one of three worked comparisons. </p><button type="button" class="btn" data-example>'+(s.exampleShown?'Next worked comparison':'Show a worked comparison')+'</button>'+(s.exampleShown?example(id,s.example):'')+'</section><p class="iv-save" role="status">'+esc(message||(sessionOnly?'Storage is unavailable; settings last for this page session.':'Settings stay in this browser when storage is available.'))+'</p><div class="iv-tools"><button type="button" data-reset>Reset inputs</button><a href="/run-locally/">Run locally</a></div><details><summary>Teaching-model vocabulary</summary><p>'+esc(ITM.CFG.vocab.slice(1).join(', '))+'</p><p>This model uses a small synthetic grammar. A supported word sequence may still lie outside that grammar.</p></details><section class="iv-resources"><h3>Related reference</h3><ul>'+meta.resources.map(([label,href])=>'<li><a href="'+href+'">'+esc(label)+'</a></li>').join('')+'<li><a href="/methods/">Methods, provenance and limitations</a></li></ul><p><a href="/cases/">Choose another question</a></p></section></div>';
+      el.innerHTML='<div class="iv iv-open"><p class="iv-use">'+esc(guide.use)+'</p><h3>'+esc(guide.question)+'</h3>'+(id==='controls'?'<h4>Your prompt pair</h4><p>Run these inputs to measure your own comparison. The worked design buttons use fixed example inputs.</p>':'')+'<form data-run><div class="iv-fields">'+inputs()+'</div><button class="btn" type="submit">Run comparison</button></form>'+presets+heads+'<p id="iv-error" class="iv-feedback" role="alert"'+(error?'':' hidden')+'>'+esc(error)+'</p><section class="iv-stage" aria-labelledby="iv-result"><h3 id="iv-result" tabindex="-1">'+(id==='controls'&&!s.custom?'Worked design measurements':'Measurements')+'</h3>'+result+'</section><details class="iv-interpretation"><summary>Interpret the comparison</summary><p>'+esc(guide.insight)+'</p><p class="iv-note">'+esc(guide.limit)+'</p></details><section class="iv-stage"><h3>Try another context</h3><p>Change the inputs above or inspect one of three worked comparisons. </p><button type="button" class="btn" data-example>'+(s.exampleShown?'Next worked comparison':'Show a worked comparison')+'</button>'+(s.exampleShown?example(id,s.example):'')+'</section><p class="iv-save" role="status">'+esc(message||(sessionOnly?'Storage is unavailable; settings last for this page session.':'Settings stay in this browser when storage is available.'))+'</p><div class="iv-tools"><button type="button" data-reset>Reset inputs</button><a href="/run-locally/">Run locally</a></div><details><summary>Teaching-model vocabulary</summary><p>'+esc(ITM.CFG.vocab.slice(1).join(', '))+'</p><p>This model uses a small synthetic grammar. A supported word sequence may still lie outside that grammar.</p></details><section class="iv-resources"><h3>Related reference</h3><ul>'+meta.resources.map(([label,href])=>'<li><a href="'+href+'">'+esc(label)+'</a></li>').join('')+'<li><a href="/methods/">Methods, provenance and limitations</a></li></ul><p><a href="/cases/">Choose another question</a></p></section></div>';
       if(focus){const node=el.querySelector(focus);node?.focus({preventScroll:true});if(node?.tagName==='H3')node.scrollIntoView({block:'nearest'});}
     }
     function run(patch={}){
       const next={...state.cases[id],...draft,...patch};
+      for(const name of ['temperature','position'])if(typeof next[name]==='string')next[name]=next[name].trim()===''?NaN:Number(next[name]);
       if(id==='controls'&&!('plan'in patch))next.custom=true;
-      try{measured(id,next);}catch(e){error=e.message;message='The last valid measurement is retained below.';render('[name="'+(id==='future'||id==='controls'?'a':'prompt')+'"]');return;}
-      const result=W.commit(sessionOnly?null:backing(),state,id,{...next,explored:true});state=result.state;sessionOnly=!result.persisted;draft={...state.cases[id]};error='';message=sessionOnly?'Computed. Storage is unavailable; settings last for this page session.':'Comparison computed; settings saved in this browser.';
+      try{measured(id,next);}catch(e){
+        error=e.message;
+        if(id==='confidence'&&(!Number.isFinite(next.temperature)||next.temperature<.25||next.temperature>4))invalidFields=['temperature'];
+        else if(id==='future'||id==='controls'){
+          invalidFields=['a','b'].filter(name=>!C.validatePrompt(next[name]).ok);
+          if(!invalidFields.length&&id==='future'){
+            const length=Math.min(C.validatePrompt(next.a).ids.length,C.validatePrompt(next.b).ids.length);
+            invalidFields=!Number.isInteger(next.position)||next.position<1||next.position>=length-1?['position']:['a','b'];
+          }
+          if(!invalidFields.length)invalidFields=['a','b'];
+        }else invalidFields=['prompt'];
+        message='The last valid measurement is retained below.';render('[name="'+invalidFields[0]+'"]');return;
+      }
+      const result=W.commit(sessionOnly?null:backing(),state,id,{...next,explored:true});state=result.state;sessionOnly=!result.persisted;draft={...state.cases[id]};error='';invalidFields=[];message=sessionOnly?'Computed. Storage is unavailable; settings last for this page session.':'Comparison computed; settings saved in this browser.';
       window.dispatchEvent(new Event('itm:case-progress'));render('#iv-result');
     }
-    el.addEventListener('input',e=>{if(e.target.name)draft[e.target.name]=e.target.type==='number'?Number(e.target.value):e.target.value;});
-    el.addEventListener('change',e=>{if(e.target.name)draft[e.target.name]=e.target.type==='number'?Number(e.target.value):e.target.value;});
+    el.addEventListener('input',e=>{if(e.target.name)draft[e.target.name]=e.target.value;});
+    el.addEventListener('change',e=>{if(e.target.name)draft[e.target.name]=e.target.value;});
     el.addEventListener('submit',e=>{if(!e.target.matches('[data-run]'))return;e.preventDefault();run();});
     el.addEventListener('click',e=>{
       const head=e.target.closest('[data-head]'),plan=e.target.closest('[data-plan]');
       if(head){run({head:head.dataset.head==='all'?null:Number(head.dataset.head)});return;}
       if(plan){const value=plan.dataset.plan;run({plan:value,custom:false,a:'the cat sat on the',b:value==='repeat'?'the cat sat on the':value==='confounded'?'the cat saw and the':'the cat saw on the'});return;}
-      if(e.target.closest('[data-example]')){const s=state.cases[id],result=W.commit(sessionOnly?null:backing(),state,id,{example:s.exampleShown?(s.example+1)%3:0,exampleShown:true,explored:true});state=result.state;sessionOnly=!result.persisted;error='';message='Worked comparison shown. Change the inputs above to investigate another context.';window.dispatchEvent(new Event('itm:case-progress'));render();}
-      if(e.target.closest('[data-reset]')){const result=W.reset(sessionOnly?null:backing(),state,id);state=result.state;draft={...state.cases[id]};sessionOnly=!result.persisted;error='';message='Inputs reset. Earlier exploration history is retained.';render();}
+      if(e.target.closest('[data-example]')){const s=state.cases[id],result=W.commit(sessionOnly?null:backing(),state,id,{example:s.exampleShown?(s.example+1)%3:0,exampleShown:true,explored:true});state=result.state;sessionOnly=!result.persisted;error='';message='Worked comparison shown. Change the inputs above to investigate another context.';window.dispatchEvent(new Event('itm:case-progress'));render('[data-example]');}
+      if(e.target.closest('[data-reset]')){const result=W.reset(sessionOnly?null:backing(),state,id);state=result.state;draft={...state.cases[id]};sessionOnly=!result.persisted;error='';message='Inputs reset.';render('[data-reset]');}
     });
     render();
   }

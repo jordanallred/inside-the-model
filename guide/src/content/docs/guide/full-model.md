@@ -7,11 +7,7 @@ sidebar:
 
 _Shapes, loss and the cost of one training step_
 
-Chapter 9 of 24 · II. The transformer · about 35 minutes. Builds on: [3. Backpropagation and optimizers](/guide/backpropagation/), [7. The transformer block](/guide/transformer-block/), [8. Position and rotary embeddings](/guide/rope/).
-
-:::tip[Skip this chapter if]
-you can trace tensor shapes through a full decoder-only transformer, write the training loop, and explain the $6\cdot N\cdot D$ compute rule and the memory cost of training (about 16 or more bytes per parameter).
-:::
+Chapter 9 of 21 · II. The transformer · about 35 minutes. Builds on: [3. Backpropagation and optimizers](/guide/backpropagation/), [7. The transformer block](/guide/transformer-block/), [8. Position and rotary embeddings](/guide/rope/).
 
 :::note[Run a whole forward pass]
 Run a whole forward pass from prompt to next-token probabilities, one step at a time. [Open in the Model Explorer](/explorer/#step=0&t=3&v=visual).
@@ -76,7 +72,7 @@ The next-token loss can be supplemented. **Multi-token prediction** <cite data-p
 
 Validation loss (or perplexity, [Chapter 4](/guide/softmax-and-loss/)) on held-out text is the cleanest pretraining signal because it is smooth and cheap. Downstream benchmarks measure what people care about but are noisier, can saturate, and can leak into training data. Neither tells you whether a model is _secure_; that requires targeted evaluation (Chapters [20](/guide/security/) and [21](/guide/evaluation/)).
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>Why is the backward pass about twice the forward pass?</summary>

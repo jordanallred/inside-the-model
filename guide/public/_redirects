@@ -10,3 +10,13 @@
 /field-notes/ /cases/ 301
 /field-notes/test-an-explanation/ /cases/choose-the-control/ 301
 /field-notes/temperature-and-knowledge/ /cases/confidence-without-learning/ 301
+/teardown/frontier /teardown/ 301
+/teardown/frontier/ /teardown/ 301
+/reference/security-guidance /guide/security/ 301
+/reference/security-guidance/ /guide/security/ 301
+/guide/reading-the-residual-stream/ /guide/transformer-block/#the-block-and-the-residual-stream 301
+/guide/features-and-circuits/ /cases/story-circuit/ 301
+/guide/intervening/ /methods/#interpret-interventions-carefully 301
+/guide/reading-the-residual-stream /guide/transformer-block/#the-block-and-the-residual-stream 301
+/guide/features-and-circuits /cases/story-circuit/ 301
+/guide/intervening /methods/#interpret-interventions-carefully 301

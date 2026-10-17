@@ -7,11 +7,7 @@ sidebar:
 
 _A lifecycle map of attacks, with the papers behind each_
 
-Chapter 20 of 24 · VII. Security and evaluation · about 60 minutes. Builds on: [11. Grouped-query and latent attention](/guide/gqa-and-mla/), [19. Prompting, retrieval, tools, agents and MCP](/guide/applications/).
-
-:::tip[Skip this chapter if]
-you can derive FGSM, explain how PGD and GCG extend it, distinguish jailbreaks from prompt injection and describe a privilege-separated defense, and name the main training-time, privacy and serving-time attacks with a paper for each.
-:::
+Chapter 20 of 21 · VII. Security and evaluation · about 60 minutes. Builds on: [11. Grouped-query and latent attention](/guide/gqa-and-mla/), [19. Prompting, retrieval, tools, agents and MCP](/guide/applications/).
 
 ## A map of the attack surface
 
@@ -59,7 +55,7 @@ Filters, hardened system prompts and trained instruction hierarchies reduce succ
 ## 3\. Training-time attacks
 
 -   **Backdoors.** <cite data-p="gu2017" data-s></cite> showed a network trained on data containing a trigger pattern behaves normally except when the trigger appears. For language models, <cite data-p="hubinger2024" data-s></cite> trained models with hidden trigger-conditioned behavior and found it persisted through standard safety training (SFT, RL, adversarial training), in some cases making it better at hiding.
--   **Practical dataset poisoning.** <cite data-p="carlini2023" data-s></cite> demonstrated attacks on web-scale datasets: _split-view poisoning_ (datasets that are lists of URLs can be changed by whoever controls the domain later) and _frontrunning poisoning_ (editing a source just before it is snapshotted). The cost to poison meaningful fractions was low. NSA's 2025 AI data security guidance names both.
+-   **Practical dataset poisoning.** <cite data-p="carlini2023" data-s></cite> demonstrated attacks on web-scale datasets: _split-view poisoning_ (datasets that are lists of URLs can be changed by whoever controls the domain later) and _frontrunning poisoning_ (editing a source just before it is snapshotted). The cost to poison meaningful fractions was low.
 -   **Fine-tuning attacks.** <cite data-p="qi2023" data-s></cite>: a handful of adversarial examples, or even benign fine-tuning data, can degrade safety behavior.
 
 ## 4\. Privacy and confidentiality
@@ -87,9 +83,8 @@ A defender's job is to turn the above into evidence about a specific system:
 5.  Prefer architectural limits over trained behavior wherever the cost of failure is high.
 6.  Write findings with reproduction steps, evidence and recommendations.
 
-Public guidance from NSA, CISA and allied agencies applies this at organizational scale (see the [security guidance reference](/reference/security-guidance/)): secure deployment environments, protected weights, verified data and artifacts, and incremental, contained adoption of agentic systems.
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>Derive the FGSM perturbation.</summary>

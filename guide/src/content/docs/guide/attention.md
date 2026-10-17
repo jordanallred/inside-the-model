@@ -7,11 +7,7 @@ sidebar:
 
 _Queries, keys and values: a soft lookup across positions_
 
-Chapter 6 of 24 · II. The transformer · about 45 minutes. Builds on: [2. Neural networks and the multilayer perceptron](/guide/neural-networks/), [4. Probability, softmax and next-token prediction](/guide/softmax-and-loss/), [5. Tokens and embeddings](/guide/tokens-and-embeddings/).
-
-:::tip[Skip this chapter if]
-you can write the formula $\operatorname{softmax}(QK^{\top} / \sqrt{d})V$ from memory, explain why the $\sqrt{d}$ is there, what a causal mask does, and what multiple heads buy you. Otherwise this is the most important chapter in the guide.
-:::
+Chapter 6 of 21 · II. The transformer · about 45 minutes. Builds on: [2. Neural networks and the multilayer perceptron](/guide/neural-networks/), [4. Probability, softmax and next-token prediction](/guide/softmax-and-loss/), [5. Tokens and embeddings](/guide/tokens-and-embeddings/).
 
 :::note[Inspect the real attention weights]
 See the actual scores, mask and softmax weights for the word “sat”, layer 0, head 0. [Open in the Model Explorer](/explorer/#step=7&t=3&l=0&h=0&v=visual).
@@ -83,7 +79,7 @@ Interpretability work has identified specific head behaviors. A well-studied one
 
 The score matrix $S$ has $n^{2}$ entries. Computing it takes $O(n^{2}\cdot d_k)$ operations and storing it takes $O(n^{2})$ memory per head. For short sequences the MLP dominates; at tens of thousands of tokens attention dominates. Chapters [10](/guide/kv-cache/)–[13](/guide/sparse-and-linear-attention/) are about living with this cost.
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>Token i's output is a "convex combination" of value rows. What does this say about what attention can do?</summary>

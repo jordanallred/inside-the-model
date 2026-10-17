@@ -7,11 +7,7 @@ sidebar:
 
 _Rotating vectors so attention knows who is near whom_
 
-Chapter 8 of 24 · II. The transformer · about 40 minutes. Builds on: [6. Attention](/guide/attention/).
-
-:::tip[Skip this chapter if]
-you can derive why rotating queries and keys by position-dependent angles makes attention scores depend only on relative position, state RoPE's frequency formula, and explain how position interpolation and YaRN extend the context window.
-:::
+Chapter 8 of 21 · II. The transformer · about 40 minutes. Builds on: [6. Attention](/guide/attention/).
 
 :::note[Inspect how position is added]
 See how position is added to a token vector. This toy model uses fixed sinusoidal positions, not RoPE, so compare the two ideas. [Open in the Model Explorer](/explorer/#step=2&t=3&v=math).
@@ -95,7 +91,7 @@ Real examples from published configurations: gpt-oss-120b was extended from a 4,
 
 Having a long window is not the same as using it well. <cite data-p="liu2023lost" data-s></cite> found that models retrieve information best from the start and end of a long prompt and worse from the middle.
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>Prove the identity ⟨R(mθ)q, R(nθ)k⟩ = ⟨q, R((n−m)θ)k⟩.</summary>

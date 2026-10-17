@@ -7,11 +7,7 @@ sidebar:
 
 _From strings to integers to vectors_
 
-Chapter 5 of 24 · I. Foundations · about 30 minutes. Builds on: [4. Probability, softmax and next-token prediction](/guide/softmax-and-loss/).
-
-:::tip[Skip this chapter if]
-you can describe how byte-pair encoding builds a vocabulary, say why the embedding table is equivalent to a one-hot matrix product, and explain why a tokenizer is a security-relevant component.
-:::
+Chapter 5 of 21 · I. Foundations · about 30 minutes. Builds on: [4. Probability, softmax and next-token prediction](/guide/softmax-and-loss/).
 
 :::note[Inspect the embedding lookup]
 The first two operations of a real model, run live: words become IDs, IDs become vectors. [Open in the Model Explorer](/explorer/#step=1&t=3&v=visual).
@@ -58,7 +54,7 @@ Early work showed that such learned vectors place related words near each other 
 
 At the output, the final vector is multiplied by another $V \times d$ matrix to produce logits (the **unembedding**). Some models tie it to $E$ to save parameters; Llama 3, gpt-oss and DeepSeek-V3 keep them separate, so the vocabulary costs $2\cdot V\cdot d$ parameters.
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>Run three merges by hand on "low low lower": which pair is merged first?</summary>

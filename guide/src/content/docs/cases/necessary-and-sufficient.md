@@ -11,4 +11,4 @@ Test both directions on **the cat sat on the**. Remove the candidate head, then 
 
 ## State the intervention, context and threshold
 
-“Sufficient” needs a precise context. Here the question is whether a place preference stays above 50% with the other attention-head outputs set to zero for a particular input. It does not mean the head is an independent language model. Compare [causal interventions](/guide/intervening/) or [inspect the reference implementation locally](/run-locally/).
+“Sufficient” needs a precise context. Here the question is whether a place preference stays above 50% with the other attention-head outputs set to zero for a particular input. It does not mean the head is an independent language model. Compare [causal interventions](/methods/#interpret-interventions-carefully) or [inspect the reference implementation locally](/run-locally/).

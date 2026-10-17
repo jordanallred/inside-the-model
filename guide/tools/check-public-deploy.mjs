@@ -15,6 +15,10 @@ function walk(dir) {
   });
 }
 
+for (const file of walk(path.join(root,'src/content/docs')).filter(f=>f.endsWith('.md'))) {
+  if (/This chapter is an outline|Widget idea:|Planned questions:/.test(fs.readFileSync(file,'utf8'))) failures.push(`${path.relative(root,file)} publishes unfinished planning content`);
+}
+
 for (const file of walk(dist)) {
   if (!/\.(?:html|js|xml)$/i.test(file)) continue;
   const output = fs.readFileSync(file, 'utf8');

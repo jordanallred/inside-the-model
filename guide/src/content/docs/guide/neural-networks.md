@@ -7,11 +7,7 @@ sidebar:
 
 _Layers, activations and what a hidden unit does_
 
-Chapter 2 of 24 · I. Foundations · about 35 minutes. Builds on: [1. Functions, parameters and gradient descent](/guide/gradient-descent/).
-
-:::tip[Skip this chapter if]
-you can say what a layer $h = \varphi (Wx + b)$ computes, why a stack of purely linear layers is no more powerful than one, and what a one-hidden-layer ReLU network looks like as a function of one input. The MLP is the "feed-forward" half of every transformer layer, so a quick refresher is worth the time.
-:::
+Chapter 2 of 21 · I. Foundations · about 35 minutes. Builds on: [1. Functions, parameters and gradient descent](/guide/gradient-descent/).
 
 ## From a line to a neuron
 
@@ -82,7 +78,7 @@ $$
 
 That is $2\cdot4\cdot d^{2}=8d^{2}$ weights per layer (ignoring biases), roughly two thirds of all non-embedding parameters. [Chapter 7](/guide/transformer-block/) introduces the gated version used by current models and [Chapter 14](/guide/mixture-of-experts/) splits this block into many "experts".
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>How many parameters does a layer mapping 4096 inputs to 14336 outputs have (no bias)?</summary>

@@ -7,11 +7,7 @@ sidebar:
 
 _Windows, sparsity, recurrence and hybrids_
 
-Chapter 13 of 24 · III. Fast attention and inference · about 45 minutes. Builds on: [6. Attention](/guide/attention/), [10. Generating text: the KV cache and inference cost](/guide/kv-cache/).
-
-:::tip[Skip this chapter if]
-you can explain sliding-window attention and attention sinks, the idea of learned sparse selection (NSA, DSA), how linear attention becomes a recurrence, and how the delta rule and gating change that recurrence.
-:::
+Chapter 13 of 21 · III. Fast attention and inference · about 45 minutes. Builds on: [6. Attention](/guide/attention/), [10. Generating text: the KV cache and inference cost](/guide/kv-cache/).
 
 ## Beyond full attention
 
@@ -69,7 +65,7 @@ Pure recurrent layers are cheap but weak at exact lookup far back; full attentio
 | Learned sparse (NSA, DSA) | $O(n\cdot k)$ | full cache kept, reads limited | selector must be good |
 | Linear / SSM | $O(n)$ | constant | lossy memory, weaker exact recall |
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>Why can a sliding-window model still use information from beyond one window?</summary>

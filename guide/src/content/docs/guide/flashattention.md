@@ -7,11 +7,7 @@ sidebar:
 
 _Exact attention without the $n\times n$ matrix_
 
-Chapter 12 of 24 · III. Fast attention and inference · about 30 minutes. Builds on: [6. Attention](/guide/attention/), [10. Generating text: the KV cache and inference cost](/guide/kv-cache/).
-
-:::tip[Skip this chapter if]
-you can explain why attention is limited by memory traffic rather than arithmetic, derive the online-softmax update, and describe how FlashAttention avoids storing the $n\times n$ matrix.
-:::
+Chapter 12 of 21 · III. Fast attention and inference · about 30 minutes. Builds on: [6. Attention](/guide/attention/), [10. Generating text: the KV cache and inference cost](/guide/kv-cache/).
 
 ## Attention is bottlenecked by memory, not math
 
@@ -52,7 +48,7 @@ FlashAttention-2 <cite data-p="dao2023" data-s></cite> reorganized the loops and
 
 Attention kernels are the reason sequence length is a software choice rather than a hard wall, they appear in every training and inference framework, and their numerical behavior (the order in which sums are accumulated, low-precision accumulation) is one source of tiny output differences between hardware and software versions.
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>Why can FlashAttention be faster even though it does the same number of FLOPs?</summary>

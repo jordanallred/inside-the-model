@@ -7,11 +7,7 @@ sidebar:
 
 _Questions, test sets, statistics and the ways evaluations lie_
 
-Chapter 21 of 24 · VII. Security and evaluation · about 45 minutes. Builds on: [4. Probability, softmax and next-token prediction](/guide/softmax-and-loss/), [20. Attacks on language models and their defenses](/guide/security/).
-
-:::tip[Skip this chapter if]
-you can explain why one sampled run proves little, compute a confidence interval for a success rate, say what contamination and saturation do to a benchmark, and describe how to evaluate a defense against an adaptive attacker.
-:::
+Chapter 21 of 21 · VII. Security and evaluation · about 45 minutes. Builds on: [4. Probability, softmax and next-token prediction](/guide/softmax-and-loss/), [20. Attacks on language models and their defenses](/guide/security/).
 
 ## What an evaluation is for
 
@@ -108,7 +104,7 @@ Security evaluation has all the issues above plus an adversary who responds to y
 | Evaluating a different artifact than the one deployed | Same weights, template, precision, serving stack |
 | Public benchmark assumed clean | Test for contamination; use private or fresh items |
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>You observe 3 successes in 20 trials. Is "15%" a reliable estimate?</summary>

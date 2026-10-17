@@ -7,11 +7,7 @@ sidebar:
 
 _More parameters, same compute per token_
 
-Chapter 14 of 24 · IV. Scaling the network · about 40 minutes. Builds on: [7. The transformer block](/guide/transformer-block/), [9. The full model and its training loop](/guide/full-model/).
-
-:::tip[Skip this chapter if]
-you can explain top-k routing with a load-balancing loss, the difference between total and active parameters, what fine-grained and shared experts are, and how DeepSeek-V3 balances load without an auxiliary loss.
-:::
+Chapter 14 of 21 · IV. Scaling the network · about 40 minutes. Builds on: [7. The transformer block](/guide/transformer-block/), [9. The full model and its training loop](/guide/full-model/).
 
 ## Conditional computation
 
@@ -68,7 +64,7 @@ An auxiliary loss pulls on the main objective and can hurt quality. DeepSeek-V3 
 -   **Memory vs compute:** an MoE model is cheap per token yet needs enough memory for all experts, so it favors serving at large batch sizes where each expert sees many tokens.
 -   **Open frontier models are overwhelmingly MoE:** for example Kimi K2 <cite data-p="kimik2" data-s></cite> and Qwen3's large models <cite data-p="qwen3" data-s></cite> alongside the models above. Read each report for exact configurations.
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>A layer has 64 experts and top-2 routing. What fraction of the expert parameters is active per token?</summary>

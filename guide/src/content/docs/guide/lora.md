@@ -7,11 +7,7 @@ sidebar:
 
 _Training a few million parameters instead of billions_
 
-Chapter 18 of 24 · V. Training · about 25 minutes. Builds on: [7. The transformer block](/guide/transformer-block/), [15. Floating point and quantization](/guide/low-precision/).
-
-:::tip[Skip this chapter if]
-you can write the LoRA update, state why it saves memory, describe QLoRA's ingredients, and explain distillation.
-:::
+Chapter 18 of 21 · V. Training · about 25 minutes. Builds on: [7. The transformer block](/guide/transformer-block/), [15. Floating point and quantization](/guide/low-precision/).
 
 ## Fine-tuning is expensive in memory
 
@@ -42,7 +38,7 @@ QLoRA <cite data-p="dettmers2023" data-s></cite> reduces memory further by stori
 
 Train a small **student** to imitate a larger **teacher**, either by matching the teacher's output distribution (minimize KL between teacher and student token probabilities) or simply by training on text the teacher generated. It transfers capability into cheaper models. DeepSeek-R1's report describes distilling its reasoning traces into smaller dense models <cite data-p="deepseekr1" data-s></cite>, and several recent small open models are distilled from larger siblings.
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>How many trainable parameters does LoRA with r = 8 add to a 4096 × 11008 matrix?</summary>

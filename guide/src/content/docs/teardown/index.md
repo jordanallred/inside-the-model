@@ -1,13 +1,12 @@
 ---
 title: Model teardowns
-description: Two current open-weight models taken apart layer by layer, using their published configurations.
+description: Two published open-weight models taken apart layer by layer, using their published configurations.
 ---
 
 The chapters teach each mechanism in isolation. These pages put the mechanisms back together by following one token through two real open-weight models, using the numbers in their configuration files and technical reports. Where a number can be recomputed from the architecture (parameter counts, cache sizes, checkpoint size), the page recomputes it and shows that it matches the published value.
 
 - [gpt-oss-120b](/teardown/gpt-oss-120b/): OpenAI's mixture-of-experts model, with grouped-query attention, alternating local and global layers, and 4-bit expert weights.
 - [DeepSeek-V3](/teardown/deepseek-v3/): multi-head latent attention, fine-grained and shared experts, multi-token prediction and FP8 training.
-- [The newest open models](/teardown/frontier/): what is reported about the largest recent releases, and what could not be confirmed.
 
 ## Side by side
 

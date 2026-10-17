@@ -7,11 +7,7 @@ sidebar:
 
 _Bits, scales and what low precision does to a model_
 
-Chapter 15 of 24 · IV. Scaling the network · about 40 minutes. Builds on: [9. The full model and its training loop](/guide/full-model/).
-
-:::tip[Skip this chapter if]
-you can decode a floating-point number from its bits, compare FP16, BF16, FP8 and FP4 formats, explain block-scaled quantization (MXFP4), and say why outliers make low-bit quantization hard.
-:::
+Chapter 15 of 21 · IV. Scaling the network · about 40 minutes. Builds on: [9. The full model and its training loop](/guide/full-model/).
 
 ## How computers store real numbers
 
@@ -57,7 +53,7 @@ The Open Compute Project's **microscaling** (MX) formats <cite data-p="rouhani20
 
 gpt-oss quantizes its mixture-of-experts weights (over 90% of its parameters) to MXFP4. The model card gives 4.25 bits per parameter and checkpoints of 60.8 GiB (120b) and 12.8 GiB (20b), which is why the 120b model fits on a single 80 GB GPU <cite data-p="openai2025oss" data-s></cite>. Check: the 114.7B mixture-of-experts parameters at 4.25 bits take $114.7\text{B}\times4.25/8\approx60.9$ GB; the other 2.12B (attention and embeddings) stay in BF16 and add $2.12\text{B}\times2\approx4.24$ GB. The total is about 65.2 GB, or 60.7 GiB, which matches the 60.8 GiB checkpoint.
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>Decode the FP8 E4M3 pattern 0 0011 101.</summary>

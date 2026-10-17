@@ -7,11 +7,7 @@ sidebar:
 
 _Models, loss, and the gradient that trains them_
 
-Chapter 1 of 24 · I. Foundations · about 30 minutes. Needs only calculus and linear algebra.
-
-:::tip[Skip this chapter if]
-you can explain why gradient descent on $f(x) = \tfrac12 \cdot a\cdot x^{2}$ converges only when the learning rate is below $2 / a$, and what "minibatch" means. Otherwise read on: every later chapter uses these ideas.
-:::
+Chapter 1 of 21 · I. Foundations · about 30 minutes. Needs only calculus and linear algebra.
 
 ## A model is a function with adjustable numbers
 
@@ -89,7 +85,7 @@ Computing $\nabla L$ over the whole dataset every step is wasteful when the data
 
 A model with enough parameters can memorize its training examples and still fail on new ones. We therefore keep some data aside, the **validation set**, and report the loss there. Training and validation loss that diverge indicate **overfitting**. This will matter again in security: a model that has memorized training text can be made to reveal it ([Chapter 20](/guide/security/)).
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>For f(x) = ½·a·x² with a = 4, what range of learning rates converges?</summary>

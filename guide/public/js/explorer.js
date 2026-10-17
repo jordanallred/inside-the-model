@@ -381,7 +381,37 @@
       }).join('') + '</ol>';
     }
 
+    /* ---- keep logical keyboard focus across full re-renders ----
+       Every render() replaces the innerHTML of #toks, #pred, #map and #stage, which drops focus to <body>
+       even when an equivalent control still exists afterwards. Controls are identified by their stable
+       data-s/t/h/w/view/a attribute (the same ones the click handler reads), plus, for the two data-a
+       values that appear twice (prev/next in both the header nav and the footer), by which of those two
+       containers held focus. If the equivalent control is gone, disabled or no longer visible, focus
+       falls back to the current step's heading so it is never silently lost to <body>. */
+    function focusScope(node) {
+      const m = node.closest('.mx-nav, .mx-foot');
+      return m ? (m.classList.contains('mx-nav') ? 'mx-nav' : 'mx-foot') : null;
+    }
+    function captureFocus() {
+      const a = document.activeElement;
+      if (!a || !el.contains(a) || a === el) return null;
+      const ds = a.dataset || {};
+      for (const attr of ['s', 't', 'h', 'w', 'view', 'a']) {
+        if (ds[attr] !== undefined) return { attr, val: ds[attr], scope: focusScope(a) };
+      }
+      return a.closest('[data-x="stage"], [data-x="map"], [data-x="toks"], [data-x="pred"]') ? { heading: true } : null;
+    }
+    function restoreFocus(desc) {
+      if (!desc) return;
+      let container = el;
+      if (desc.scope) { const s = el.querySelector('.' + desc.scope); if (s) container = s; }
+      const target = desc.heading ? null : container.querySelector('[data-' + desc.attr + '="' + desc.val + '"]');
+      if (target && !target.disabled && target.offsetParent !== null) { target.focus(); return; }
+      const h = $('stage') && $('stage').querySelector('.mx-h');
+      if (h) h.focus();
+    }
     function render() {
+      const focusDesc = captureFocus();
       compute();
       const S = STEPS[st.step], I = INFO[S.k], D = describe(st.step), T = tr.T, last = tr.probs[T - 1], ord = last.map((x, i) => i).sort((a, b) => last[b] - last[a]);
       const txt = $('text'); if (document.activeElement !== txt) txt.value = st.prompt;
@@ -397,7 +427,7 @@
       const ws0 = ws();
       $('stage').innerHTML = '<div class="mx-sh" style="--gc:' + colorOf(st.step) + '"><div class="mx-kick"><span>Step ' + (st.step + 1) + ' of ' + STEPS.length + '</span><span>' + where(st.step) + '</span></div>' +
           '<div class="mx-nav"><button type="button" class="mx-btn" data-a="prev"' + (st.step ? '' : ' disabled') + ' aria-label="Previous step">←</button><button type="button" class="mx-btn primary" data-a="next"' + (next ? '' : ' disabled') + ' aria-label="Next step">→</button></div></div>' +
-        '<h2 class="mx-h">' + I.t + ' <small>' + I.tech + '</small></h2><p class="mx-why">' + I.why + '</p>' +
+        '<h2 class="mx-h" tabindex="-1">' + I.t + ' <small>' + I.tech + '</small></h2><p class="mx-why">' + I.why + '</p>' +
         '<div class="mx-tools"><div class="mx-tabs" role="group" aria-label="View">' + [['visual', 'Picture'], ['math', 'Numbers'], ['code', 'Code']].map(v => '<button type="button" data-view="' + v[0] + '" aria-pressed="' + (v[0] === st.view) + '">' + v[1] + '</button>').join('') + '</div>' +
           (HEADD[S.k] ? '<div class="mx-seg" role="group" aria-label="Attention head"><span class="mx-k">Head</span>' + [0, 1].map(h => '<button type="button" data-h="' + h + '" aria-pressed="' + (h === st.h) + '">' + h + '</button>').join('') + '</div>' : '') + '</div>' +
         '<div class="mx-view">' + (st.view === 'math' ? numbers() : st.view === 'code' ? codeView() : picture()) + '</div>' +
@@ -412,6 +442,7 @@
       const code = $('code'), cur = code && code.querySelector('.on'); if (cur) code.scrollTop = Math.max(0, cur.offsetTop - 48);
       $('announce').textContent = 'Step ' + (st.step + 1) + ' of ' + STEPS.length + ': ' + where(st.step) + ', ' + INFO[S.k].t + '. Following ' + wd[st.t] + '.';
       try { history.replaceState(null, '', '#' + new URLSearchParams({ p: st.prompt, step: st.step, t: st.t, l: S.l === undefined ? 0 : S.l, h: st.h, v: st.view, w: st.w }).toString()); } catch (e) {}
+      restoreFocus(focusDesc);
     }
     /* writeText is asynchronous and can be refused (permissions, insecure origin), so report what actually happened */
     const copy = (b, text, ok, no) => { const say = m => { b.textContent = m; }; try { navigator.clipboard.writeText(text).then(() => say(ok), () => say(no)); } catch (x) { say(no); } };

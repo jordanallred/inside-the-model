@@ -41,6 +41,6 @@ const GL = vm.runInNewContext('var window={};' + fs.readFileSync('public/js/glos
 for (const [k, g] of Object.entries(GL)) { try { new RegExp('\\b(' + g.p.join('|') + ')\\b'); } catch (e) { problems.push(`glossary ${k}: bad pattern`); } }
 
 console.log(`pages ${html.length}, internal links ${links}, citation keys used ${usedKeys.size}/${Object.keys(PAPERS).length}, glossary terms ${Object.keys(GL).length}`);
-if (unusedPapers.length) console.log('bibliography entries not cited in any chapter (still listed on the papers page):', unusedPapers.join(', '));
+if (unusedPapers.length) console.log(`${unusedPapers.length} reference records are unused by the published content and omitted from its bibliography.`);
 if (problems.length) { console.log('\nPROBLEMS:\n' + problems.join('\n')); process.exit(1); }
 console.log('all internal links, anchors and citations resolve');

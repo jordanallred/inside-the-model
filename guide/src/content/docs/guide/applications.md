@@ -7,11 +7,7 @@ sidebar:
 
 _How models become applications, and where trust breaks_
 
-Chapter 19 of 24 · VI. Systems · about 40 minutes. Builds on: [17. Post-training: instruction tuning, preferences and reinforcement learning](/guide/post-training/).
-
-:::tip[Skip this chapter if]
-you can explain in-context learning and chain of thought, how retrieval-augmented generation works end to end, how tool calling and agent loops are built, what MCP is, and where untrusted text enters each of these.
-:::
+Chapter 19 of 21 · VI. Systems · about 40 minutes. Builds on: [17. Post-training: instruction tuning, preferences and reinforcement learning](/guide/post-training/).
 
 ## A trained model is a component, not a product
 
@@ -61,7 +57,7 @@ Capabilities (browse, run code, edit files, send mail) come entirely from the to
 
 ## The Model Context Protocol (MCP)
 
-MCP is an open protocol for connecting AI applications to tools and data without custom integrations for each. An application (the _client_) connects to _servers_ that expose **tools** (actions), **resources** (data) and **prompts** (templates), exchanging JSON-RPC messages over a local process pipe or HTTP. Two properties matter for security: tool names and descriptions are fed to the model as text (so a description is itself a prompt), and the protocol leaves authentication, identity binding and manifest signing largely to implementers. NSA's May 2026 information sheet on MCP addresses these gaps. It recommends treating components as separate trust zones aligned with data classification, preferring local servers for private data, validating every tool call's parameters against a schema, sandboxing tool execution at the operating-system level with least privilege, signing messages with expiry and replay protection, treating tool output as untrusted input, and logging every invocation (see the [security guidance reference](/reference/security-guidance/)).
+MCP is an open protocol for connecting AI applications to tools and data without custom integrations for each. An application (the _client_) connects to _servers_ that expose **tools** (actions), **resources** (data) and **prompts** (templates), exchanging JSON-RPC messages over a local process pipe or HTTP. Tool descriptions and returned content can become model inputs; they must not be treated as trusted instructions merely because they arrive through a tool. MCP includes an [authorization specification](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2025-11-25/basic/authorization.mdx). Authorization controls access; it does not make returned text trustworthy. Consult the protocol’s [security best practices](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/docs/2026-07-28/tutorials/security/security_best_practices.mdx) for implementation guidance.
 
 ## Where untrusted text enters
 
@@ -75,7 +71,7 @@ MCP is an open protocol for connecting AI applications to tools and data without
 
 All of these arrive in the same token stream. <cite data-p="greshake2023" data-s></cite> named the resulting attack **indirect prompt injection**: an attacker who cannot talk to the model plants instructions where the model will later read them. The most useful heuristic for reviewing an agent is the "lethal trifecta" (Simon Willison): private data access + exposure to untrusted content + a way to communicate externally. If all three are present, data theft is possible; remove one.
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>Explain why a RAG system can leak documents across users even with a perfect model.</summary>

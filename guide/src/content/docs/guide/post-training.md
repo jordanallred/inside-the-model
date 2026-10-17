@@ -7,11 +7,7 @@ sidebar:
 
 _From text continuer to assistant and reasoner_
 
-Chapter 17 of 24 · V. Training · about 50 minutes. Builds on: [4. Probability, softmax and next-token prediction](/guide/softmax-and-loss/), [16. Pretraining at scale](/guide/pretraining/).
-
-:::tip[Skip this chapter if]
-you can describe SFT, the RLHF pipeline (reward model with Bradley–Terry loss, PPO with a KL penalty), derive the DPO loss, explain GRPO's group-relative advantage, and say how reasoning models are trained and why test-time compute helps.
-:::
+Chapter 17 of 21 · V. Training · about 50 minutes. Builds on: [4. Probability, softmax and next-token prediction](/guide/softmax-and-loss/), [16. Pretraining at scale](/guide/pretraining/).
 
 ## Pretrained models are not assistants
 
@@ -109,7 +105,7 @@ This opens a second axis of scaling. <cite data-p="snell2024" data-s></cite> sho
 -   **Instruction hierarchy.** gpt-oss is trained to rank instruction sources: system, then developer, then user, then assistant, then tool output. The model card reports its instruction-hierarchy scores trail OpenAI's o4-mini; for example system-prompt extraction resistance scored 0.832 (120b) versus 0.993 for o4-mini <cite data-p="openai2025oss" data-s></cite>. The hierarchy is a trained behavior, not a mechanism, and its robustness is measured, not guaranteed.
 -   **Chain of thought.** The gpt-oss card says no direct optimization pressure was applied to the reasoning text, so that it stays an honest signal for monitoring, and advises developers not to show raw reasoning to users without filtering <cite data-p="openai2025oss" data-s></cite>.
 
-## Check yourself
+## Worked examples
 
 <details>
 <summary>Why is the SFT loss computed on response tokens only?</summary>

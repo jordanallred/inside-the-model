@@ -5,6 +5,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import searchMath from './tools/rehype-search-math.mjs';
 import { CH, PARTS } from './src/chapters.mjs';
 import { siteUrl, socialCardUrl, repoUrl } from './src/site-config.mjs';
 import './public/js/case-catalog.js';
@@ -27,7 +28,7 @@ const labItems = fs.readdirSync(labsDir).filter(f => f.endsWith('.md') && f !== 
 export default defineConfig({
   site: siteUrl,
   vite: { resolve: { alias: { '/brand': fileURLToPath(new URL('./public/brand', import.meta.url)) } } },
-  markdown: { remarkPlugins: [remarkMath], rehypePlugins: [rehypeKatex] },
+  markdown: { remarkPlugins: [remarkMath], rehypePlugins: [rehypeKatex, searchMath] },
   integrations: [
     starlight({
       title: 'Inside the Model',
@@ -90,7 +91,6 @@ export default defineConfig({
             { slug: 'teardown', label: 'Overview' },
             { slug: 'teardown/gpt-oss-120b', label: 'gpt-oss-120b' },
             { slug: 'teardown/deepseek-v3', label: 'DeepSeek-V3' },
-            { slug: 'teardown/frontier', label: 'The newest open models' },
             { slug: 'teardown/compare', label: 'Compare with the toy model' },
           ],
         },
@@ -98,7 +98,6 @@ export default defineConfig({
           label: 'Reference',
           collapsed: true,
           items: [
-            { slug: 'reference/security-guidance', label: 'Public AI security guidance' },
             { slug: 'reference/papers', label: 'All papers' },
           ],
         },
